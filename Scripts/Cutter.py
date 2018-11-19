@@ -25,6 +25,7 @@ def image_ids_in(root_dir, ignore=['.DS_Store']):
 # cut tiles with coordinates in the name (exclude white)
 start_time = time.time()
 svslist = image_ids_in(path)
+os.mkdir("../tiles/")
 for i in svslist:
     otdir = "../tiles/"+i
     os.mkdir(otdir)
