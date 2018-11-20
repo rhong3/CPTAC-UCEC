@@ -47,17 +47,12 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
 def tile(image_file, outdir, path_to_slide = "../images/"):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
+    print(slide.dimensions)
 
-    assert 'openslide.bounds-height' in slide.properties
-    assert 'openslide.bounds-width' in slide.properties
-    assert 'openslide.bounds-x' in slide.properties
-    assert 'openslide.bounds-y' in slide.properties
-
-    x = int(slide.properties['openslide.bounds-x'])
-    y = int(slide.properties['openslide.bounds-y'])
-    bounds_height = int(slide.properties['openslide.bounds-height'])
-    bounds_width = int(slide.properties['openslide.bounds-width'])
-
+    bounds_width = slide.dimensions[0]
+    bounds_height = slide.dimensions[1]
+    x = 0
+    y = 0
     half_width_region = 49
     full_width_region = 299
     stepsize = full_width_region - half_width_region
