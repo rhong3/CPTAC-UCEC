@@ -19,7 +19,8 @@ def image_ids_in(root_dir, ignore=['.DS_Store']):
         if id in ignore:
             print('Skipping ID:', id)
         else:
-            ids.append(id)
+            dirname = id.split('_')[-2]
+            ids.append((id, dirname))
     return ids
 
 # cut tiles with coordinates in the name (exclude white)
@@ -30,12 +31,12 @@ try:
 except(FileExistsError):
     pass
 for i in svslist:
-    otdir = "../tiles/"+i
+    otdir = "../tiles/"+i[1]
     try:
         os.mkdir(otdir)
     except(FileExistsError):
         pass
-    n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file = i, outdir = otdir)
+    n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file = i[0], outdir = otdir)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # # Time measure tool
