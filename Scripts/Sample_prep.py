@@ -49,10 +49,10 @@ def samplesum(pdlist, path):
 
 pan = pd.read_csv('../new_joined_PID.csv', header = 0)
 pl, nl = inlist_check(pan, '../tiles')
-with open('../inlist.txt','w') as f:
+with open('../inlist.csv','w') as f:
     f.write(','.join(pl))
     f.close()
-with open('../Notinlist.txt','w') as f:
+with open('../Notinlist.csv','w') as f:
     f.write(','.join(nl))
     f.close()
 all = samplesum(pan, '../tiles/')
