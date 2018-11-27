@@ -82,7 +82,7 @@ class INCEPTION():
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
         logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
-                                               num_classes=2,
+                                               num_classes=4,
                                                is_training=is_train,
                                                dropout_keep_prob=dropout,
                                                scope='GoogleNet')

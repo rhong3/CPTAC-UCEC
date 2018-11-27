@@ -5,7 +5,7 @@ import numpy as np
 
 tile_path = "../tiles/"
 
-def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv']):
+def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.csv', 'te_sample.csv']):
     ids = []
     for id in os.listdir(root_dir):
         if id in ignore:
@@ -15,7 +15,7 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv']):
     return ids
 
 
-def inlist_check(pdlist, dir):
+def inlist_check(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), dir = "../tiles/"):
     isin = []
     Not = []
     tiles = image_ids_in(dir)
@@ -28,7 +28,7 @@ def inlist_check(pdlist, dir):
     return isin, Not
 
 
-def samplesum(pdlist, path):
+def samplesum(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), path = "../tiles/"):
     data = []
     lbdict ={'MSI': 1, 'Endometroid': 2, 'Serous-like' : 3, 'POLE' : 4}
     for idx, row in pdlist.iterrows():
@@ -45,6 +45,14 @@ def samplesum(pdlist, path):
     datapd = sku.shuffle(datapd)
 
     return datapd
+
+
+def set_sep(all, path = "../tiles/", cut=0.1):
+    test, train = np.split(all, [int(cut*len(all))])
+    test.to_csv(path+'te_sample.csv', header=True, index=False)
+    train.to_csv(path + 'tr_sample.csv', header=True, index=False)
+
+    return train, test
 
 
 pan = pd.read_csv('../new_joined_PID.csv', header = 0)

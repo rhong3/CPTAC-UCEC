@@ -83,7 +83,7 @@ class INCEPTION():
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
         logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
-                                                                   num_classes=2,
+                                                                   num_classes=4,
                                                                    is_training=is_train,
                                                                    dropout_keep_prob=dropout,
                                                                    reuse=None,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on 11/15/2018
+Created on 11/26/2018
 
 @author: RH
 """
@@ -43,11 +43,11 @@ HYPERPARAMS = {
 MAX_ITER = np.inf
 MAX_EPOCHS = ep
 
-img_dir = '../Neutrophil/All_Tiles_final'
-LOG_DIR = "../Neutrophil/{}".format(dirr)
-METAGRAPH_DIR = "../Neutrophil/{}".format(dirr)
-data_dir = "../Neutrophil/{}/data".format(dirr)
-out_dir = "../Neutrophil/{}/out".format(dirr)
+img_dir = '../tiles/'
+LOG_DIR = "../Results/{}".format(dirr)
+METAGRAPH_DIR = "../Results/{}".format(dirr)
+data_dir = "../Results/{}/data".format(dirr)
+out_dir = "../Results/{}/out".format(dirr)
 
 
 def counters(totlist_dir):
@@ -237,9 +237,8 @@ if __name__ == "__main__":
         except(FileExistsError):
             pass
 
-    _, _, _, tes, trs = Sample_prep.samplesum()
-    tes.to_csv(img_dir+'/te_sample.csv', index=False)
-    trs.to_csv(img_dir+'/tr_sample.csv', index=False)
+    all = Sample_prep.samplesum()
+    tes, trs = Sample_prep.set_sep(all)
     trc, tec = counters(img_dir)
 
     try:
