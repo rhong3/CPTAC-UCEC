@@ -21,6 +21,7 @@ import cnnir23
 import pandas as pd
 import cv2
 import Sample_prep
+import time
 
 
 dirr = sys.argv[1]
@@ -84,17 +85,21 @@ def loader(totlist_dir):
     for i in range(len(trimlist)):
         if not i % 1000:
             sys.stdout.flush()
-        # Load the image
-        img = load_image(trimlist[i])
-        label = trlblist[i]
-        # Create a feature
-        feature = {'train/label': _int64_feature(label),
-                   'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
-        # Create an example protocol buffer
-        example = tf.train.Example(features=tf.train.Features(feature=feature))
+        try:
+            # Load the image
+            img = load_image(trimlist[i])
+            label = trlblist[i]
+            # Create a feature
+            feature = {'train/label': _int64_feature(label),
+                       'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+            # Create an example protocol buffer
+            example = tf.train.Example(features=tf.train.Features(feature=feature))
 
-        # Serialize to string and write on the file
-        writer.write(example.SerializeToString())
+            # Serialize to string and write on the file
+            writer.write(example.SerializeToString())
+        except AttributeError:
+            print('Error image:'+trimlist[i])
+            pass
 
     writer.close()
     sys.stdout.flush()
@@ -104,18 +109,21 @@ def loader(totlist_dir):
     for i in range(len(teimlist)):
         if not i % 1000:
             sys.stdout.flush()
-        # Load the image
-        img = load_image(teimlist[i])
-        label = telblist[i]
-        # Create a feature
-        feature = {'test/label': _int64_feature(label),
-                   'test/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
-        # Create an example protocol buffer
-        example = tf.train.Example(features=tf.train.Features(feature=feature))
+        try:
+            # Load the image
+            img = load_image(teimlist[i])
+            label = telblist[i]
+            # Create a feature
+            feature = {'test/label': _int64_feature(label),
+                       'test/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+            # Create an example protocol buffer
+            example = tf.train.Example(features=tf.train.Features(feature=feature))
 
-        # Serialize to string and write on the file
-        writer.write(example.SerializeToString())
-
+            # Serialize to string and write on the file
+            writer.write(example.SerializeToString())
+        except AttributeError:
+            print('Error image:'+trimlist[i])
+            pass
     writer.close()
     sys.stdout.flush()
 
