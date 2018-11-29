@@ -11,9 +11,9 @@ from itertools import cycle
 
 
 def realout(pdx, path, name):
-    lbdict = {1: 'MSI', 2: 'Endometroid', 3: 'Serous-like', 4: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
-    prl = pdx.argmax(axis=1).astype('uint8') + 1
+    prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     prl = prl.replace(lbdict)
     # Might want to remove ''
@@ -24,9 +24,9 @@ def realout(pdx, path, name):
 
 
 def metrics(pdx, tl, path, name):
-    lbdict = {1: 'MSI', 2: 'Endometroid', 3: 'Serous-like', 4: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
-    prl = pdx.argmax(axis=1).astype('uint8')+1
+    prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     prl = prl.replace(lbdict)
     # Might want to remove ''
@@ -44,23 +44,23 @@ def metrics(pdx, tl, path, name):
     for idx, row in out.iterrows():
         if row['Prediction'] == row['True_label']:
             accu += 1
-            if row['True_label'] == 1:
+            if row['True_label'] == 0:
                 accua += 1
-            elif row['True_label'] == 2:
+            elif row['True_label'] == 1:
                 accub += 1
-            elif row['True_label'] == 3:
+            elif row['True_label'] == 2:
                 accuc += 1
-            elif row['True_label'] == 4:
+            elif row['True_label'] == 3:
                 accud += 1
 
     accur = round(accu/tott,2)
     print('Total Accuracy:')
     print(accur)
 
-    tota = out.loc[out['True_label'] == 1].count()
-    totb = out.loc[out['True_label'] == 2].count()
-    totc = out.loc[out['True_label'] == 3].count()
-    totd = out.loc[out['True_label'] == 4].count()
+    tota = out.loc[out['True_label'] == 0].count()
+    totb = out.loc[out['True_label'] == 1].count()
+    totc = out.loc[out['True_label'] == 2].count()
+    totd = out.loc[out['True_label'] == 3].count()
     accuar = round(accua/tota,2)
     print('MSI Accuracy:')
     print(accuar)
@@ -86,13 +86,13 @@ def metrics(pdx, tl, path, name):
         microy = []
         microscore = []
         for i in range(4):
-            fpr[i], tpr[i], _ = skl.metrics.roc_curve((prl[:, 0] == int(i+1)).astype('uint8'), pdx[:, i])
+            fpr[i], tpr[i], _ = skl.metrics.roc_curve((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
             auc = skl.metrics.roc_auc_score(fpr[i], tpr[i])
-            microy.extend((prl[:, 0] == int(i+1)).astype('uint8'))
+            microy.extend((prl[:, 0] == int(i)).astype('uint8'))
             microscore.extend(pdx[:, i])
 
-            precision[i], recall[i], _ = skl.metrics.precision_recall_curve((prl[:, 0] == int(i+1)).astype('uint8'), pdx[:, i])
-            average_precision[i] = skl.metrics.average_precision_score((prl[:, 0] == int(i+1)).astype('uint8'), pdx[:, i])
+            precision[i], recall[i], _ = skl.metrics.precision_recall_curve((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
+            average_precision[i] = skl.metrics.average_precision_score((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
 
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(), np.asarray(microscore).ravel())
@@ -217,7 +217,7 @@ def py_map2jpg(imgmap, rang, colorMap):
 
 
 def CAM(net, w, pred, x, y, path, name, rd=0):
-    lbdict = {1: 'MSI', 2: 'Endometroid', 3: 'Serous-like', 4: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
     DIRB = "../Results/{}/out/{}_Endometroid_img".format(path, name)
     DIRC = "../Results/{}/out/{}_Serious-like_img".format(path, name)
@@ -246,11 +246,17 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
 
     pdx = np.asmatrix(pred)
 
-    prl = pdx.argmax(axis=1).astype('uint8')+1
+    prl = pdx.argmax(axis=1).astype('uint8')
 
     for ij in range(len(y)):
         id = str(ij + rd)
-        if prl[ij, 0] == 1:
+        if prl[ij, 0] == 0:
+            if y[ij] == 0:
+                ddt = 'Correct'
+            else:
+                ddt = 'Wrong'
+
+        elif prl[ij, 0] == 1:
             if y[ij] == 1:
                 ddt = 'Correct'
             else:
@@ -264,12 +270,6 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
 
         elif prl[ij, 0] == 3:
             if y[ij] == 3:
-                ddt = 'Correct'
-            else:
-                ddt = 'Wrong'
-
-        elif prl[ij, 0] == 4:
-            if y[ij] == 4:
                 ddt = 'Correct'
             else:
                 ddt = 'Wrong'
@@ -287,19 +287,19 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
         scoresMean = np.mean(scores, axis=0)
         ascending_order = np.argsort(scoresMean)
         IDX_category = ascending_order[::-1]  # [::-1] to sort in descending order
-        if prl[ij, 0] == 1:
+        if prl[ij, 0] == 0:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[0], :])
             DIRR = DIRA
             catt = 'MSI'
-        elif prl[ij, 0] == 2:
+        elif prl[ij, 0] == 1:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[1], :])
             DIRR = DIRB
             catt = 'Endometroid'
-        elif prl[ij, 0] == 3:
+        elif prl[ij, 0] == 2:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[2], :])
             DIRR = DIRC
             catt = 'Serous-like'
-        elif prl[ij, 0] == 4:
+        elif prl[ij, 0] == 3:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[3], :])
             DIRR = DIRD
             catt = 'POLE'

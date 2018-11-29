@@ -30,7 +30,7 @@ def inlist_check(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), dir 
 
 def samplesum(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), path = "../tiles/"):
     data = []
-    lbdict ={'MSI': 1, 'Endometroid': 2, 'Serous-like' : 3, 'POLE' : 4}
+    lbdict ={'MSI': 0, 'Endometroid': 1, 'Serous-like' : 2, 'POLE' : 3}
     for idx, row in pdlist.iterrows():
         folder = row["Parent Sample ID(s)"]
         label = row["Subtype"]
