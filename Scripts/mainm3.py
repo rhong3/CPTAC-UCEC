@@ -242,21 +242,25 @@ if __name__ == "__main__":
     for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
         try:
             os.mkdir(DIR)
-        except(FileExistsError):
+        except FileExistsError:
             pass
 
-    all = Sample_prep.samplesum()
-    tes, trs = Sample_prep.set_sep(all)
-    trc, tec = counters(img_dir)
+    try:
+        trc, tec = counters(img_dir)
+    except FileNotFoundError:
+        all = Sample_prep.samplesum()
+        tes, trs = Sample_prep.set_sep(all)
+        trc, tec = counters(img_dir)
+        loader(img_dir)
 
     try:
         modeltoload = sys.argv[5]
         try:
             testmode = sys.argv[6]
             main(trc, tec, to_reload=modeltoload, test=True)
-        except(IndexError):
+        except IndexError:
             main(trc, tec, to_reload=modeltoload)
-    except(IndexError):
+    except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(img_dir)
         main(trc, tec)
