@@ -77,7 +77,7 @@ class INCEPTION():
 
         y_in = tf.placeholder(dtype=tf.int8, name="y")
 
-        onehot_labels = tf.one_hot(indices=tf.cast(y_in, tf.int32), depth=2)
+        onehot_labels = tf.one_hot(indices=tf.cast(y_in, tf.int32), depth=4)
 
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
