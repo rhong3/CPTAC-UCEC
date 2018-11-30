@@ -55,13 +55,14 @@ def set_sep(all, path = "../tiles/", cut=0.1):
     return train, test
 
 
-pan = pd.read_csv('../new_joined_PID.csv', header = 0)
-pl, nl = inlist_check(pan, '../tiles')
-with open('../inlist.csv','w') as f:
-    f.write(','.join(pl))
-    f.close()
-with open('../Notinlist.csv','w') as f:
-    f.write(','.join(nl))
-    f.close()
-all = samplesum(pan, '../tiles/')
-all.to_csv('../tiles/all.csv', header = True, index = False)
+if __name__ == "__main__":
+    pan = pd.read_csv('../new_joined_PID.csv', header = 0)
+    pl, nl = inlist_check(pan, '../tiles')
+    with open('../inlist.csv','w') as f:
+        f.write(','.join(pl))
+        f.close()
+    with open('../Notinlist.csv','w') as f:
+        f.write(','.join(nl))
+        f.close()
+    all = samplesum(pan, '../tiles/')
+    all.to_csv('../tiles/all.csv', header = True, index = False)
