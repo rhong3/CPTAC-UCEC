@@ -16,7 +16,6 @@ def realout(pdx, path, name):
     prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     prl = prl.replace(lbdict)
-    # Might want to remove ''
     out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])
     out = pd.concat([out, prl], axis=1)
     out.insert(loc=0, column='Num', value=out.index)
@@ -28,15 +27,17 @@ def metrics(pdx, tl, path, name):
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
-    prl = prl.replace(lbdict)
-    # Might want to remove ''
     out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])
     outtl = pd.DataFrame(tl, columns = ['True_label'])
     out = pd.concat([out,prl,outtl], axis=1)
-    out.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
+
+    stprl = prl.replace(lbdict)
+    stouttl = outtl.replace(lbdict)
+    stout = pd.concat([out, stprl, stouttl], axis=1)
+    stout.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
+
     accu = 0
     tott = out.shape[0]
-
     accua = 0
     accub = 0
     accuc = 0
