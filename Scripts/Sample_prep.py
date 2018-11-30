@@ -5,6 +5,7 @@ import numpy as np
 
 tile_path = "../tiles/"
 
+
 def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.csv', 'te_sample.csv']):
     ids = []
     for id in os.listdir(root_dir):
