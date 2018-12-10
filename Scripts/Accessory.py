@@ -87,13 +87,13 @@ def metrics(pdx, tl, path, name):
         microy = []
         microscore = []
         for i in range(4):
-            fpr[i], tpr[i], _ = skl.metrics.roc_curve((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
+            fpr[i], tpr[i], _ = skl.metrics.roc_curve((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
             auc = skl.metrics.roc_auc_score(fpr[i], tpr[i])
-            microy.extend((prl[:, 0] == int(i)).astype('uint8'))
+            microy.extend((prl.iloc[:, 0].values == int(i)).astype('uint8'))
             microscore.extend(pdx[:, i])
 
-            precision[i], recall[i], _ = skl.metrics.precision_recall_curve((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
-            average_precision[i] = skl.metrics.average_precision_score((prl[:, 0] == int(i)).astype('uint8'), pdx[:, i])
+            precision[i], recall[i], _ = skl.metrics.precision_recall_curve((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
+            average_precision[i] = skl.metrics.average_precision_score((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
 
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(), np.asarray(microscore).ravel())
