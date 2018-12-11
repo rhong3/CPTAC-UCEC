@@ -27,13 +27,13 @@ def metrics(pdx, tl, path, name):
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
-    out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])
+    outt = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])
     outtl = pd.DataFrame(tl, columns = ['True_label'])
-    out = pd.concat([out,prl,outtl], axis=1)
+    out = pd.concat([outt,prl,outtl], axis=1)
 
     stprl = prl.replace(lbdict)
     stouttl = outtl.replace(lbdict)
-    stout = pd.concat([out, stprl, stouttl], axis=1)
+    stout = pd.concat([outt, stprl, stouttl], axis=1)
     stout.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
 
     accu = 0
@@ -58,10 +58,10 @@ def metrics(pdx, tl, path, name):
     print('Total Accuracy:')
     print(accur)
 
-    tota = out.loc[out['True_label'] == 0].count()
-    totb = out.loc[out['True_label'] == 1].count()
-    totc = out.loc[out['True_label'] == 2].count()
-    totd = out.loc[out['True_label'] == 3].count()
+    tota = out[out.True_label == 0].shape[0]
+    totb = out[out.True_label == 1].shape[0]
+    totc = out[out.True_label == 2].shape[0]
+    totd = out[out.True_label == 3].shape[0]
     accuar = round(accua/tota,2)
     print('MSI Accuracy:')
     print(accuar)
@@ -137,8 +137,7 @@ def metrics(pdx, tl, path, name):
         colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
         for i, color in zip(range(4), colors):
             plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                     label='ROC curve of {0} (area = {1:0.2f})'
-                           ''.format(lbdict[i], roc_auc[i]))
+                     label='ROC curve of {0} (area = {1:0.2f})'.format(lbdict[i], roc_auc[i]))
 
         plt.plot([0, 1], [0, 1], 'k--', lw=2)
         plt.xlim([0.0, 1.0])
@@ -149,8 +148,7 @@ def metrics(pdx, tl, path, name):
         plt.legend(loc="lower right")
         plt.savefig("../Results/{}/out/{}_ROC.png".format(path, name))
 
-        print('Average precision score, micro-averaged over all classes: {0:0.2f}'
-              .format(average_precision["micro"]))
+        print('Average precision score, micro-averaged over all classes: {0:0.2f}'.format(average_precision["micro"]))
         # setup plot details
         colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
         plt.figure(figsize=(7, 8))
@@ -173,8 +171,7 @@ def metrics(pdx, tl, path, name):
         for i, color in zip(range(4), colors):
             l, = plt.plot(recall[i], precision[i], color=color, lw=2)
             lines.append(l)
-            labels.append('Precision-recall for {0} (area = {1:0.2f})'
-                          ''.format(lbdict[i], average_precision[i]))
+            labels.append('Precision-recall for {0} (area = {1:0.2f})'.format(lbdict[i], average_precision[i]))
 
         fig = plt.gcf()
         fig.subplots_adjust(bottom=0.25)
