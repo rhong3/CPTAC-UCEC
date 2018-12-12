@@ -62,16 +62,28 @@ def metrics(pdx, tl, path, name):
     totb = out[out.True_label == 1].shape[0]
     totc = out[out.True_label == 2].shape[0]
     totd = out[out.True_label == 3].shape[0]
-    accuar = round(accua/tota,2)
+    try:
+        accuar = round(accua/tota,2)
+    except ZeroDivisionError:
+        accuar = "Not enough data for MSI."
     print('MSI Accuracy:')
     print(accuar)
-    accubr = round(accub/totb,2)
+    try:
+        accubr = round(accub/totb,2)
+    except ZeroDivisionError:
+        accubr = "Not enough data for Endometroid."
     print('Endometroid Accuracy:')
     print(accubr)
-    accucr = round(accuc/totc,2)
+    try:
+        accucr = round(accuc/totc,2)
+    except ZeroDivisionError:
+        accucr = "Not enough data for Serious-like."
     print('Serious-like Accuracy:')
     print(accucr)
-    accudr = round(accud/totd,2)
+    try:
+        accudr = round(accud/totd,2)
+    except ZeroDivisionError:
+        accudr = "Not enough data for POLE."
     print('POLE Accuracy:')
     print(accudr)
     try:
