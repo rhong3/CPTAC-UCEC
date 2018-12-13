@@ -65,25 +65,25 @@ def metrics(pdx, tl, path, name):
     try:
         accuar = round(accua/tota,2)
     except ZeroDivisionError:
-        accuar = "Not enough data for MSI."
+        accuar = "No data for MSI."
     print('MSI Accuracy:')
     print(accuar)
     try:
         accubr = round(accub/totb,2)
     except ZeroDivisionError:
-        accubr = "Not enough data for Endometroid."
+        accubr = "No data for Endometroid."
     print('Endometroid Accuracy:')
     print(accubr)
     try:
         accucr = round(accuc/totc,2)
     except ZeroDivisionError:
-        accucr = "Not enough data for Serious-like."
+        accucr = "No data for Serious-like."
     print('Serious-like Accuracy:')
     print(accucr)
     try:
         accudr = round(accud/totd,2)
     except ZeroDivisionError:
-        accudr = "Not enough data for POLE."
+        accudr = "No data for POLE."
     print('POLE Accuracy:')
     print(accudr)
     try:
@@ -99,17 +99,30 @@ def metrics(pdx, tl, path, name):
         microy = []
         microscore = []
         for i in range(4):
-            fpr[i], tpr[i], _ = skl.metrics.roc_curve((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
-            auc = skl.metrics.roc_auc_score(fpr[i], tpr[i])
-            microy.extend((prl.iloc[:, 0].values == int(i)).astype('uint8'))
-            microscore.extend(pdx[:, i])
+            fpr[i], tpr[i], _ = skl.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                      np.asarray(pdx[:, i]).ravel())
+            try:
+                roc_auc[i] = skl.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                       np.asarray(pdx[:, i]).ravel())
+            except ValueError:
+                roc_auc[i] = np.nan
 
-            precision[i], recall[i], _ = skl.metrics.precision_recall_curve((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
-            average_precision[i] = skl.metrics.average_precision_score((prl.iloc[:, 0].values == int(i)).astype('uint8'), pdx[:, i])
+            microy.extend(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')))
+            microscore.extend(np.asarray(pdx[:, i]).ravel())
+
+            precision[i], recall[i], _ = \
+                skl.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                   np.asarray(pdx[:, i]).ravel())
+            try:
+                average_precision[i] = \
+                    skl.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                        np.asarray(pdx[:, i]).ravel())
+            except ValueError:
+                average_precision[i] = np.nan
 
         # Compute micro-average ROC curve and ROC area
         fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(), np.asarray(microscore).ravel())
-        roc_auc["micro"] = skl.metrics.roc_auc_score(fpr["micro"], tpr["micro"])
+        roc_auc["micro"] = skl.metrics.auc(fpr["micro"], tpr["micro"])
 
         # A "micro-average": quantifying score on all classes jointly
         precision["micro"], recall["micro"], _ = skl.metrics.precision_recall_curve(np.asarray(microy).ravel(),
@@ -132,7 +145,7 @@ def metrics(pdx, tl, path, name):
 
         fpr["macro"] = all_fpr
         tpr["macro"] = mean_tpr
-        roc_auc["macro"] = skl.metrics.roc_auc_score(fpr["macro"], tpr["macro"])
+        roc_auc["macro"] = skl.metrics.auc(fpr["macro"], tpr["macro"])
 
         # Plot all ROC curves
         plt.figure()
@@ -163,7 +176,7 @@ def metrics(pdx, tl, path, name):
         print('Average precision score, micro-averaged over all classes: {0:0.2f}'.format(average_precision["micro"]))
         # setup plot details
         colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
-        plt.figure(figsize=(7, 8))
+        plt.figure(figsize=(7, 9))
         f_scores = np.linspace(0.2, 0.8, num=4)
         lines = []
         labels = []
@@ -192,7 +205,7 @@ def metrics(pdx, tl, path, name):
         plt.xlabel('Recall')
         plt.ylabel('Precision')
         plt.title('{} Precision-Recall curve: Average Accu={}'.format(name, accur))
-        plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=14))
+        plt.legend(lines, labels, loc=(0, -.39), prop=dict(size=12))
         plt.savefig("../Results/{}/out/{}_PRC.png".format(path, name))
     except ValueError:
         print('Not able to generate plots based on this set!')
