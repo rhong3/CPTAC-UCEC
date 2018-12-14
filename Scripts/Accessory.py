@@ -205,7 +205,7 @@ def metrics(pdx, tl, path, name):
         plt.xlabel('Recall')
         plt.ylabel('Precision')
         plt.title('{} Precision-Recall curve: Average Accu={}'.format(name, accur))
-        plt.legend(lines, labels, loc=(0, -.39), prop=dict(size=12))
+        plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=12))
         plt.savefig("../Results/{}/out/{}_PRC.png".format(path, name))
     except ValueError:
         print('Not able to generate plots based on this set!')
