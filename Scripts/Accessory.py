@@ -54,7 +54,7 @@ def metrics(pdx, tl, path, name):
             elif row['True_label'] == 3:
                 accud += 1
 
-    accur = round(accu/tott,2)
+    accur = round(accu/tott,5)
     print('Total Accuracy:')
     print(accur)
 
@@ -63,25 +63,25 @@ def metrics(pdx, tl, path, name):
     totc = out[out.True_label == 2].shape[0]
     totd = out[out.True_label == 3].shape[0]
     try:
-        accuar = round(accua/tota,2)
+        accuar = round(accua/tota,5)
     except ZeroDivisionError:
         accuar = "No data for MSI."
     print('MSI Accuracy:')
     print(accuar)
     try:
-        accubr = round(accub/totb,2)
+        accubr = round(accub/totb,5)
     except ZeroDivisionError:
         accubr = "No data for Endometroid."
     print('Endometroid Accuracy:')
     print(accubr)
     try:
-        accucr = round(accuc/totc,2)
+        accucr = round(accuc/totc,5)
     except ZeroDivisionError:
         accucr = "No data for Serious-like."
     print('Serious-like Accuracy:')
     print(accucr)
     try:
-        accudr = round(accud/totd,2)
+        accudr = round(accud/totd,5)
     except ZeroDivisionError:
         accudr = "No data for POLE."
     print('POLE Accuracy:')
@@ -150,19 +150,19 @@ def metrics(pdx, tl, path, name):
         # Plot all ROC curves
         plt.figure()
         plt.plot(fpr["micro"], tpr["micro"],
-                 label='micro-average ROC curve (area = {0:0.2f})'
+                 label='micro-average ROC curve (area = {0:0.5f})'
                        ''.format(roc_auc["micro"]),
                  color='deeppink', linestyle=':', linewidth=4)
 
         plt.plot(fpr["macro"], tpr["macro"],
-                 label='macro-average ROC curve (area = {0:0.2f})'
+                 label='macro-average ROC curve (area = {0:0.5f})'
                        ''.format(roc_auc["macro"]),
                  color='navy', linestyle=':', linewidth=4)
 
         colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
         for i, color in zip(range(4), colors):
             plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                     label='ROC curve of {0} (area = {1:0.2f})'.format(lbdict[i], roc_auc[i]))
+                     label='ROC curve of {0} (area = {1:0.5f})'.format(lbdict[i], roc_auc[i]))
 
         plt.plot([0, 1], [0, 1], 'k--', lw=2)
         plt.xlim([0.0, 1.0])
@@ -173,7 +173,7 @@ def metrics(pdx, tl, path, name):
         plt.legend(loc="lower right")
         plt.savefig("../Results/{}/out/{}_ROC.png".format(path, name))
 
-        print('Average precision score, micro-averaged over all classes: {0:0.2f}'.format(average_precision["micro"]))
+        print('Average precision score, micro-averaged over all classes: {0:0.5f}'.format(average_precision["micro"]))
         # setup plot details
         colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
         plt.figure(figsize=(7, 9))
@@ -190,13 +190,13 @@ def metrics(pdx, tl, path, name):
 
         l, = plt.plot(recall["micro"], precision["micro"], color='gold', lw=2)
         lines.append(l)
-        labels.append('micro-average Precision-recall (area = {0:0.2f})'
+        labels.append('micro-average Precision-recall (area = {0:0.5f})'
                       ''.format(average_precision["micro"]))
 
         for i, color in zip(range(4), colors):
             l, = plt.plot(recall[i], precision[i], color=color, lw=2)
             lines.append(l)
-            labels.append('Precision-recall for {0} (area = {1:0.2f})'.format(lbdict[i], average_precision[i]))
+            labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(lbdict[i], average_precision[i]))
 
         fig = plt.gcf()
         fig.subplots_adjust(bottom=0.25)
