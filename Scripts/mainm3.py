@@ -246,12 +246,12 @@ if __name__ == "__main__":
             pass
 
     try:
-        trc, tec = counters(img_dir)
+        trc, tec = counters(data_dir)
     except FileNotFoundError:
-        all = Sample_prep.samplesum()
-        tes, trs = Sample_prep.set_sep(all)
-        trc, tec = counters(img_dir)
-        loader(img_dir)
+        alll = Sample_prep.samplesum()
+        tes, trs = Sample_prep.set_sep(alll, path=data_dir)
+        trc, tec = counters(data_dir)
+        loader(data_dir)
 
     try:
         modeltoload = sys.argv[5]

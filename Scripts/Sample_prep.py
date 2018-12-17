@@ -43,13 +43,22 @@ def samplesum(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), path = 
         except:
             print(folder+' not in tiles!')
     datapd = pd.DataFrame(data, columns = ['path', 'label'])
-    datapd = sku.shuffle(datapd)
 
     return datapd
 
 
-def set_sep(all, path = "../tiles/", cut=0.1):
-    test, train = np.split(all, [int(cut*len(all))])
+def set_sep(alll, path="../tiles/", cut=0.1):
+    trlist = []
+    telist = []
+    for i in range(4):
+        subset = alll.loc[alll['label'] == i]
+        test, train = np.split(subset, [int(cut * len(subset))])
+        trlist.append(train)
+        telist.append(test)
+    test = pd.concat(telist)
+    train = pd.concat(trlist)
+    test = sku.shuffle(test)
+    train = sku.shuffle(train)
     test.to_csv(path+'te_sample.csv', header=True, index=False)
     train.to_csv(path + 'tr_sample.csv', header=True, index=False)
 
@@ -65,5 +74,6 @@ if __name__ == "__main__":
     with open('../Notinlist.csv','w') as f:
         f.write(','.join(nl))
         f.close()
-    all = samplesum(pan, '../tiles/')
-    all.to_csv('../tiles/all.csv', header = True, index = False)
+    allls = samplesum(pan, '../tiles/')
+    set_sep(allls)
+    allls.to_csv('../tiles/all.csv', header = True, index = False)
