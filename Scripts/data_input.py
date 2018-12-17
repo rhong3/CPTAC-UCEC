@@ -34,11 +34,11 @@ class DataSet(object):
                 resize=None,  # (width, height) tuple or None
                 horizontal_flip=True,
                 vertical_flip=True,
-                rotate=360,  # Maximum rotation angle in degrees
+                rotate=180,  # Maximum rotation angle in degrees
                 crop_probability=0,  # How often we do crops
                 crop_min_percent=0.6,  # Minimum linear dimension of a crop
                 crop_max_percent=1.,  # Maximum linear dimension of a crop
-                mixup=0):  # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
+                mixup=1):  # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
         if resize is not None:
             images = tf.image.resize_bilinear(images, resize)
 
@@ -131,7 +131,7 @@ class DataSet(object):
             dataset = dataset.repeat(ep)
             batched_dataset = dataset.batch(batch_size, drop_remainder=True)
             batched_dataset = batched_dataset.map(self.decode)
-            # batched_dataset = batched_dataset.map(self.augment)
+            batched_dataset = batched_dataset.map(self.augment)
             iterator = batched_dataset.make_initializable_iterator()
             return iterator, self._filename, filenames
         else:
