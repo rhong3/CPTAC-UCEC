@@ -248,7 +248,7 @@ if __name__ == "__main__":
     try:
         trc, tec = counters(data_dir)
     except FileNotFoundError:
-        alll = Sample_prep.samplesum()
+        alll = Sample_prep.samplesum(path=img_dir)
         tes, trs = Sample_prep.set_sep(alll, path=data_dir)
         trc, tec = counters(data_dir)
         loader(data_dir)

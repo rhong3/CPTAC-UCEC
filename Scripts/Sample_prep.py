@@ -47,7 +47,7 @@ def samplesum(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), path = 
     return datapd
 
 
-def set_sep(alll, path="../tiles/", cut=0.1):
+def set_sep(alll, path="../tiles", cut=0.1):
     trlist = []
     telist = []
     for i in range(4):
@@ -59,8 +59,8 @@ def set_sep(alll, path="../tiles/", cut=0.1):
     train = pd.concat(trlist)
     test = sku.shuffle(test)
     train = sku.shuffle(train)
-    test.to_csv(path+'te_sample.csv', header=True, index=False)
-    train.to_csv(path + 'tr_sample.csv', header=True, index=False)
+    test.to_csv(path+'/te_sample.csv', header=True, index=False)
+    train.to_csv(path + '/tr_sample.csv', header=True, index=False)
 
     return train, test
 
