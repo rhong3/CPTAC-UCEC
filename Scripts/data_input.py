@@ -38,7 +38,7 @@ class DataSet(object):
                 crop_probability=0,  # How often we do crops
                 crop_min_percent=0.6,  # Minimum linear dimension of a crop
                 crop_max_percent=1.,  # Maximum linear dimension of a crop
-                mixup=1):  # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
+                mixup=0.4):  # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
         if resize is not None:
             images = tf.image.resize_bilinear(images, resize)
 
