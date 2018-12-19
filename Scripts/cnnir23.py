@@ -29,11 +29,12 @@ class INCEPTION():
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta"):
+                 log_dir="./log", meta_dir="./meta", mixup=0.3):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
         self.sesh = tf.Session()
+        self.mixup = mixup
 
         if meta_graph:  # load saved graph
             model_name = os.path.basename(meta_graph)
@@ -81,6 +82,17 @@ class INCEPTION():
         onehot_labels = tf.one_hot(indices=tf.cast(y_in, tf.int32), depth=4)
 
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
+
+        if is_train: # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
+            def cshift(values):  # Circular shift in batch dimension
+                return tf.concat([values[-1:, ...], values[:-1, ...]], 0)
+
+            mixup = 1.0 * self.mixup  # Convert to float, as tf.distributions.Beta requires floats.
+            beta = tf.distributions.Beta(mixup, mixup)
+            lam = beta.sample(INCEPTION.DEFAULTS["batch_size"])
+            ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
+            x_in = ll * x_in + (1 - ll) * cshift(x_in)
+            onehot_labels = lam * onehot_labels + (1 - lam) * cshift(onehot_labels)
 
         logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
                                                                    num_classes=4,

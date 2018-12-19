@@ -37,8 +37,7 @@ class DataSet(object):
                 rotate=180,  # Maximum rotation angle in degrees
                 crop_probability=0,  # How often we do crops
                 crop_min_percent=0.6,  # Minimum linear dimension of a crop
-                crop_max_percent=1.,  # Maximum linear dimension of a crop
-                mixup=0.3):  # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
+                crop_max_percent=1.):  # Maximum linear dimension of a crop
         if resize is not None:
             images = tf.image.resize_bilinear(images, resize)
 
@@ -108,17 +107,6 @@ class DataSet(object):
                     images,
                     tf.contrib.image.compose_transforms(*transforms),
                     interpolation='BILINEAR')  # or 'NEAREST'
-
-            def cshift(values):  # Circular shift in batch dimension
-                return tf.concat([values[-1:, ...], values[:-1, ...]], 0)
-
-            if mixup > 0:
-                mixup = 1.0 * mixup  # Convert to float, as tf.distributions.Beta requires floats.
-                beta = tf.distributions.Beta(mixup, mixup)
-                lam = beta.sample(batch_size)
-                ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
-                images = ll * images + (1 - ll) * cshift(images)
-                labels = lam * labels + (1 - lam) * cshift(labels)
 
         return images, labels
 
