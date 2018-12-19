@@ -122,7 +122,7 @@ class DataSet(object):
 
         return images, labels
 
-    def data(self, Not_Realtest=True):
+    def data(self, Not_Realtest=True, train=True):
         batch_size = self._batchsize
         ep = self._epochs
         if Not_Realtest:
@@ -131,7 +131,8 @@ class DataSet(object):
             dataset = dataset.repeat(ep)
             batched_dataset = dataset.batch(batch_size, drop_remainder=True)
             batched_dataset = batched_dataset.map(self.decode)
-            batched_dataset = batched_dataset.map(self.augment)
+            if train:
+                batched_dataset = batched_dataset.map(self.augment)
             iterator = batched_dataset.make_initializable_iterator()
             return iterator, self._filename, filenames
         else:

@@ -122,7 +122,7 @@ class INCEPTION():
         pdx = []
         yl = []
         if Not_Realtest:
-            itr, file, ph = X.data()
+            itr, file, ph = X.data(train=False)
             next_element = itr.get_next()
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
@@ -144,7 +144,7 @@ class INCEPTION():
                         ac.metrics(pdx, yl, dirr, 'Test')
                         break
         else:
-            itr, img, ph = X.data(Not_Realtest=False)
+            itr, img, ph = X.data(Not_Realtest=False, train=False)
             next_element = itr.get_next()
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: img})

@@ -29,7 +29,9 @@ def metrics(pdx, tl, path, name):
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     outt = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])
     outtl = pd.DataFrame(tl, columns = ['True_label'])
-    out = pd.concat([outt,prl,outtl], axis=1)
+    if name == 'Validation' or name == 'Training':
+        outtl = outtl.round(0)
+    out = pd.concat([outt, prl, outtl], axis=1)
 
     stprl = prl.replace(lbdict)
     stouttl = outtl.replace(lbdict)
