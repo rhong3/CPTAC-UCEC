@@ -8,6 +8,11 @@ import time
 import numpy as np
 import tensorflow as tf
 import GoogleNet
+import inception_v2
+import inception_v3
+import inception_v4
+import inception_resnet_v1
+import inception_resnet_v2
 import Accessory as ac
 
 slim = tf.contrib.slim
@@ -28,12 +33,13 @@ class INCEPTION():
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta", mixup=0.3):
+                 log_dir="./log", meta_dir="./meta", mixup=0.3, model='IG'):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
         self.sesh = tf.Session()
         self.mixup = mixup
+        self.model = model
 
         if meta_graph:  # load saved graph
             model_name = os.path.basename(meta_graph)
@@ -45,7 +51,7 @@ class INCEPTION():
 
         else:  # build graph from scratch
             self.datetime = datetime.now().strftime(r"%y%m%d_%H%M")
-            handles = self._buildGraph()
+            handles = self._buildGraph(self.model)
             for handle in handles:
                 tf.add_to_collection(INCEPTION.RESTORE_KEY, handle)
             self.sesh.run(tf.global_variables_initializer())
@@ -70,43 +76,85 @@ class INCEPTION():
     def step(self):
         return self.global_step.eval(session=self.sesh)
 
-    def _buildGraph(self):
+    def _buildGraph(self, model):
         x_in = tf.placeholder(tf.float32, name="x")
         x_in_reshape = tf.reshape(x_in, [-1, self.input_dim[1], self.input_dim[2], 3])
 
         dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
 
-        y_in = tf.placeholder(dtype=tf.int8, name="y")
-
-        onehot_labels = tf.one_hot(indices=tf.cast(y_in, tf.int32), depth=4)
+        y_in = tf.placeholder(dtype=tf.int32, name="y")
 
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
-        if is_train: # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
-            def cshift(values):  # Circular shift in batch dimension
-                return tf.concat([values[-1:, ...], values[:-1, ...]], 0)
-
-            mixup = 1.0 * self.mixup  # Convert to float, as tf.distributions.Beta requires floats.
-            beta = tf.distributions.Beta(mixup, mixup)
-            lam = beta.sample(INCEPTION.DEFAULTS["batch_size"])
-            ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
-            x_in = ll * x_in + (1 - ll) * cshift(x_in)
-            onehot_labels = lam * onehot_labels + (1 - lam) * cshift(onehot_labels)
-
-        logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
-                                               num_classes=4,
-                                               is_training=is_train,
-                                               dropout_keep_prob=dropout,
-                                               scope='GoogleNet')
+        if model == 'IG':
+            logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
+                                                   num_classes=4,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='GoogleNet')
+        elif model == 'I2':
+            logits, nett, ww = inception_v2.inception_v2(x_in_reshape,
+                                                         num_classes=4,
+                                                         is_training=is_train,
+                                                         dropout_keep_prob=dropout,
+                                                         min_depth=16,
+                                                         depth_multiplier=1.0,
+                                                         prediction_fn=slim.softmax,
+                                                         spatial_squeeze=True,
+                                                         reuse=None,
+                                                         scope='InceptionV2',
+                                                         global_pool=False)
+        elif model == 'I3':
+            logits, nett, ww = inception_v3.inception_v3(x_in_reshape,
+                                                         num_classes=4,
+                                                         is_training=is_train,
+                                                         dropout_keep_prob=dropout,
+                                                         min_depth=16,
+                                                         depth_multiplier=1.0,
+                                                         prediction_fn=slim.softmax,
+                                                         spatial_squeeze=True,
+                                                         reuse=None,
+                                                         create_aux_logits=True,
+                                                         scope='InceptionV3',
+                                                         global_pool=False)
+        elif model == 'I4':
+            logits, nett, ww = inception_v4.inception_v4(x_in_reshape,
+                                                         num_classes=4,
+                                                         is_training=is_train,
+                                                         dropout_keep_prob=dropout,
+                                                         reuse=None,
+                                                         create_aux_logits=True,
+                                                         scope='InceptionV4')
+        elif model == 'IR1':
+            logits, nett, ww = inception_resnet_v1.inception_resnet_v1(x_in_reshape,
+                                                                       num_classes=4,
+                                                                       is_training=is_train,
+                                                                       dropout_keep_prob=dropout,
+                                                                       reuse=None,
+                                                                       scope='InceptionRes1')
+        elif model == 'IR2':
+            logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
+                                                                       num_classes=4,
+                                                                       is_training=is_train,
+                                                                       dropout_keep_prob=dropout,
+                                                                       reuse=None,
+                                                                       create_aux_logits=True,
+                                                                       scope='InceptionRes2')
+        else:
+            logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
+                                                   num_classes=4,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='GoogleNet')
 
         pred = tf.nn.softmax(logits, name="prediction")
 
         global_step = tf.Variable(0, trainable=False)
 
         pred_cost = tf.losses.softmax_cross_entropy(
-            onehot_labels=onehot_labels, logits=logits)
+            onehot_labels=y_in, logits=logits)
 
-        tf.summary.scalar("InceptionV1_cost", pred_cost)
+        tf.summary.scalar("{}_cost".format(model), pred_cost)
 
         train_op = tf.contrib.layers.optimize_loss(
             loss=pred_cost,
@@ -178,8 +226,8 @@ class INCEPTION():
         with tf.Session() as sessa:
             sessa.run(itr.initializer, feed_dict={ph: file})
             x, y = sessa.run(next_element)
-
-            feed_dict = {self.x_in: x, self.y_in: y}
+            yin = tf.one_hot(indices=tf.cast(y, tf.int32), depth=4)
+            feed_dict = {self.x_in: x, self.y_in: yin}
 
             fetches = [self.global_step]
 
@@ -204,7 +252,19 @@ class INCEPTION():
                     try:
                         x, y = sessa.run(next_element)
 
-                        feed_dict = {self.x_in: x, self.y_in: y,
+                        yin = tf.one_hot(indices=tf.cast(y, tf.int32), depth=4)
+
+                        # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
+                        def cshift(values):  # Circular shift in batch dimension
+                            return tf.concat([values[-1:, ...], values[:-1, ...]], 0)
+                        mixup = 1.0 * self.mixup  # Convert to float, as tf.distributions.Beta requires floats.
+                        beta = tf.distributions.Beta(mixup, mixup)
+                        lam = beta.sample(bs)
+                        ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
+                        x = ll * x + (1 - ll) * cshift(x)
+                        yin = lam * yin + (1 - lam) * cshift(yin)
+
+                        feed_dict = {self.x_in: x, self.y_in: yin,
                                      self.dropout_: self.dropout}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
@@ -220,8 +280,8 @@ class INCEPTION():
 
                             if cross_validate:
                                 xv, yv = sessa.run(next_element)
-
-                                feed_dict = {self.x_in: xv, self.y_in: yv}
+                                yvin = tf.one_hot(indices=tf.cast(yv, tf.int32), depth=4)
+                                feed_dict = {self.x_in: xv, self.y_in: yvin}
                                 fetches = [self.pred_cost, self.merged_summary]
                                 valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
 
@@ -235,8 +295,8 @@ class INCEPTION():
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Validation begin: {} -------\n".format(now), flush=True)
                                 xv, yv = sessa.run(next_element)
-
-                                feed_dict = {self.x_in: xv, self.y_in: yv}
+                                yvin = tf.one_hot(indices=tf.cast(yv, tf.int32), depth=4)
+                                feed_dict = {self.x_in: xv, self.y_in: yvin}
                                 fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                                 valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
@@ -248,11 +308,6 @@ class INCEPTION():
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Validation end: {} -------\n".format(now), flush=True)
 
-                        # if i%50000 == 0 and save:
-                        #     interfile=os.path.join(os.path.abspath(outdir), "{}_cnn_{}".format(
-                        #             self.datetime, "_".join(map(str, self.input_dim))))
-                        #     saver.save(self.sesh, interfile, global_step=self.step)
-
                     except tf.errors.OutOfRangeError:
                         print("final avg cost (@ step {} = epoch {}): {}".format(
                             i+1, np.around(i / ct * bs), err_train / i), flush=True)
@@ -262,7 +317,7 @@ class INCEPTION():
 
                         if save:
                             outfile = os.path.join(os.path.abspath(outdir),
-                                                   "inception1_{}".format("_".join(['dropout', str(self.dropout)])))
+                                                   "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
                             saver.save(self.sesh, outfile, global_step=None)
                         try:
                             self.train_logger.flush()
@@ -285,7 +340,8 @@ class INCEPTION():
             print("------- Training end: {} -------\n".format(now), flush=True)
 
             if save:
-                outfile = os.path.join(os.path.abspath(outdir), "inception1_{}".format("_".join(['dropout', str(self.dropout)])))
+                outfile = os.path.join(os.path.abspath(outdir),
+                                       "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
                 saver.save(self.sesh, outfile, global_step=None)
             try:
                 self.train_logger.flush()

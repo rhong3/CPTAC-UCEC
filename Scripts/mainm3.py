@@ -12,12 +12,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 import data_input
-import cnnm3
-import cnng3
-import cnni3
-import cnnt3
-import cnnir13
-import cnnir23
+import cnn3
 import pandas as pd
 import cv2
 import Sample_prep
@@ -143,22 +138,7 @@ def tfreloader(mode, ep, bs, ctr, cte):
 def main(trc, tec, to_reload=None, test=None):
 
     if test:  # restore
-
-        if md == 'IG':
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I2':
-            m = cnnt3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I3':
-            m = cnnm3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I4':
-            m = cnni3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'IR1':
-            m = cnnir13.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'IR2':
-            m = cnnir23.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        else:
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-
+        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= 1000:
             HE = tfreloader('test', 1, 1000, trc, tec)
@@ -170,22 +150,7 @@ def main(trc, tec, to_reload=None, test=None):
             print("Not enough testing images!")
 
     elif to_reload:
-
-        if md == 'IG':
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I2':
-            m = cnnt3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I3':
-            m = cnnm3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'I4':
-            m = cnni3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'IR1':
-            m = cnnir13.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        elif md == 'IR2':
-            m = cnnir23.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-        else:
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR)
-
+        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
         HE = tfreloader('train', ep, bs, trc, tec)
         itt = int(trc * ep / bs)
@@ -203,22 +168,7 @@ def main(trc, tec, to_reload=None, test=None):
             print("Not enough testing images!")
 
     else:  # train
-
-        if md == 'IG':
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        elif md == 'I2':
-            m = cnnt3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        elif md == 'I3':
-            m = cnnm3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        elif md == 'I4':
-            m = cnni3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        elif md == 'IR1':
-            m = cnnir13.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        elif md == 'IR2':
-            m = cnnir23.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-        else:
-            m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR)
-
+        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
         HE = tfreloader('train', ep, bs, trc, tec)
         itt = int(trc*ep/bs)+1
