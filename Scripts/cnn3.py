@@ -7,12 +7,6 @@ import sys
 import time
 import numpy as np
 import tensorflow as tf
-import GoogleNet
-import inception_v2
-import inception_v3
-import inception_v4
-import inception_resnet_v1
-import inception_resnet_v2
 import Accessory as ac
 
 slim = tf.contrib.slim
@@ -87,12 +81,15 @@ class INCEPTION():
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
         if model == 'IG':
+            import GoogleNet
             logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
                                                    num_classes=4,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='GoogleNet')
+            print('Using Inception-V1')
         elif model == 'I2':
+            import inception_v2
             logits, nett, ww = inception_v2.inception_v2(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -104,7 +101,9 @@ class INCEPTION():
                                                          reuse=None,
                                                          scope='InceptionV2',
                                                          global_pool=False)
+            print('Using Inception-V2')
         elif model == 'I3':
+            import inception_v3
             logits, nett, ww = inception_v3.inception_v3(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -117,7 +116,9 @@ class INCEPTION():
                                                          create_aux_logits=True,
                                                          scope='InceptionV3',
                                                          global_pool=False)
+            print('Using Inception-V3')
         elif model == 'I4':
+            import inception_v4
             logits, nett, ww = inception_v4.inception_v4(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -125,14 +126,18 @@ class INCEPTION():
                                                          reuse=None,
                                                          create_aux_logits=True,
                                                          scope='InceptionV4')
+            print('Using Inception-V4')
         elif model == 'IR1':
+            import inception_resnet_v1
             logits, nett, ww = inception_resnet_v1.inception_resnet_v1(x_in_reshape,
                                                                        num_classes=4,
                                                                        is_training=is_train,
                                                                        dropout_keep_prob=dropout,
                                                                        reuse=None,
                                                                        scope='InceptionRes1')
+            print('Using Inception-Resnet-V1')
         elif model == 'IR2':
+            import inception_resnet_v2
             logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
                                                                        num_classes=4,
                                                                        is_training=is_train,
@@ -140,12 +145,15 @@ class INCEPTION():
                                                                        reuse=None,
                                                                        create_aux_logits=True,
                                                                        scope='InceptionRes2')
+            print('Using Inception-Resnet-V2')
         else:
+            import GoogleNet
             logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
                                                    num_classes=4,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='GoogleNet')
+            print('Using Default: Inception-V1')
 
         pred = tf.nn.softmax(logits, name="prediction")
 
@@ -226,8 +234,7 @@ class INCEPTION():
         with tf.Session() as sessa:
             sessa.run(itr.initializer, feed_dict={ph: file})
             x, y = sessa.run(next_element)
-            yin = tf.one_hot(indices=tf.cast(y, tf.int32), depth=4)
-            feed_dict = {self.x_in: x, self.y_in: yin}
+            feed_dict = {self.x_in: x, self.y_in: y}
 
             fetches = [self.global_step]
 
@@ -244,28 +251,15 @@ class INCEPTION():
             err_train = 0
             now = datetime.now().isoformat()[11:]
             print("------- Training begin: {} -------\n".format(now), flush=True)
-            itr, file, ph = X.data()
+            itr, file, ph = X.data(mixup=self.mixup)
             next_element = itr.get_next()
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-
-                        yin = tf.one_hot(indices=tf.cast(y, tf.int32), depth=4)
-
-                        # Mixup coeffecient, see https://arxiv.org/abs/1710.09412.pdf
-                        def cshift(values):  # Circular shift in batch dimension
-                            return tf.concat([values[-1:, ...], values[:-1, ...]], 0)
-                        mixup = 1.0 * self.mixup  # Convert to float, as tf.distributions.Beta requires floats.
-                        beta = tf.distributions.Beta(mixup, mixup)
-                        lam = beta.sample(bs)
-                        ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
-                        ly = tf.tile(tf.expand_dims(lam, -1), [1, 4])
-                        x = ll * x + (1 - ll) * cshift(x)
-                        yin = ly * yin + (1 - ly) * cshift(yin)
-
-                        feed_dict = {self.x_in: x, self.y_in: yin,
+                        print(y)
+                        feed_dict = {self.x_in: x, self.y_in: y,
                                      self.dropout_: self.dropout}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
@@ -280,9 +274,8 @@ class INCEPTION():
                             print("round {} --> cost: ".format(i), cost, flush=True)
 
                             if cross_validate:
-                                xv, yv = sessa.run(next_element)
-                                yvin = tf.one_hot(indices=tf.cast(yv, tf.int32), depth=4)
-                                feed_dict = {self.x_in: xv, self.y_in: yvin}
+                                x, y = sessa.run(next_element)
+                                feed_dict = {self.x_in: x, self.y_in: y}
                                 fetches = [self.pred_cost, self.merged_summary]
                                 valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
 
@@ -295,17 +288,16 @@ class INCEPTION():
                             if cross_validate:
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Validation begin: {} -------\n".format(now), flush=True)
-                                xv, yv = sessa.run(next_element)
-                                yvin = tf.one_hot(indices=tf.cast(yv, tf.int32), depth=4)
-                                feed_dict = {self.x_in: xv, self.y_in: yvin}
+                                x, y = sessa.run(next_element)
+                                feed_dict = {self.x_in: x, self.y_in: y}
                                 fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                                 valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
                                 self.valid_logger.add_summary(valid_summary, i)
 
                                 print("round {} --> Last CV cost: ".format(i), valid_cost, flush=True)
-                                ac.CAM(net, w, pred, xv, yv, dirr, 'Validation')
-                                ac.metrics(pred, yv, dirr, 'Validation')
+                                ac.CAM(net, w, pred, x, y, dirr, 'Validation')
+                                ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Validation end: {} -------\n".format(now), flush=True)
 

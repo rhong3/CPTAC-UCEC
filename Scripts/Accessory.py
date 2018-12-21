@@ -23,6 +23,10 @@ def realout(pdx, path, name):
 
 
 def metrics(pdx, tl, path, name):
+    tl = np.asmatrix(tl)
+    print(tl)
+    tl = tl.argmax(axis=1).astype('uint8')
+    print(tl)
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
@@ -242,6 +246,8 @@ def py_map2jpg(imgmap, rang, colorMap):
 
 
 def CAM(net, w, pred, x, y, path, name, rd=0):
+    y = np.asmatrix(y)
+    y = y.argmax(axis=1).astype('uint8')
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
     DIRB = "../Results/{}/out/{}_Endometroid_img".format(path, name)
