@@ -261,8 +261,9 @@ class INCEPTION():
                         beta = tf.distributions.Beta(mixup, mixup)
                         lam = beta.sample(bs)
                         ll = tf.expand_dims(tf.expand_dims(tf.expand_dims(lam, -1), -1), -1)
+                        ly = tf.tile(tf.expand_dims(lam, -1), [1, 4])
                         x = ll * x + (1 - ll) * cshift(x)
-                        yin = lam * yin + (1 - lam) * cshift(yin)
+                        yin = ly * yin + (1 - ly) * cshift(yin)
 
                         feed_dict = {self.x_in: x, self.y_in: yin,
                                      self.dropout_: self.dropout}
