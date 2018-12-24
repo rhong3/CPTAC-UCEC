@@ -190,6 +190,7 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
+                        print(y)
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
@@ -251,14 +252,13 @@ class INCEPTION():
             err_train = 0
             now = datetime.now().isoformat()[11:]
             print("------- Training begin: {} -------\n".format(now), flush=True)
-            itr, file, ph = X.data(mixup=self.mixup)
+            itr, file, ph = X.data()
             next_element = itr.get_next()
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-                        print(y)
                         feed_dict = {self.x_in: x, self.y_in: y,
                                      self.dropout_: self.dropout}
 
