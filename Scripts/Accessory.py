@@ -26,9 +26,7 @@ def metrics(pdx, tl, path, name):
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
-    print(pdx)
     pdx = np.asmatrix(pdx)
-    print(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     outt = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serious-like_score', 'POLE_score'])

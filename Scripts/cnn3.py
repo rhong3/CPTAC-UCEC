@@ -76,7 +76,7 @@ class INCEPTION():
 
         dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
 
-        y_in = tf.placeholder(dtype=tf.int32, name="y")
+        y_in = tf.placeholder(dtype=tf.float32, name="y")
 
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
@@ -190,7 +190,6 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-                        print(y)
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)

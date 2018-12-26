@@ -129,6 +129,7 @@ class DataSet(object):
     def onehot_only(self, images, labels):
         with tf.name_scope('onehot_only'):
             labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=4)
+            labels = tf.cast(labels, tf.float32)
         return images, labels
 
     def data(self, Not_Realtest=True, train=True):
