@@ -199,7 +199,7 @@ class INCEPTION():
                             yl = y
                         else:
                             pdx = np.concatenate((pdx, pred), axis=0)
-                            yl = np.concatenate((yl, y), axis=None)
+                            yl = np.concatenate((yl, y), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
                         ac.metrics(pdx, yl, dirr, 'Test')
