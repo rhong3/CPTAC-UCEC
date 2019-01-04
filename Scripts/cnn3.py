@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Convolutional neural nets driving code
 
+Created on 11/26/2018
+
+@author: RH
+"""
 from datetime import datetime
 import os
 import sys
@@ -11,12 +17,9 @@ import Accessory as ac
 
 slim = tf.contrib.slim
 
+
 class INCEPTION():
-    """
-    Use the InceptionV1 architecture
-
-    """
-
+    # hyper parameters
     DEFAULTS = {
         "batch_size": 128,
         "dropout": 0.8,
@@ -27,12 +30,11 @@ class INCEPTION():
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta", mixup=0.3, model='IG'):
+                 log_dir="./log", meta_dir="./meta", model='IG'):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
         self.sesh = tf.Session()
-        self.mixup = mixup
         self.model = model
 
         if meta_graph:  # load saved graph
@@ -70,14 +72,16 @@ class INCEPTION():
     def step(self):
         return self.global_step.eval(session=self.sesh)
 
+    # build graph; choose a structure defined in model
     def _buildGraph(self, model):
+        # image input
         x_in = tf.placeholder(tf.float32, name="x")
         x_in_reshape = tf.reshape(x_in, [-1, self.input_dim[1], self.input_dim[2], 3])
-
+        # dropout
         dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
-
+        # label input
         y_in = tf.placeholder(dtype=tf.float32, name="y")
-
+        # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
         if model == 'IG':
@@ -176,6 +180,7 @@ class INCEPTION():
                 y_in, logits, nett, ww, pred, pred_cost,
                 global_step, train_op, merged_summary)
 
+    # inference using trained models
     def inference(self, X, dirr, train_status=False, Not_Realtest=True):
         now = datetime.now().isoformat()[11:]
         print("------- Testing begin: {} -------\n".format(now), flush=True)
@@ -228,6 +233,7 @@ class INCEPTION():
         now = datetime.now().isoformat()[11:]
         print("------- Testing end: {} -------\n".format(now), flush=True)
 
+    # get global step
     def get_global_step(self, X):
         itr, file, ph = X.data()
         next_element = itr.get_next()
@@ -242,6 +248,7 @@ class INCEPTION():
 
         return i
 
+    # training
     def train(self, X, ct, bs, dirr, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
         start_time = time.time()
         if save:

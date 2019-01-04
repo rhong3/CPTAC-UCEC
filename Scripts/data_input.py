@@ -1,3 +1,10 @@
+"""
+Data input preparation from decoding TFrecords, onehot encoding, augmentation, and batching
+
+Created on 11/01/2018
+
+@author: RH
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -5,8 +12,9 @@ from __future__ import print_function
 import tensorflow as tf
 import math
 
-class DataSet(object):
 
+class DataSet(object):
+    # bs is batch size; ep is epoch; images are images; mode is test/train; filename is tfrecords
     def __init__(self, bs, count, ep=1, images = None, mode = None, filename = None):
         self._batchsize = bs
         self._index_in_epoch = 0
@@ -16,6 +24,7 @@ class DataSet(object):
         self._filename = filename
         self._epochs = ep
 
+    # decoding tfrecords; return images and labels
     def decode(self, serialized_example):
         features = tf.parse_example(
             serialized_example,
@@ -30,6 +39,7 @@ class DataSet(object):
         label = tf.cast(features[self._mode + '/label'], tf.int32)
         return image, label
 
+    # augmentation including onehot encoding
     def augment(self, images, labels,
                 resize=None,  # (width, height) tuple or None
                 horizontal_flip=True,
@@ -126,12 +136,14 @@ class DataSet(object):
 
         return images, labels
 
+    # onehot encoding only; for test set
     def onehot_only(self, images, labels):
         with tf.name_scope('onehot_only'):
             labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=4)
             labels = tf.cast(labels, tf.float32)
         return images, labels
 
+    # dataset preparation; batching; Real test or not; train or test
     def data(self, Not_Realtest=True, train=True):
         batch_size = self._batchsize
         ep = self._epochs

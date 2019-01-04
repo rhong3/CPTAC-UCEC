@@ -1,5 +1,6 @@
-# Tile a real scn file, load a trained model and run the test.
 """
+Tile a real scn/svs file, load a trained model and run the test.
+
 Created on 11/01/2018
 
 @author: RH
@@ -13,39 +14,38 @@ import os
 import sys
 import numpy as np
 import data_input
-import cnnm3
-import cnng3
-import cnni3
-import cnnt3
-import cnnir13
-import cnnir23
+import cnn3
 import pandas as pd
 import cv2
 import skimage.morphology as mph
 
-dirr = sys.argv[1]
-imgfile = sys.argv[2]
-bs = sys.argv[3]
-md = sys.argv[4]
-modeltoload = sys.argv[5]
-metadir = sys.argv[6]
+dirr = sys.argv[1]  # name of output directory
+imgfile = sys.argv[2]  # input scn/svs name
+bs = sys.argv[3]  # batch size
+md = sys.argv[4]  # loaded model's structure type
+modeltoload = sys.argv[5]  # name of trained model to be loaded
+metadir = sys.argv[6]  # metagraph directory
 bs = int(bs)
 
 IMG_DIM = 299
 
-INPUT_DIM = [bs, IMG_DIM, IMG_DIM, 3]
+INPUT_DIM = [bs, IMG_DIM, IMG_DIM, 3]  # default image size
 
+# default hyperparameters
 HYPERPARAMS = {
     "batch_size": bs,
     "dropout": 0.8,
     "learning_rate": 1E-4
 }
+
+# path of directories
 LOG_DIR = "../Neutrophil"
 data_dir = "../Neutrophil/{}/data".format(dirr)
 out_dir = "../Neutrophil/{}/out".format(dirr)
 METAGRAPH_DIR = "../Neutrophil/{}".format(metadir)
 file_DIR = "../Neutrophil/{}".format(dirr)
 
+# make directories
 try:
     os.mkdir(METAGRAPH_DIR)
 except(FileExistsError):
@@ -72,48 +72,38 @@ except(FileExistsError):
     pass
 
 
+# load image tiles
 def loader(images, bs, ct):
     dataset = data_input.DataSet(bs, ct, images=images)
     return dataset
 
 
+# main function for real test image prediction
 def test(images, count, bs, to_reload=None):
-
-    if md == 'IG':
-        m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    elif md == 'I2':
-        m = cnnt3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    elif md == 'I3':
-        m = cnnm3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    elif md == 'I4':
-        m = cnni3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    elif md == 'IR1':
-        m = cnnir13.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    elif md == 'IR2':
-        m = cnnir23.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
-    else:
-        m = cnng3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR)
+    m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
 
     print("Loaded! Ready for test!")
     HE = loader(images, bs, count)
     m.inference(HE, dirr, Not_Realtest=False)
 
-# cut tiles with coordinates in the name (exclude white)
+
 start_time = time.time()
+# cut tiles with coordinates in the name (exclude white)
 n_x, n_y, raw_img, resx, resy, imgs, ct = get_tilev3.tile(image_file = imgfile, outdir = out_dir)
 print("--- %s seconds ---" % (time.time() - start_time))
-
+# load tiles dictionary
 dict = pd.read_csv(out_dir+'/dict.csv', header=0)
-
+# predictions on tiles
 test(imgs, ct, bs, to_reload=modeltoload)
-
+# load dictionary of predictions on tiles
 teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
-
+# join 2 dictionaries
 joined = pd.merge(dict, teresult, how='inner', on=['Num'])
-
+# save joined dictionary
 joined.to_csv(out_dir+'/finaldict.csv', index=False)
 
 # output heat map of pos and neg.
+# initialize a graph and for each RGB channel
 opt = np.full((n_x, n_y), 0)
 hm_R = np.full((n_x, n_y), 0)
 hm_G = np.full((n_x, n_y), 0)
@@ -121,6 +111,7 @@ hm_B = np.full((n_x, n_y), 0)
 
 print(np.shape(opt))
 
+lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
 poscsv = joined.loc[joined['Prediction'] == 1]
 for index, row in poscsv.iterrows():
     opt[int(row["X_pos"]), int(row["Y_pos"])] = 255

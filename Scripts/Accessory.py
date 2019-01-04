@@ -1,3 +1,10 @@
+"""
+Calculation of metrics including accuracy, AUROC, and PRC and outputing CAM of tiles
+
+Created on 11/01/2018
+
+@author: RH
+"""
 import matplotlib
 matplotlib.use('Agg')
 import os
@@ -10,6 +17,7 @@ import cv2
 from itertools import cycle
 
 
+# for real image prediction, just output the prediction scores as csv
 def realout(pdx, path, name):
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
@@ -22,7 +30,9 @@ def realout(pdx, path, name):
     out.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
 
 
+# need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
 def metrics(pdx, tl, path, name):
+    # format clean up
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
@@ -40,6 +50,7 @@ def metrics(pdx, tl, path, name):
     stout = pd.concat([outt, stprl, stouttl], axis=1)
     stout.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
 
+    # accuracy calculations
     accu = 0
     tott = out.shape[0]
     accua = 0
@@ -90,8 +101,9 @@ def metrics(pdx, tl, path, name):
         accudr = "No data for POLE."
     print('POLE Accuracy:')
     print(accudr)
+
     try:
-        # Compute ROC curve and ROC area for each class
+        # Compute ROC and PRC curve and ROC and PRC area for each class
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
@@ -178,7 +190,7 @@ def metrics(pdx, tl, path, name):
         plt.savefig("../Results/{}/out/{}_ROC.png".format(path, name))
 
         print('Average precision score, micro-averaged over all classes: {0:0.5f}'.format(average_precision["micro"]))
-        # setup plot details
+        # Plot all PRC curves
         colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
         plt.figure(figsize=(7, 9))
         f_scores = np.linspace(0.2, 0.8, num=4)
@@ -215,6 +227,7 @@ def metrics(pdx, tl, path, name):
         print('Not able to generate plots based on this set!')
 
 
+# format activation and weight to get heatmap
 def py_returnCAMmap(activation, weights_LR):
     n_feat, w, h, n = activation.shape
     act_vec = np.reshape(activation, [n_feat, w*h])
@@ -230,10 +243,12 @@ def py_returnCAMmap(activation, weights_LR):
     return out
 
 
+# image to double
 def im2double(im):
     return cv2.normalize(im.astype('float'), None, 0.0, 1.0, cv2.NORM_MINMAX)
 
 
+# image to jpg
 def py_map2jpg(imgmap, rang, colorMap):
     if rang is None:
         rang = [np.min(imgmap), np.max(imgmap)]
@@ -243,6 +258,8 @@ def py_map2jpg(imgmap, rang, colorMap):
     return cv2.applyColorMap(heatmap_x, cv2.COLORMAP_JET)
 
 
+# generating CAM plots of each tile; net is activation; w is weight; pred is prediction scores; x are input images;
+# y are labels; path is output folder, name is test/validation; rd is current batch number
 def CAM(net, w, pred, x, y, path, name, rd=0):
     y = np.asmatrix(y)
     y = y.argmax(axis=1).astype('uint8')
@@ -365,6 +382,7 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
             cv2.imwrite(imname3, full)
 
 
+# CAM for real test; no need to determine correct or wrong
 def CAM_R(net, w, pred, x, path, name, rd=0):
     DIRR = "../Results/{}/out/{}_img".format(path, name)
     rd = rd * 1000
