@@ -184,6 +184,3 @@ cv2.imwrite(out_dir+'/Overlay.png', overlay)
 # print("--- %s seconds ---" % (time.time() - start_time))
 
 
-
-
-
