@@ -112,19 +112,34 @@ hm_B = np.full((n_x, n_y), 0)
 print(np.shape(opt))
 
 lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
-poscsv = joined.loc[joined['Prediction'] == 1]
-for index, row in poscsv.iterrows():
+# MSI is labeled red in output heat map
+msicsv = joined.loc[joined['Prediction'] == 'MSI']
+for index, row in msicsv.iterrows():
     opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
     hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
-    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["pos_score"]-0.5)*2)*255)
-    hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["pos_score"] - 0.5) * 2) * 255)
-
-negcsv = joined.loc[joined['Prediction'] == 0]
-for index, row in negcsv.iterrows():
+    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["MSI_score"]))*255)
+    hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["MSI_score"])) * 255)
+# Endometroid is labeled blue in output heat map
+edmcsv = joined.loc[joined['Prediction'] == 'Endometroid']
+for index, row in edmcsv.iterrows():
     opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
     hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
-    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["neg_score"]-0.5)*2)*255)
-    hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["neg_score"] - 0.5) * 2) * 255)
+    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["Endometroid_score"]))*255)
+    hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["Endometroid_score"])) * 255)
+# Serous-like is labeled green in output heat map
+srlcsv = joined.loc[joined['Prediction'] == 'Serous-like']
+for index, row in srlcsv.iterrows():
+    opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
+    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = 255
+    hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["Serious-like_score"]))*255)
+    hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["Serious-like_score"])) * 255)
+# POLE is labeled yellow in output heat map
+plecsv = joined.loc[joined['Prediction'] == 'POLE']
+for index, row in plecsv.iterrows():
+    opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
+    hm_G[int(row["X_pos"]), int(row["Y_pos"])] = 255
+    hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
+    hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["POLE_score"]))*255)
 
 opt = opt.repeat(5, axis=0).repeat(5, axis=1)
 opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
