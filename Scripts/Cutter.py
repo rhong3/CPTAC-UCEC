@@ -1,5 +1,6 @@
-# Tile a real scn file, load a trained model and run the test.
 """
+Tile svs/scn files
+
 Created on 11/01/2018
 
 @author: RH
@@ -13,6 +14,8 @@ import Slicer
 
 path = '../images'
 
+
+# Get all images in the root directory
 def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
     ids = []
     for id in os.listdir(root_dir):

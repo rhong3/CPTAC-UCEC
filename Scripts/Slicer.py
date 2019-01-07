@@ -1,4 +1,6 @@
 """
+Tile real scn/svs files; used by Cutter.py
+
 Created on 11/19/2018
 
 @author: RH
@@ -9,6 +11,7 @@ import pandas as pd
 import multiprocessing as mp
 
 
+# check if a tile is background or not; return a blank pixel percentage score
 def bgcheck(img):
     the_imagea = np.array(img)[:, :, :3]
     the_imagea = np.nan_to_num(the_imagea)
@@ -20,6 +23,10 @@ def bgcheck(img):
     return white
 
 
+# tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
+# x and y are the upper left position of each tile; tile_size is tile size; stepsize of each step; x0 is the row to cut.
+# outdir is the output directory for images;
+# imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles.
 def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
     # pid = os.getpid()
     # print('{}: start working'.format(pid))
@@ -44,6 +51,10 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
     return imloc, imlist
 
 
+# image_file is the scn/svs name; outdir is the output directory; path_to_slide is where the scn/svs stored.
+# First open the slide, determine how many tiles can be cut, record the residue edges width,
+# and calculate the final output prediction heat map size should be. Then, using multithread to cut tiles, and stack up
+# tiles and their position dictionaries.
 def tile(image_file, outdir, path_to_slide = "../images/"):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
