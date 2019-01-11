@@ -168,6 +168,8 @@ class INCEPTION():
 
         tf.summary.scalar("{}_cost".format(model), pred_cost)
 
+        tf.summary.scalar("{}_pred".format(model), pred)
+
         train_op = tf.contrib.layers.optimize_loss(
             loss=pred_cost,
             learning_rate=self.learning_rate,
