@@ -29,17 +29,25 @@ def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
 # cut tiles with coordinates in the name (exclude white)
 start_time = time.time()
 svslist = image_ids_in(path)
-try:
-    os.mkdir("../tiles/")
-except(FileExistsError):
-    pass
-for i in svslist:
-    otdir = "../tiles/"+i[1]
+for DIR in ("../tiles/", "../tiles/level0/", "../tiles/level1/", "../tiles/level2/"):
     try:
-        os.mkdir(otdir)
+        os.mkdir(DIR)
     except(FileExistsError):
         pass
-    n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file = i[0], outdir = otdir)
+
+for level in range(3):
+    for i in svslist:
+        otdir = "../tiles/level{}/{}".format(str(level), i[1])
+        try:
+            os.mkdir(otdir)
+        except(FileExistsError):
+            pass
+        try:
+            n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file=i[0], outdir=otdir, level=level)
+        except(IndexError):
+            pass
+        if len(os.listdir(otdir)) == 0:
+            os.rmdir(otdir)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # # Time measure tool

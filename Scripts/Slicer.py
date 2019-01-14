@@ -27,7 +27,7 @@ def bgcheck(img):
 # x and y are the upper left position of each tile; tile_size is tile size; stepsize of each step; x0 is the row to cut.
 # outdir is the output directory for images;
 # imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles.
-def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
+def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level):
     # pid = os.getpid()
     # print('{}: start working'.format(pid))
     slide = OpenSlide(slp)
@@ -35,11 +35,11 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
     imlist = []
     y0 = 0
     target_x = x0 * stepsize
-    image_x = target_x + x
+    image_x = (target_x + x)*(4**level)
     while y0 < n_y:
         target_y = y0 * stepsize
-        image_y = target_y + y
-        img = slide.read_region((image_x, image_y), 0, (tile_size, tile_size))
+        image_y = (target_y + y)*(4**level)
+        img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img)
         if wscore < 0.3:
             img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
@@ -55,13 +55,13 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir):
 # First open the slide, determine how many tiles can be cut, record the residue edges width,
 # and calculate the final output prediction heat map size should be. Then, using multithread to cut tiles, and stack up
 # tiles and their position dictionaries.
-def tile(image_file, outdir, path_to_slide = "../images/"):
+def tile(image_file, outdir, level, path_to_slide = "../images/"):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
-    print(slide.dimensions)
+    print(slide.level_dimensions)
 
-    bounds_width = slide.dimensions[0]
-    bounds_height = slide.dimensions[1]
+    bounds_width = slide.level_dimensions[level][0]
+    bounds_height = slide.level_dimensions[level][1]
     x = 0
     y = 0
     half_width_region = 49
@@ -82,7 +82,7 @@ def tile(image_file, outdir, path_to_slide = "../images/"):
     pool = mp.Pool(processes=8)
     tasks = []
     while x0 < n_x:
-        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir))
+        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level))
         tasks.append(task)
         x0 += 1
     # slice images with multiprocessing
