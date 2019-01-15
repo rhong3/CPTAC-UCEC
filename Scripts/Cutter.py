@@ -46,7 +46,7 @@ for level in range(3):
             n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file=i[0], outdir=otdir, level=level)
         except(IndexError):
             pass
-        if len(os.listdir(otdir)) == 0:
+        if len(os.listdir(otdir)) < 2:
             os.rmdir(otdir)
 print("--- %s seconds ---" % (time.time() - start_time))
 

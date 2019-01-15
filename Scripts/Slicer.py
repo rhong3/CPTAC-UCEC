@@ -58,6 +58,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level):
 def tile(image_file, outdir, level, path_to_slide = "../images/"):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
+    print(slp)
     print(slide.level_dimensions)
 
     bounds_width = slide.level_dimensions[level][0]
