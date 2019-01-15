@@ -9,6 +9,7 @@ Created on 11/01/2018
 import time
 import matplotlib
 import os
+import shutil
 matplotlib.use('Agg')
 import Slicer
 
@@ -47,7 +48,7 @@ for level in range(3):
         except(IndexError):
             pass
         if len(os.listdir(otdir)) < 2:
-            os.rmdir(otdir)
+            shutil.rmtree(otdir, ignore_errors=True)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # # Time measure tool
