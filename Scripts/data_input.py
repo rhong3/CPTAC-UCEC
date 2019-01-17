@@ -44,11 +44,11 @@ class DataSet(object):
                 resize=None,  # (width, height) tuple or None
                 horizontal_flip=True,
                 vertical_flip=True,
-                rotate=180,  # Maximum rotation angle in degrees
+                rotate=0,  # Maximum rotation angle in degrees
                 crop_probability=0,  # How often we do crops
                 crop_min_percent=0.6,  # Minimum linear dimension of a crop
                 crop_max_percent=1.,  # Maximum linear dimension of a crop
-                mixup=0.3):
+                mixup=0.4):
         if resize is not None:
             images = tf.image.resize_bilinear(images, resize)
 
