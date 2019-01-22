@@ -1,4 +1,11 @@
-import numpy as np
+"""
+Join csv/tsv files of CPTAC images to create a label list
+
+Created on 11/01/2018
+
+@author: RH
+"""
+
 import pandas as pd
 
 PID = pd.read_csv("../joined_PID.csv", header = 0)

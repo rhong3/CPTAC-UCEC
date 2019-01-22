@@ -1,6 +1,12 @@
-import numpy as np
-import pandas as pd
+"""
+Join csv/tsv files of TCGA images to create a label list
 
+Created on 1/17/2019
+
+@author: RH
+"""
+
+import pandas as pd
 
 image_meta = pd.read_csv('../TCGA_Image_meta.tsv', sep='\t', header=0)
 TCGA_list = pd.read_excel('../datafile.S1.1.KeyClinicalData.xls', header=0)
