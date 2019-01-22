@@ -10,6 +10,7 @@ import os
 import shutil
 import csv
 
+
 # Get all images in the root directory
 def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
     ids = []
@@ -21,21 +22,33 @@ def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
     return ids
 
 
-with open('TCGA_inlist.csv', mode='r') as csv_file:
-    filenames = csv.DictReader(csv_file)
+def flatten(l, a):
+    for i in l:
+        if isinstance(i, list):
+            flatten(i, a)
+        else:
+            a.append(i)
+    return a
+
 
 imids = image_ids_in('../TCGA-UCEC/')
 
 try:
     os.mkdir('../TCGA-UCEC/inlist')
     os.mkdir('../TCGA-UCEC/outlist')
-except(FileExistsError):
+except FileExistsError:
     pass
 
-for imid in imids:
-    if imid in filenames:
-        shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/inlist/' + str(imid))
-    else:
-        shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/outlist/' + str(imid))
+with open('TCGA_inlist.csv', mode='r') as csv_file:
+    file = csv.reader(csv_file)
+    filenames = flatten(list(file), [])
+    print(filenames)
+
+    for imid in imids:
+        if imid in filenames:
+            shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/inlist/' + str(imid))
+        else:
+            shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/outlist/' + str(imid))
+
 
 
