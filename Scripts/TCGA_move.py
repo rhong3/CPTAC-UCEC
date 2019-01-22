@@ -35,6 +35,10 @@ imids = image_ids_in('../TCGA-UCEC/')
 
 try:
     os.mkdir('../TCGA-UCEC/inlist')
+except FileExistsError:
+    pass
+
+try:
     os.mkdir('../TCGA-UCEC/outlist')
 except FileExistsError:
     pass
@@ -42,7 +46,6 @@ except FileExistsError:
 with open('TCGA_inlist.csv', mode='r') as csv_file:
     file = csv.reader(csv_file)
     filenames = flatten(list(file), [])
-    print(filenames)
 
     for imid in imids:
         if imid in filenames:
