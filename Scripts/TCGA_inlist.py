@@ -7,41 +7,35 @@ Created on 1/22/2019
 """
 
 import pandas as pd
-import os
-import shutil
-
-# Get all images in the root directory
-def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
-    ids = []
-    for id in os.listdir(root_dir):
-        if id in ignore:
-            print('Skipping ID:', id)
-        else:
-            ids.append(id)
-    return ids
-
+import csv
 
 TCGA = pd.read_csv('../new_TCGA_list.csv', header=0)
 filenames = TCGA['File Name'].tolist()
 
-imids = image_ids_in('../TCGA-UCEC/')
+imids = open("../TCGA_images.txt").read().splitlines()
+print(imids)
 
-try:
-    os.mkdir('../TCGA-UCEC/inlist')
-    os.mkdir('../TCGA-UCEC/outlist')
-except(FileExistsError):
-    pass
-
-inlist_count = 0
-outlist_count = 0
+inlist_count = []
+outlist_count = []
 
 for imid in imids:
     if imid in filenames:
-        shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/inlist/' + str(imid))
-        inlist_count += 1
+        inlist_count.append(imid)
     else:
-        shutil.move('../TCGA-UCEC/' + str(imid), '../TCGA-UCEC/outlist/' + str(imid))
-        outlist_count += 1
+        outlist_count.append(imid)
 
 print(inlist_count)
 print(outlist_count)
+print(len(inlist_count))
+print(len(outlist_count))
+csvfile = "../TCGA_inlist.csv"
+with open(csvfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for val in inlist_count:
+        writer.writerow([val])
+
+csvfile = "../TCGA_outlist.csv"
+with open(csvfile, "w") as output:
+    writer = csv.writer(output, lineterminator='\n')
+    for val in outlist_count:
+        writer.writerow([val])
