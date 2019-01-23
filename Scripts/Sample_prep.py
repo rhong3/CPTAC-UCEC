@@ -24,6 +24,7 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.
     return ids
 
 
+# Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(level, path="../tiles/"):
     level = str(level)
     big_images = []
@@ -46,6 +47,7 @@ def big_image_sum(level, path="../tiles/"):
 
 
 # seperate into training and testing; each type is the same separation ratio on big images
+# test and train csv files contain tiles' path.
 def set_sep(alll, level, path, cut=0.15):
     level = str(level)
     trlist = []
