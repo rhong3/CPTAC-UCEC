@@ -54,7 +54,8 @@ for level in range(3):
 
     for i in CPTAClist:
         matchrow = CPTAC_ref.loc[CPTAC_ref['Parent Sample ID(s)'] == i[1]]
-        label = str(matchrow['Subtype'])
+        label = matchrow['Subtype'].to_string(index=False, header=False)
+        print(label)
         otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
         try:
             os.mkdir(otdir)
@@ -69,7 +70,8 @@ for level in range(3):
 
     for i in TCGAlist:
         matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
-        label = str(matchrow['label'])
+        label = matchrow['label'].to_string(index=False, header=False)
+        print(label)
         otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
         try:
             os.mkdir(otdir)
