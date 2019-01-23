@@ -24,69 +24,52 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.
     return ids
 
 
-# check if the big image has label
-def inlist_check(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), dir = "../tiles/"):
-    isin = []
-    Not = []
-    tiles = image_ids_in(dir)
-    pd = pdlist["Parent Sample ID(s)"].tolist()
-    for a in tiles:
-        if a in pd:
-            isin.append(a)
-        else:
-            Not.append(a)
-    return isin, Not
-
-
-# for each big image that has label, make a dictionary contains paths of all its tiles
-def samplesum(pdlist = pd.read_csv('../new_joined_PID.csv', header = 0), path = "../tiles/"):
-    data = []
-    lbdict ={'MSI': 0, 'Endometroid': 1, 'Serous-like' : 2, 'POLE' : 3}
-    for idx, row in pdlist.iterrows():
-        folder = row["Parent Sample ID(s)"]
-        label = row["Subtype"]
-        try:
-            imgs = image_ids_in(path+folder)
-            for i in imgs:
-                imgsdir = path+folder+'/'+i
-                data.append([imgsdir, int(lbdict[label])])
-        except:
-            print(folder+' not in tiles!')
-    datapd = pd.DataFrame(data, columns = ['path', 'label'])
+def big_image_sum(level, path="../tiles/"):
+    level = str(level)
+    big_images = []
+    POLEimg = image_ids_in(path+"level{}/POLE/".format(level))
+    SLimg = image_ids_in(path+"level{}/Serous-like/".format(level))
+    MSIimg = image_ids_in(path+"level{}/MSI/".format(level))
+    EMimg = image_ids_in(path+"level{}/Endometroid/".format(level))
+    for i in MSIimg:
+        big_images.append([i, 0])
+    for i in EMimg:
+        big_images.append([i, 1])
+    for i in SLimg:
+        big_images.append([i, 2])
+    for i in POLEimg:
+        big_images.append([i, 4])
+    datapd = pd.DataFrame(big_images, columns=['path', 'label'])
+    datapd.to_csv(path+"level{}/All_images.csv".format(level), header=True, index=False)
 
     return datapd
 
 
-# seperate into training and testing; each type is the same separation ratio
-def set_sep(alll, path="../tiles", cut=0.1):
+# seperate into training and testing; each type is the same separation ratio on big images
+def set_sep(alll, level, path, cut=0.15):
+    level = str(level)
     trlist = []
     telist = []
     for i in range(4):
         subset = alll.loc[alll['label'] == i]
+        subset = sku.shuffle(subset)
         test, train = np.split(subset, [int(cut * len(subset))])
         trlist.append(train)
         telist.append(test)
     test = pd.concat(telist)
     train = pd.concat(trlist)
-    test = sku.shuffle(test)
-    train = sku.shuffle(train)
-    test.to_csv(path+'/te_sample.csv', header=True, index=False)
-    train.to_csv(path + '/tr_sample.csv', header=True, index=False)
+    test_tiles_list = []
+    train_tiles_list = []
+    for idx, row in test.iterrows():
+        tile_ids = image_ids_in(row['path'].to_string(index=False, header=False))
+        test_tiles_list.append(tile_ids)
+    for idx, row in train.iterrows():
+        tile_ids = image_ids_in(row['path'].to_string(index=False, header=False))
+        train_tiles_list.append(tile_ids)
+    test_tiles = pd.concat(test_tiles_list)
+    train_tiles = pd.concat(train_tiles_list)
+    test_tiles.to_csv(path+'/te_sample.csv'.format(level), header=True, index=False)
+    train_tiles.to_csv(path+'/tr_sample.csv'.format(level), header=True, index=False)
 
-    return train, test
+    return train_tiles, test_tiles
 
-
-if __name__ == "__main__":
-    pan = pd.read_csv('../new_joined_PID.csv', header = 0)
-    pl, nl = inlist_check(pan, '../tiles')
-    # check if big image has label
-    with open('../inlist.csv','w') as f:
-        f.write(','.join(pl))
-        f.close()
-    with open('../Notinlist.csv','w') as f:
-        f.write(','.join(nl))
-        f.close()
-    allls = samplesum(pan, '../tiles/')
-    set_sep(allls)
-    # save all tiles paths in a csv
-    allls.to_csv('../tiles/all.csv', header = True, index = False)

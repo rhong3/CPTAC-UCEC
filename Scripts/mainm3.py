@@ -25,6 +25,7 @@ dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
 ep = sys.argv[3]    # epochs to train
 md = sys.argv[4]    # structure to use
+level = sys.argv[5] # level of tiles to use
 bs = int(bs)
 ep = int(ep)
 
@@ -208,16 +209,16 @@ if __name__ == "__main__":
     try:
         trc, tec = counters(data_dir)
     except FileNotFoundError:
-        alll = Sample_prep.samplesum(path=img_dir)
-        tes, trs = Sample_prep.set_sep(alll, path=data_dir)
+        alll = Sample_prep.big_image_sum(level, path=img_dir)
+        tes, trs = Sample_prep.set_sep(alll, level, path=data_dir)
         trc, tec = counters(data_dir)
         loader(data_dir)
     # have trained model or not; train from scratch if not
     try:
-        modeltoload = sys.argv[5]
+        modeltoload = sys.argv[6]
         # test or not
         try:
-            testmode = sys.argv[6]
+            testmode = sys.argv[7]
             main(trc, tec, to_reload=modeltoload, test=True)
         except IndexError:
             main(trc, tec, to_reload=modeltoload)
