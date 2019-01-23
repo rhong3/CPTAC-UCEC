@@ -70,7 +70,7 @@ def set_sep(alll, level, path, cut=0.15):
         train_tiles_list.append(tile_ids)
     test_tiles = pd.concat(test_tiles_list)
     train_tiles = pd.concat(train_tiles_list)
-    test_tiles = sku.shuffle(test_tiles)
+    # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
