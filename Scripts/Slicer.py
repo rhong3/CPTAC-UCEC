@@ -80,7 +80,7 @@ def tile(image_file, outdir, level, path_to_slide = "../images/"):
     x0 = 0
     # create multiporcessing pool
     print(mp.cpu_count())
-    pool = mp.Pool(processes=8)
+    pool = mp.Pool(processes=mp.cpu_count())
     tasks = []
     while x0 < n_x:
         task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level))
