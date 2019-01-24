@@ -52,6 +52,22 @@ for level in range(3):
         except(FileExistsError):
             pass
 
+    for i in TCGAlist:
+        matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
+        label = matchrow['label'].to_string(index=False, header=False)
+        print(label)
+        otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+        try:
+            os.mkdir(otdir)
+        except(FileExistsError):
+            pass
+        try:
+            n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
+        except(IndexError):
+            pass
+        if len(os.listdir(otdir)) < 2:
+            shutil.rmtree(otdir, ignore_errors=True)
+
     for i in CPTAClist:
         matchrow = CPTAC_ref.loc[CPTAC_ref['Parent Sample ID(s)'] == i[1]]
         label = matchrow['Subtype'].to_string(index=False, header=False)
@@ -68,21 +84,6 @@ for level in range(3):
         if len(os.listdir(otdir)) < 2:
             shutil.rmtree(otdir, ignore_errors=True)
 
-    for i in TCGAlist:
-        matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
-        label = matchrow['label'].to_string(index=False, header=False)
-        print(label)
-        otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
-        try:
-            os.mkdir(otdir)
-        except(FileExistsError):
-            pass
-        try:
-            n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
-        except(IndexError):
-            pass
-        if len(os.listdir(otdir)) < 2:
-            shutil.rmtree(otdir, ignore_errors=True)
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # # Time measure tool
