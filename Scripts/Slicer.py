@@ -88,8 +88,7 @@ def tile(image_file, outdir, level, path_to_slide = "../images/"):
         x0 += 1
     # slice images with multiprocessing
     temp = pool.starmap(v_slide, tasks)
-    print(list(zip(*temp))[0])
-    tempdict = list(zip(*temp))[0]
+    tempdict = list(temp)
     temp = None
     pool.close()
     pool.join()
