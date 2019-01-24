@@ -62,7 +62,7 @@ for level in range(3):
         except(FileExistsError):
             pass
         try:
-            n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
+            n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
         except(IndexError):
             pass
         if len(os.listdir(otdir)) < 2:
@@ -78,7 +78,7 @@ for level in range(3):
         except(FileExistsError):
             pass
         try:
-            n_x, n_y, raw_img, resx, resy, imgs, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir, level=level)
+            n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir, level=level)
         except(IndexError):
             pass
         if len(os.listdir(otdir)) < 2:

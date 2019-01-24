@@ -3,6 +3,8 @@ Tile real scn/svs files; used by Cutter.py
 
 Created on 11/19/2018
 
+*** Removed imlist storage to minimize memory usage 01/24/2019 ***
+
 @author: RH
 """
 from openslide import OpenSlide
@@ -26,13 +28,12 @@ def bgcheck(img):
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
 # x and y are the upper left position of each tile; tile_size is tile size; stepsize of each step; x0 is the row to cut.
 # outdir is the output directory for images;
-# imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles.
+# imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles (Removed 01/24/2019).
 def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level):
     # pid = os.getpid()
     # print('{}: start working'.format(pid))
     slide = OpenSlide(slp)
     imloc = []
-    imlist = []
     y0 = 0
     target_x = x0 * stepsize
     image_x = (target_x + x)*(4**level)
@@ -45,10 +46,9 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level):
             img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
             strr = outdir + "/region_x-{}-y-{}.png".format(target_x, target_y)
             imloc.append([x0, y0, target_x, target_y, strr])
-            imlist.append(np.array(img)[:, :, :3])
         y0 += 1
     slide.close()
-    return imloc, imlist
+    return imloc
 
 
 # image_file is the scn/svs name; outdir is the output directory; path_to_slide is where the scn/svs stored.
@@ -89,7 +89,6 @@ def tile(image_file, outdir, level, path_to_slide = "../images/"):
     # slice images with multiprocessing
     temp = pool.starmap(v_slide, tasks)
     tempdict = list(zip(*temp))[0]
-    tempimglist = list(zip(*temp))[1]
     temp = None
     pool.close()
     pool.join()
@@ -104,14 +103,9 @@ def tile(image_file, outdir, level, path_to_slide = "../images/"):
     imlocpd.columns = ["Num", "X_pos", "Y_pos", "X", "Y", "Loc"]
     imlocpd.to_csv(outdir + "/dict.csv", index = False)
     tempdict = None
+    ct = len(imloc)
+    print(ct)
 
-    tempimglist = list(filter(None, tempimglist))
-    imglist = []
-    list(map(imglist.extend, tempimglist))
-    ct = len(imglist)
-    tempimglist = None
-    imglist = np.asarray(imglist)
-
-    return n_x, n_y, lowres, residue_x, residue_y, imglist, ct
+    return n_x, n_y, lowres, residue_x, residue_y, ct
 
 
