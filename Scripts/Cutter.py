@@ -72,17 +72,34 @@ for level in range(3):
         matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
         label = matchrow['label'].to_string(index=False, header=False)
         print(label)
-        otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
-        try:
-            os.mkdir(otdir)
-        except(FileExistsError):
-            pass
-        try:
-            n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
-        except(IndexError):
-            pass
-        if len(os.listdir(otdir)) < 2:
-            shutil.rmtree(otdir, ignore_errors=True)
+        if level == 2:
+            otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+            try:
+                os.mkdir(otdir)
+            except(FileExistsError):
+                pass
+            try:
+                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=level)
+            except(IndexError):
+                pass
+            if len(os.listdir(otdir)) < 2:
+                shutil.rmtree(otdir, ignore_errors=True)
+
+        else:
+            if label == 'POLE':
+                otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+                try:
+                    os.mkdir(otdir)
+                except(FileExistsError):
+                    pass
+                try:
+                    n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
+                                                                    level=level)
+                except(IndexError):
+                    pass
+                if len(os.listdir(otdir)) < 2:
+                    shutil.rmtree(otdir, ignore_errors=True)
+
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
