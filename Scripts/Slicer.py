@@ -18,10 +18,14 @@ def bgcheck(img):
     the_imagea = np.array(img)[:, :, :3]
     the_imagea = np.nan_to_num(the_imagea)
     maska = (the_imagea[:, :, 0] > 200).astype(np.uint8)
-    maskb = (the_imagea[:, :, 1] > 120).astype(np.uint8)
+    maskb = (the_imagea[:, :, 1] > 200).astype(np.uint8)
     maskc = (the_imagea[:, :, 2] > 200).astype(np.uint8)
-    mask = maska * maskb * maskc
-    white = np.sum(mask)/(299 * 299)
+    mask1 = maska * maskb * maskc
+    maskb1 = (the_imagea[:, :, 1] > 130).astype(np.uint8)
+    maskb2 = (the_imagea[:, :, 1] < 201).astype(np.uint8)
+    mask2 = maskb1*maskb2
+
+    white = (np.sum(mask1)+np.sum(mask2))/(299 * 299)
 
     return white
 
