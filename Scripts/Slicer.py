@@ -20,12 +20,9 @@ def bgcheck(img):
     maska = (the_imagea[:, :, 0] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, 1] > 200).astype(np.uint8)
     maskc = (the_imagea[:, :, 2] > 200).astype(np.uint8)
-    mask1 = maska * maskb * maskc
-    maskb1 = (the_imagea[:, :, 1] > 150).astype(np.uint8)
-    maskb2 = (the_imagea[:, :, 1] < 201).astype(np.uint8)
-    mask2 = maskb1*maskb2
+    mask = maska * maskb * maskc
 
-    white = (np.sum(mask1)+np.sum(mask2))/(299 * 299)
+    white = np.sum(mask)/(299 * 299)
 
     return white
 
