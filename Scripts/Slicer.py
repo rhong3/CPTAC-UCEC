@@ -21,7 +21,7 @@ def bgcheck(img):
     maskb = (the_imagea[:, :, 1] > 200).astype(np.uint8)
     maskc = (the_imagea[:, :, 2] > 200).astype(np.uint8)
     mask1 = maska * maskb * maskc
-    maskb1 = (the_imagea[:, :, 1] > 130).astype(np.uint8)
+    maskb1 = (the_imagea[:, :, 1] > 150).astype(np.uint8)
     maskb2 = (the_imagea[:, :, 1] < 201).astype(np.uint8)
     mask2 = maskb1*maskb2
 
