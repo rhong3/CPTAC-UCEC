@@ -85,7 +85,7 @@ for level in range(3):
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
 
-        else:
+        elif level == 1:
             if label == 'POLE':
                 otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
                 try:
