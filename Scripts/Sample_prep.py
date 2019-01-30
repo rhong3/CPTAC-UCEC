@@ -24,6 +24,16 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.
     return ids
 
 
+def tile_ids_in(root_dir, label, ignore=['.DS_Store','dict.csv','all.csv', 'tr_sample.csv', 'te_sample.csv']):
+    ids = []
+    for id in os.listdir(root_dir):
+        if id in ignore:
+            print('Skipping ID:', id)
+        else:
+            ids.append([id, label])
+    return ids
+
+
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(level, path="../tiles/"):
     level = str(level)
@@ -63,13 +73,13 @@ def set_sep(alll, level, path, cut=0.15):
     test_tiles_list = []
     train_tiles_list = []
     for idx, row in test.iterrows():
-        tile_ids = image_ids_in(row['path'])
+        tile_ids = tile_ids_in(row['path'], row['label'])
         test_tiles_list.append(tile_ids)
     for idx, row in train.iterrows():
-        tile_ids = image_ids_in(row['path'])
+        tile_ids = tile_ids_in(row['path'], row['label'])
         train_tiles_list.append(tile_ids)
-    test_tiles = pd.concat(test_tiles_list)
-    train_tiles = pd.concat(train_tiles_list)
+    test_tiles = pd.DataFrame(test_tiles_list, columns=['path', 'label'])
+    train_tiles = pd.DataFrame(train_tiles_list, columns=['path', 'label'])
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
