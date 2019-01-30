@@ -74,10 +74,10 @@ def set_sep(alll, level, path, cut=0.15):
     train_tiles_list = []
     for idx, row in test.iterrows():
         tile_ids = tile_ids_in(row['path'], row['label'])
-        test_tiles_list.append(tile_ids)
+        test_tiles_list.extend(tile_ids)
     for idx, row in train.iterrows():
         tile_ids = tile_ids_in(row['path'], row['label'])
-        train_tiles_list.append(tile_ids)
+        train_tiles_list.extend(tile_ids)
     test_tiles = pd.DataFrame(test_tiles_list, columns=['path', 'label'])
     train_tiles = pd.DataFrame(train_tiles_list, columns=['path', 'label'])
     # No shuffle on test set
