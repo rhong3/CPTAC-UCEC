@@ -33,13 +33,13 @@ def big_image_sum(level, path="../tiles/"):
     MSIimg = image_ids_in(path+"level{}/MSI/".format(level))
     EMimg = image_ids_in(path+"level{}/Endometroid/".format(level))
     for i in MSIimg:
-        big_images.append([i, 0])
+        big_images.append([path+"level{}/MSI/{}".format(level, i), 0])
     for i in EMimg:
-        big_images.append([i, 1])
+        big_images.append([path+"level{}/Endometroid/{}".format(level, i), 1])
     for i in SLimg:
-        big_images.append([i, 2])
+        big_images.append([path+"level{}/Serous-like/{}".format(level, i), 2])
     for i in POLEimg:
-        big_images.append([i, 4])
+        big_images.append([path+"level{}/POLE/{}".format(level, i), 3])
     datapd = pd.DataFrame(big_images, columns=['path', 'label'])
     datapd.to_csv(path+"level{}/All_images.csv".format(level), header=True, index=False)
 
@@ -63,10 +63,10 @@ def set_sep(alll, level, path, cut=0.15):
     test_tiles_list = []
     train_tiles_list = []
     for idx, row in test.iterrows():
-        tile_ids = image_ids_in(row['path'].to_string(index=False, header=False))
+        tile_ids = image_ids_in(row['path'])
         test_tiles_list.append(tile_ids)
     for idx, row in train.iterrows():
-        tile_ids = image_ids_in(row['path'].to_string(index=False, header=False))
+        tile_ids = image_ids_in(row['path'])
         train_tiles_list.append(tile_ids)
     test_tiles = pd.concat(test_tiles_list)
     train_tiles = pd.concat(train_tiles_list)
