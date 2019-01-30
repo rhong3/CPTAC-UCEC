@@ -30,7 +30,7 @@ def tile_ids_in(root_dir, label, ignore=['.DS_Store','dict.csv','all.csv', 'tr_s
         if id in ignore:
             print('Skipping ID:', id)
         else:
-            ids.append([id, label])
+            ids.append([root_dir+'/'+id, label])
     return ids
 
 
