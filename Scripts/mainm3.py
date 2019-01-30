@@ -224,7 +224,7 @@ if __name__ == "__main__":
             main(trc, tec, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
-            loader(img_dir)
+            loader(data_dir)
         main(trc, tec)
 
 
