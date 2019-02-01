@@ -151,13 +151,11 @@ class DataSet(object):
             filenames = tf.placeholder(tf.string, shape=None)
             dataset = tf.data.TFRecordDataset(filenames)
             dataset = dataset.repeat(ep)
+            batched_dataset = dataset.batch(batch_size, drop_remainder=False)
+            batched_dataset = batched_dataset.map(self.decode)
             if train:
-                batched_dataset = dataset.batch(batch_size, drop_remainder=True)
-                batched_dataset = batched_dataset.map(self.decode)
                 batched_dataset = batched_dataset.map(self.augment)
             else:
-                batched_dataset = dataset.batch(batch_size, drop_remainder=False)
-                batched_dataset = batched_dataset.map(self.decode)
                 batched_dataset = batched_dataset.map(self.onehot_only)
             iterator = batched_dataset.make_initializable_iterator()
             return iterator, self._filename, filenames
