@@ -7,8 +7,6 @@ Created on 11/26/2018
 
 @author: RH
 """
-import matplotlib
-matplotlib.use('Agg')
 import os
 import sys
 import numpy as np
@@ -19,7 +17,8 @@ import pandas as pd
 import cv2
 import Sample_prep
 import time
-
+import matplotlib
+matplotlib.use('Agg')
 
 dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
@@ -226,5 +225,4 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
         main(trc, tec)
-
 

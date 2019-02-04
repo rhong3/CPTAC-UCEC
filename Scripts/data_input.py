@@ -15,7 +15,7 @@ import math
 
 class DataSet(object):
     # bs is batch size; ep is epoch; images are images; mode is test/train; filename is tfrecords
-    def __init__(self, bs, count, ep=1, images = None, mode = None, filename = None):
+    def __init__(self, bs, count, ep=1, images=None, mode=None, filename=None):
         self._batchsize = bs
         self._index_in_epoch = 0
         self._num_examples = count
