@@ -24,7 +24,11 @@ dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
 ep = sys.argv[3]    # epochs to train
 md = sys.argv[4]    # structure to use
-level = sys.argv[5] # level of tiles to use
+try:
+    level = sys.argv[5]  # level of tiles to use
+except IndexError:
+    level = None
+
 bs = int(bs)
 ep = int(ep)
 
@@ -145,17 +149,17 @@ def tfreloader(mode, ep, bs, ctr, cte):
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
-def main(trc, tec, to_reload=None, test=None):
+def main(trc, tec, testset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= 1000:
             HE = tfreloader('test', 1, 1000, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
             HE = tfreloader('test', 1, tec, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
 
@@ -170,10 +174,10 @@ def main(trc, tec, to_reload=None, test=None):
             m.train(HE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= 1000:
             HE = tfreloader('test', 1, 1000, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
             HE = tfreloader('test', 1, tec, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
 
@@ -188,10 +192,10 @@ def main(trc, tec, to_reload=None, test=None):
             m.train(HE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= 1000:
             HE = tfreloader('test', 1, 1000, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
             HE = tfreloader('test', 1, tec, trc, tec)
-            m.inference(HE, dirr)
+            m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
 
@@ -207,6 +211,7 @@ if __name__ == "__main__":
     # get counts of testing and training dataset; if not exist, prepare testing and training datasets from sampling
     try:
         trc, tec = counters(data_dir)
+        tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
     except FileNotFoundError:
         alll = Sample_prep.big_image_sum(level, path=img_dir)
         tes, trs = Sample_prep.set_sep(alll, level, path=data_dir)
@@ -218,11 +223,11 @@ if __name__ == "__main__":
         # test or not
         try:
             testmode = sys.argv[7]
-            main(trc, tec, to_reload=modeltoload, test=True)
+            main(trc, tec, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
-            main(trc, tec, to_reload=modeltoload)
+            main(trc, tec, testset=tes, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
-        main(trc, tec)
+        main(trc, tec, testset=tes)
 

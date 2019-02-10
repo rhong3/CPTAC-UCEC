@@ -31,7 +31,7 @@ def realout(pdx, path, name):
 
 
 # need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
-def metrics(pdx, tl, path, name):
+def metrics(pdx, tl, path, name, ori_test=None):
     # format clean up
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
@@ -44,10 +44,14 @@ def metrics(pdx, tl, path, name):
     if name == 'Validation' or name == 'Training':
         outtl = outtl.round(0)
     out = pd.concat([outt, prl, outtl], axis=1)
+    if ori_test is not None:
+        out = pd.concat([ori_test, out], axis=1)
 
     stprl = prl.replace(lbdict)
     stouttl = outtl.replace(lbdict)
     stout = pd.concat([outt, stprl, stouttl], axis=1)
+    if ori_test is not None:
+        stout = pd.concat([ori_test, stout], axis=1)
     stout.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
 
     # accuracy calculations
