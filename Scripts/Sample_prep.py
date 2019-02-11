@@ -56,7 +56,7 @@ def big_image_sum(level=None, path="../tiles/"):
 
     else:
         big_images = []
-        for level in range(4):
+        for level in range(3):
             level = str(level)
             POLEimg = image_ids_in(path + "level{}/POLE/".format(level))
             SLimg = image_ids_in(path + "level{}/Serous-like/".format(level))
@@ -81,7 +81,7 @@ def big_image_sum(level=None, path="../tiles/"):
 def set_sep(alll, path, cut=0.15):
     trlist = []
     telist = []
-    for i in range(4):
+    for i in range(3):
         subset = alll.loc[alll['label'] == i]
         subset = sku.shuffle(subset)
         test, train = np.split(subset, [int(cut * len(subset))])
