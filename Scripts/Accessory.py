@@ -96,8 +96,8 @@ def metrics(pdx, tl, path, name, ori_test=None):
     try:
         accucr = round(accuc/totc,5)
     except ZeroDivisionError:
-        accucr = "No data for Serious-like."
-    print('Serious-like Accuracy:')
+        accucr = "No data for Serous-like."
+    print('Serous-like Accuracy:')
     print(accucr)
     try:
         accudr = round(accud/totd,5)
