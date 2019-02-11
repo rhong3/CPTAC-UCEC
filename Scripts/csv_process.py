@@ -59,24 +59,24 @@ imids = image_ids_in('../CPTAC_img')
 inlist = []
 outlist = []
 reverse_inlist = []
-try:
-    os.mkdir('../CPTAC_img/inlist')
-except FileExistsError:
-    pass
-
-try:
-    os.mkdir('../CPTAC_img/outlist')
-except FileExistsError:
-    pass
+# try:
+#     os.mkdir('../CPTAC_img/inlist')
+# except FileExistsError:
+#     pass
+#
+# try:
+#     os.mkdir('../CPTAC_img/outlist')
+# except FileExistsError:
+#     pass
 
 for im in imids:
     if im[1] in ref_list:
         inlist.append(im[0])
         reverse_inlist.append(im[1])
-        shutil.move('../CPTAC_img/'+str(im[0]), '../CPTAC_img/inlist/'+str(im[0]))
+        # shutil.move('../CPTAC_img/'+str(im[0]), '../CPTAC_img/inlist/'+str(im[0]))
     else:
         outlist.append(im[0])
-        shutil.move('../CPTAC_img/' + str(im[0]), '../CPTAC_img/outlist/' + str(im[0]))
+        # shutil.move('../CPTAC_img/' + str(im[0]), '../CPTAC_img/outlist/' + str(im[0]))
 
 csvfile = "../CPTAC_inlist.csv"
 with open(csvfile, "w") as output:
@@ -91,5 +91,11 @@ with open(csvfile, "w") as output:
         writer.writerow([val])
 
 filtered_PID = PID[PID["Parent Sample ID(s)"].isin(reverse_inlist)]
+
+tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometriod', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
+a = filtered_PID['TCGA_subtype']
+filtered_PID['Subtype'] = a
+filtered_PID.Subtype = filtered_PID.Subtype.replace(tpdict)
+filtered_PID = filtered_PID[filtered_PID.Subtype != 'Other']
 
 filtered_PID.to_csv("../filtered_joined_PID.csv", header=True, index=False)
