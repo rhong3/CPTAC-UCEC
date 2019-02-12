@@ -17,19 +17,147 @@ import cv2
 from itertools import cycle
 
 
+# Plot ROC and PRC plots
+def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur):
+    # Compute ROC and PRC curve and ROC and PRC area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    # PRC
+    # For each class
+    precision = dict()
+    recall = dict()
+    average_precision = dict()
+    microy = []
+    microscore = []
+    for i in range(4):
+        fpr[i], tpr[i], _ = skl.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                  np.asarray(pdx[:, i]).ravel())
+        try:
+            roc_auc[i] = skl.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                   np.asarray(pdx[:, i]).ravel())
+        except ValueError:
+            roc_auc[i] = np.nan
+
+        microy.extend(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')))
+        microscore.extend(np.asarray(pdx[:, i]).ravel())
+
+        precision[i], recall[i], _ = \
+            skl.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                               np.asarray(pdx[:, i]).ravel())
+        try:
+            average_precision[i] = \
+                skl.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                                                    np.asarray(pdx[:, i]).ravel())
+        except ValueError:
+            average_precision[i] = np.nan
+
+    # Compute micro-average ROC curve and ROC area
+    fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(),
+                                                          np.asarray(microscore).ravel())
+    roc_auc["micro"] = skl.metrics.auc(fpr["micro"], tpr["micro"])
+
+    # A "micro-average": quantifying score on all classes jointly
+    precision["micro"], recall["micro"], _ = skl.metrics.precision_recall_curve(np.asarray(microy).ravel(),
+                                                                                np.asarray(microscore).ravel())
+    average_precision["micro"] = skl.metrics.average_precision_score(np.asarray(microy).ravel(),
+                                                                     np.asarray(microscore).ravel(),
+                                                                     average="micro")
+
+    # Compute macro-average ROC curve and ROC area
+
+    # First aggregate all false positive rates
+    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(4)]))
+
+    # Then interpolate all ROC curves at this points
+    mean_tpr = np.zeros_like(all_fpr)
+    for i in range(4):
+        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+    # Finally average it and compute AUC
+    mean_tpr /= 4
+
+    fpr["macro"] = all_fpr
+    tpr["macro"] = mean_tpr
+    roc_auc["macro"] = skl.metrics.auc(fpr["macro"], tpr["macro"])
+
+    # Plot all ROC curves
+    plt.figure()
+    plt.plot(fpr["micro"], tpr["micro"],
+             label='micro-average ROC curve (area = {0:0.5f})'
+                   ''.format(roc_auc["micro"]),
+             color='deeppink', linestyle=':', linewidth=4)
+
+    plt.plot(fpr["macro"], tpr["macro"],
+             label='macro-average ROC curve (area = {0:0.5f})'
+                   ''.format(roc_auc["macro"]),
+             color='navy', linestyle=':', linewidth=4)
+
+    colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
+    for i, color in zip(range(4), colors):
+        plt.plot(fpr[i], tpr[i], color=color, lw=2,
+                 label='ROC curve of {0} (area = {1:0.5f})'.format(fdict[i], roc_auc[i]))
+
+    plt.plot([0, 1], [0, 1], 'k--', lw=2)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC of {}'.format(name))
+    plt.legend(loc="lower right")
+    plt.savefig("../Results/{}/out/{}_{}_ROC.png".format(path, name, dm))
+
+    print('Average precision score, micro-averaged over all classes: {0:0.5f}'.format(average_precision["micro"]))
+    # Plot all PRC curves
+    colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
+    plt.figure(figsize=(7, 9))
+    f_scores = np.linspace(0.2, 0.8, num=4)
+    lines = []
+    labels = []
+    for f_score in f_scores:
+        x = np.linspace(0.01, 1)
+        y = f_score * x / (2 * x - f_score)
+        l, = plt.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
+        plt.annotate('f1={0:0.1f}'.format(f_score), xy=(0.9, y[45] + 0.02))
+    lines.append(l)
+    labels.append('iso-f1 curves')
+
+    l, = plt.plot(recall["micro"], precision["micro"], color='gold', lw=2)
+    lines.append(l)
+    labels.append('micro-average Precision-recall (area = {0:0.5f})'
+                  ''.format(average_precision["micro"]))
+
+    for i, color in zip(range(4), colors):
+        l, = plt.plot(recall[i], precision[i], color=color, lw=2)
+        lines.append(l)
+        labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(fdict[i], average_precision[i]))
+
+    fig = plt.gcf()
+    fig.subplots_adjust(bottom=0.25)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('{} Precision-Recall curve: Average Accu={}'.format(name, accur))
+    plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=12))
+    plt.savefig("../Results/{}/out/{}_{}_PRC.png".format(path, name, dm))
+
+
 # slide level; need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
 def slide_metrics(inter_pd, path, name, fordict):
     inter_pd = inter_pd.drop(['path', 'label', 'Prediction'], axis=1)
     inter_pd = inter_pd.groupby(['slide']).mean()
     inter_pd = inter_pd.round({'True_label': 0})
     inter_pd['Prediction'] = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
-    redict = {'MSI_score': 0, 'Endometroid_score': 1, 'Serous-like_score': 2, 'POLE_score': 3}
+    redict = {'MSI_score': int(0), 'Endometroid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
     inter_pd['Prediction'] = inter_pd['Prediction'].replace(redict)
+    inter_pd.to_csv("../Results/{}/out/fake_{}_slide.csv".format(path, name), index=True)
+
 
     stinter_pd = inter_pd
     stinter_pd['Prediction'] = stinter_pd['Prediction'].replace(fordict)
     stinter_pd['True_label'] = stinter_pd['True_label'].replace(fordict)
-    stinter_pd.to_csv("../Results/{}/out/{}_slide.csv".format(path, name), index=False)
+    stinter_pd.to_csv("../Results/{}/out/{}_slide.csv".format(path, name), index=True)
 
     # accuracy calculations
     accu = 0
@@ -41,23 +169,36 @@ def slide_metrics(inter_pd, path, name, fordict):
     for idx, row in inter_pd.iterrows():
         if row['Prediction'] == row['True_label']:
             accu += 1
-            if row['True_label'] == 0:
+            print(row['True_label'])
+            print(row['Prediction'])
+            if int(row['True_label']) == 0:
                 accua += 1
-            elif row['True_label'] == 1:
+            elif int(row['True_label']) == 1:
                 accub += 1
-            elif row['True_label'] == 2:
+            elif int(row['True_label']) == 2:
                 accuc += 1
-            elif row['True_label'] == 3:
+            elif int(row['True_label']) == 3:
                 accud += 1
 
-    accur = round(accu / tott, 5)
+    print(accua)
+    print(accub)
+    print(accuc)
+    print(accud)
+
+    accurr = round(accu / tott, 5)
     print('Slide Total Accuracy:')
-    print(accur)
+    print(accurr)
 
     tota = inter_pd[inter_pd.True_label == 0].shape[0]
     totb = inter_pd[inter_pd.True_label == 1].shape[0]
     totc = inter_pd[inter_pd.True_label == 2].shape[0]
     totd = inter_pd[inter_pd.True_label == 3].shape[0]
+
+    print(inter_pd[inter_pd.True_label == 0])
+    print(inter_pd[inter_pd.True_label == 1])
+    print(inter_pd[inter_pd.True_label == 2])
+    print(inter_pd[inter_pd.True_label == 3])
+
     try:
         accuar = round(accua / tota, 5)
     except ZeroDivisionError:
@@ -84,131 +225,11 @@ def slide_metrics(inter_pd, path, name, fordict):
     print(accudr)
 
     try:
-        outtl = inter_pd['True_label']
-        pdx = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].values()
-
-        # Compute ROC and PRC curve and ROC and PRC area for each class
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        # PRC
-        # For each class
-        precision = dict()
-        recall = dict()
-        average_precision = dict()
-        microy = []
-        microscore = []
-        for i in range(4):
-            fpr[i], tpr[i], _ = skl.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                      np.asarray(pdx[:, i]).ravel())
-            try:
-                roc_auc[i] = skl.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                       np.asarray(pdx[:, i]).ravel())
-            except ValueError:
-                roc_auc[i] = np.nan
-
-            microy.extend(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')))
-            microscore.extend(np.asarray(pdx[:, i]).ravel())
-
-            precision[i], recall[i], _ = \
-                skl.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                   np.asarray(pdx[:, i]).ravel())
-            try:
-                average_precision[i] = \
-                    skl.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                        np.asarray(pdx[:, i]).ravel())
-            except ValueError:
-                average_precision[i] = np.nan
-
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(),
-                                                              np.asarray(microscore).ravel())
-        roc_auc["micro"] = skl.metrics.auc(fpr["micro"], tpr["micro"])
-
-        # A "micro-average": quantifying score on all classes jointly
-        precision["micro"], recall["micro"], _ = skl.metrics.precision_recall_curve(np.asarray(microy).ravel(),
-                                                                                    np.asarray(microscore).ravel())
-        average_precision["micro"] = skl.metrics.average_precision_score(np.asarray(microy).ravel(),
-                                                                         np.asarray(microscore).ravel(),
-                                                                         average="micro")
-
-        # Compute macro-average ROC curve and ROC area
-
-        # First aggregate all false positive rates
-        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(4)]))
-
-        # Then interpolate all ROC curves at this points
-        mean_tpr = np.zeros_like(all_fpr)
-        for i in range(4):
-            mean_tpr += interp(all_fpr, fpr[i], tpr[i])
-
-        # Finally average it and compute AUC
-        mean_tpr /= 4
-
-        fpr["macro"] = all_fpr
-        tpr["macro"] = mean_tpr
-        roc_auc["macro"] = skl.metrics.auc(fpr["macro"], tpr["macro"])
-
-        # Plot all ROC curves
-        plt.figure()
-        plt.plot(fpr["micro"], tpr["micro"],
-                 label='micro-average ROC curve (area = {0:0.5f})'
-                       ''.format(roc_auc["micro"]),
-                 color='deeppink', linestyle=':', linewidth=4)
-
-        plt.plot(fpr["macro"], tpr["macro"],
-                 label='macro-average ROC curve (area = {0:0.5f})'
-                       ''.format(roc_auc["macro"]),
-                 color='navy', linestyle=':', linewidth=4)
-
-        colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
-        for i, color in zip(range(4), colors):
-            plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                     label='ROC curve of {0} (area = {1:0.5f})'.format(fordict[i], roc_auc[i]))
-
-        plt.plot([0, 1], [0, 1], 'k--', lw=2)
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('ROC of {}'.format(name))
-        plt.legend(loc="lower right")
-        plt.savefig("../Results/{}/out/{}_slide_ROC.png".format(path, name))
-
-        print('Average precision score, micro-averaged over all classes: {0:0.5f}'.format(average_precision["micro"]))
-        # Plot all PRC curves
-        colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
-        plt.figure(figsize=(7, 9))
-        f_scores = np.linspace(0.2, 0.8, num=4)
-        lines = []
-        labels = []
-        for f_score in f_scores:
-            x = np.linspace(0.01, 1)
-            y = f_score * x / (2 * x - f_score)
-            l, = plt.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
-            plt.annotate('f1={0:0.1f}'.format(f_score), xy=(0.9, y[45] + 0.02))
-        lines.append(l)
-        labels.append('iso-f1 curves')
-
-        l, = plt.plot(recall["micro"], precision["micro"], color='gold', lw=2)
-        lines.append(l)
-        labels.append('micro-average Precision-recall (area = {0:0.5f})'
-                      ''.format(average_precision["micro"]))
-
-        for i, color in zip(range(4), colors):
-            l, = plt.plot(recall[i], precision[i], color=color, lw=2)
-            lines.append(l)
-            labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(fordict[i], average_precision[i]))
-
-        fig = plt.gcf()
-        fig.subplots_adjust(bottom=0.25)
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.title('{} Precision-Recall curve: Average Accu={}'.format(name, accur))
-        plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=12))
-        plt.savefig("../Results/{}/out/{}_slide_PRC.png".format(path, name))
+        outtl_slide = inter_pd['True_label']
+        print(outtl_slide)
+        pdx_slide = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
+        print(pdx_slide)
+        ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr)
     except ValueError:
         print('Not able to generate plots based on this set!')
 
@@ -232,20 +253,20 @@ def metrics(pdx, tl, path, name, ori_test=None):
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
     lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
-    pdx = np.asmatrix(pdx)
-    prl = pdx.argmax(axis=1).astype('uint8')
+    pdxt = np.asmatrix(pdx)
+    prl = pdxt.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
-    outt = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score'])
-    outtl = pd.DataFrame(tl, columns = ['True_label'])
+    outt = pd.DataFrame(pdxt, columns = ['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score'])
+    outtlt = pd.DataFrame(tl, columns = ['True_label'])
     if name == 'Validation' or name == 'Training':
-        outtl = outtl.round(0)
-    out = pd.concat([outt, prl, outtl], axis=1)
+        outtlt = outtlt.round(0)
+    out = pd.concat([outt, prl, outtlt], axis=1)
     if ori_test is not None:
         out = pd.concat([ori_test, out], axis=1)
         slide_metrics(out, path, name, lbdict)
 
     stprl = prl.replace(lbdict)
-    stouttl = outtl.replace(lbdict)
+    stouttl = outtlt.replace(lbdict)
     stout = pd.concat([outt, stprl, stouttl], axis=1)
     if ori_test is not None:
         stout = pd.concat([ori_test, stout], axis=1)
@@ -270,9 +291,9 @@ def metrics(pdx, tl, path, name, ori_test=None):
             elif row['True_label'] == 3:
                 accud += 1
 
-    accur = round(accu/tott,5)
+    accurw = round(accu/tott,5)
     print('Tile Total Accuracy:')
-    print(accur)
+    print(accurw)
 
     tota = out[out.True_label == 0].shape[0]
     totb = out[out.True_label == 1].shape[0]
@@ -304,126 +325,7 @@ def metrics(pdx, tl, path, name, ori_test=None):
     print(accudr)
 
     try:
-        # Compute ROC and PRC curve and ROC and PRC area for each class
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
-        # PRC
-        # For each class
-        precision = dict()
-        recall = dict()
-        average_precision = dict()
-        microy = []
-        microscore = []
-        for i in range(4):
-            fpr[i], tpr[i], _ = skl.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                      np.asarray(pdx[:, i]).ravel())
-            try:
-                roc_auc[i] = skl.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                       np.asarray(pdx[:, i]).ravel())
-            except ValueError:
-                roc_auc[i] = np.nan
-
-            microy.extend(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')))
-            microscore.extend(np.asarray(pdx[:, i]).ravel())
-
-            precision[i], recall[i], _ = \
-                skl.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                   np.asarray(pdx[:, i]).ravel())
-            try:
-                average_precision[i] = \
-                    skl.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
-                                                        np.asarray(pdx[:, i]).ravel())
-            except ValueError:
-                average_precision[i] = np.nan
-
-        # Compute micro-average ROC curve and ROC area
-        fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(), np.asarray(microscore).ravel())
-        roc_auc["micro"] = skl.metrics.auc(fpr["micro"], tpr["micro"])
-
-        # A "micro-average": quantifying score on all classes jointly
-        precision["micro"], recall["micro"], _ = skl.metrics.precision_recall_curve(np.asarray(microy).ravel(),
-                                                                                    np.asarray(microscore).ravel())
-        average_precision["micro"] = skl.metrics.average_precision_score(np.asarray(microy).ravel(),
-                                                                         np.asarray(microscore).ravel(), average="micro")
-
-        # Compute macro-average ROC curve and ROC area
-
-        # First aggregate all false positive rates
-        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(4)]))
-
-        # Then interpolate all ROC curves at this points
-        mean_tpr = np.zeros_like(all_fpr)
-        for i in range(4):
-            mean_tpr += interp(all_fpr, fpr[i], tpr[i])
-
-        # Finally average it and compute AUC
-        mean_tpr /= 4
-
-        fpr["macro"] = all_fpr
-        tpr["macro"] = mean_tpr
-        roc_auc["macro"] = skl.metrics.auc(fpr["macro"], tpr["macro"])
-
-        # Plot all ROC curves
-        plt.figure()
-        plt.plot(fpr["micro"], tpr["micro"],
-                 label='micro-average ROC curve (area = {0:0.5f})'
-                       ''.format(roc_auc["micro"]),
-                 color='deeppink', linestyle=':', linewidth=4)
-
-        plt.plot(fpr["macro"], tpr["macro"],
-                 label='macro-average ROC curve (area = {0:0.5f})'
-                       ''.format(roc_auc["macro"]),
-                 color='navy', linestyle=':', linewidth=4)
-
-        colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
-        for i, color in zip(range(4), colors):
-            plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                     label='ROC curve of {0} (area = {1:0.5f})'.format(lbdict[i], roc_auc[i]))
-
-        plt.plot([0, 1], [0, 1], 'k--', lw=2)
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('ROC of {}'.format(name))
-        plt.legend(loc="lower right")
-        plt.savefig("../Results/{}/out/{}_tile_ROC.png".format(path, name))
-
-        print('Average precision score, micro-averaged over all classes: {0:0.5f}'.format(average_precision["micro"]))
-        # Plot all PRC curves
-        colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal', 'red'])
-        plt.figure(figsize=(7, 9))
-        f_scores = np.linspace(0.2, 0.8, num=4)
-        lines = []
-        labels = []
-        for f_score in f_scores:
-            x = np.linspace(0.01, 1)
-            y = f_score * x / (2 * x - f_score)
-            l, = plt.plot(x[y >= 0], y[y >= 0], color='gray', alpha=0.2)
-            plt.annotate('f1={0:0.1f}'.format(f_score), xy=(0.9, y[45] + 0.02))
-        lines.append(l)
-        labels.append('iso-f1 curves')
-
-        l, = plt.plot(recall["micro"], precision["micro"], color='gold', lw=2)
-        lines.append(l)
-        labels.append('micro-average Precision-recall (area = {0:0.5f})'
-                      ''.format(average_precision["micro"]))
-
-        for i, color in zip(range(4), colors):
-            l, = plt.plot(recall[i], precision[i], color=color, lw=2)
-            lines.append(l)
-            labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(lbdict[i], average_precision[i]))
-
-        fig = plt.gcf()
-        fig.subplots_adjust(bottom=0.25)
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.title('{} Precision-Recall curve: Average Accu={}'.format(name, accur))
-        plt.legend(lines, labels, loc=(0, -.38), prop=dict(size=12))
-        plt.savefig("../Results/{}/out/{}_tile_PRC.png".format(path, name))
+        ROC_PRC(outtlt, pdxt, path, name, lbdict, 'tile', accurw)
     except ValueError:
         print('Not able to generate plots based on this set!')
 
