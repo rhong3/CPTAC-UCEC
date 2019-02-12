@@ -151,13 +151,6 @@ def slide_metrics(inter_pd, path, name, fordict):
     inter_pd['Prediction'] = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
     redict = {'MSI_score': int(0), 'Endometroid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
     inter_pd['Prediction'] = inter_pd['Prediction'].replace(redict)
-    inter_pd.to_csv("../Results/{}/out/fake_{}_slide.csv".format(path, name), index=True)
-
-
-    stinter_pd = inter_pd
-    stinter_pd['Prediction'] = stinter_pd['Prediction'].replace(fordict)
-    stinter_pd['True_label'] = stinter_pd['True_label'].replace(fordict)
-    stinter_pd.to_csv("../Results/{}/out/{}_slide.csv".format(path, name), index=True)
 
     # accuracy calculations
     accu = 0
@@ -171,13 +164,13 @@ def slide_metrics(inter_pd, path, name, fordict):
             accu += 1
             print(row['True_label'])
             print(row['Prediction'])
-            if int(row['True_label']) == 0:
+            if row['True_label'] == 0:
                 accua += 1
-            elif int(row['True_label']) == 1:
+            elif row['True_label'] == 1:
                 accub += 1
-            elif int(row['True_label']) == 2:
+            elif row['True_label'] == 2:
                 accuc += 1
-            elif int(row['True_label']) == 3:
+            elif row['True_label'] == 3:
                 accud += 1
 
     print(accua)
@@ -232,7 +225,9 @@ def slide_metrics(inter_pd, path, name, fordict):
         ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr)
     except ValueError:
         print('Not able to generate plots based on this set!')
-
+    inter_pd['Prediction'] = inter_pd['Prediction'].replace(fordict)
+    inter_pd['True_label'] = inter_pd['True_label'].replace(fordict)
+    inter_pd.to_csv("../Results/{}/out/{}_slide.csv".format(path, name), index=True)
 
 # for real image prediction, just output the prediction scores as csv
 def realout(pdx, path, name):
