@@ -173,11 +173,6 @@ def slide_metrics(inter_pd, path, name, fordict):
             elif row['True_label'] == 3:
                 accud += 1
 
-    print(accua)
-    print(accub)
-    print(accuc)
-    print(accud)
-
     accurr = round(accu / tott, 5)
     print('Slide Total Accuracy:')
     print(accurr)
@@ -186,11 +181,6 @@ def slide_metrics(inter_pd, path, name, fordict):
     totb = inter_pd[inter_pd.True_label == 1].shape[0]
     totc = inter_pd[inter_pd.True_label == 2].shape[0]
     totd = inter_pd[inter_pd.True_label == 3].shape[0]
-
-    print(inter_pd[inter_pd.True_label == 0])
-    print(inter_pd[inter_pd.True_label == 1])
-    print(inter_pd[inter_pd.True_label == 2])
-    print(inter_pd[inter_pd.True_label == 3])
 
     try:
         accuar = round(accua / tota, 5)
@@ -218,7 +208,7 @@ def slide_metrics(inter_pd, path, name, fordict):
     print(accudr)
 
     try:
-        outtl_slide = inter_pd['True_label']
+        outtl_slide = inter_pd['True_label'].to_frame(Name='True_lable')
         print(outtl_slide)
         pdx_slide = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
         print(pdx_slide)
