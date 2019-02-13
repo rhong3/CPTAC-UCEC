@@ -162,8 +162,6 @@ def slide_metrics(inter_pd, path, name, fordict):
     for idx, row in inter_pd.iterrows():
         if row['Prediction'] == row['True_label']:
             accu += 1
-            print(row['True_label'])
-            print(row['Prediction'])
             if row['True_label'] == 0:
                 accua += 1
             elif row['True_label'] == 1:
@@ -208,7 +206,7 @@ def slide_metrics(inter_pd, path, name, fordict):
     print(accudr)
 
     try:
-        outtl_slide = inter_pd['True_label'].to_frame(Name='True_lable')
+        outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
         print(outtl_slide)
         pdx_slide = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
         print(pdx_slide)
