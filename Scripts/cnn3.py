@@ -299,7 +299,7 @@ class INCEPTION():
                                 print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
 
                             if i > 9999:
-                                train_mean_cost = np.mean(train_cost[-1000:-1])
+                                train_mean_cost = np.mean(train_cost[-3000:-1])
                                 print('Mean training cost: {}'.format(train_mean_cost))
                                 valid_mean_cost = np.mean(validation_cost[-4:-1])
                                 print('Mean CV cost: {}'.format(valid_mean_cost))
