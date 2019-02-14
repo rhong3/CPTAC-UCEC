@@ -264,6 +264,9 @@ class INCEPTION():
             next_element = itr.get_next()
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
+                train_cost = []
+                validation_cost = []
+                valid_cost = 0
                 while True:
                     try:
                         x, y = sessa.run(next_element)
@@ -278,6 +281,8 @@ class INCEPTION():
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 
+                        train_cost.append(cost)
+
                         if i % 1000 == 0 and verbose:
                             print("round {} --> cost: ".format(i), cost, flush=True)
 
@@ -289,9 +294,20 @@ class INCEPTION():
 
                                 self.valid_logger.add_summary(valid_summary, i)
 
+                                validation_cost.append(valid_cost)
+
                                 print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
 
-                        if i == max_iter-int(i/1000)-2 and verbose:  # and i >= 10000:
+                            if i > 9999:
+                                train_mean_cost = np.mean(train_cost[-1000:-1])
+                                print('Mean training cost: {}'.format(train_mean_cost))
+                                valid_mean_cost = np.mean(validation_cost[-4:-1])
+                                print('Mean CV cost: {}'.format(valid_mean_cost))
+                                if cost > train_mean_cost and valid_cost > valid_mean_cost:
+                                    print("Early stopped! No improvement for at least 3000 iterations")
+                                    break
+
+                        if i == max_iter-int(i/1000)-2 and verbose:
 
                             if cross_validate:
                                 now = datetime.now().isoformat()[11:]
@@ -330,6 +346,44 @@ class INCEPTION():
                             print('Not logging', flush=True)
 
                         break
+                try:
+                    if cross_validate:
+                        now = datetime.now().isoformat()[11:]
+                        print("------- Validation begin: {} -------\n".format(now), flush=True)
+                        x, y = sessa.run(next_element)
+                        feed_dict = {self.x_in: x, self.y_in: y}
+                        fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
+                        valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
+
+                        self.valid_logger.add_summary(valid_summary, i)
+
+                        print("round {} --> Last CV cost: ".format(i), valid_cost, flush=True)
+                        ac.CAM(net, w, pred, x, y, dirr, 'Validation')
+                        ac.metrics(pred, y, dirr, 'Validation')
+                        now = datetime.now().isoformat()[11:]
+                        print("------- Validation end: {} -------\n".format(now), flush=True)
+
+                    print("final avg cost (@ step {} = epoch {}): {}".format(
+                        i + 1, np.around(i / ct * bs), err_train / i), flush=True)
+
+                    now = datetime.now().isoformat()[11:]
+                    print("------- Training end: {} -------\n".format(now), flush=True)
+
+                    if save:
+                        outfile = os.path.join(os.path.abspath(outdir),
+                                               "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
+                        saver.save(self.sesh, outfile, global_step=None)
+                    try:
+                        self.train_logger.flush()
+                        self.train_logger.close()
+                        self.valid_logger.flush()
+                        self.valid_logger.close()
+
+                    except(AttributeError):  # not logging
+                        print('Not logging', flush=True)
+                except tf.errors.OutOfRangeError:
+                    print('No more validation needed!')
+
             print("--- %s seconds ---" % (time.time() - start_time))
 
         except(KeyboardInterrupt):
