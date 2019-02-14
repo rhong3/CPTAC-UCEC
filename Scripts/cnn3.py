@@ -306,6 +306,13 @@ class INCEPTION():
                                 if cost > train_mean_cost and valid_cost > valid_mean_cost:
                                     print("Early stopped! No improvement for at least 3000 iterations")
                                     break
+                                else:
+                                    print("Passed early stopping evaluation. Continue training!")
+                                    if save:
+                                        outfile = os.path.join(os.path.abspath(outdir),
+                                                               "{}_{}".format(self.model,
+                                                                              "_".join(['dropout', str(self.dropout)])))
+                                        saver.save(self.sesh, outfile, global_step=None)
 
                         if i == max_iter-int(i/1000)-2 and verbose:
 
@@ -369,10 +376,6 @@ class INCEPTION():
                     now = datetime.now().isoformat()[11:]
                     print("------- Training end: {} -------\n".format(now), flush=True)
 
-                    if save:
-                        outfile = os.path.join(os.path.abspath(outdir),
-                                               "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
-                        saver.save(self.sesh, outfile, global_step=None)
                     try:
                         self.train_logger.flush()
                         self.train_logger.close()
