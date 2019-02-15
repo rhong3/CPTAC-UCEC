@@ -90,7 +90,7 @@ for level in range(3):
                 shutil.rmtree(otdir, ignore_errors=True)
 
         else:
-            if label == 'POLE':
+            if label != 'Endometroid':
                 otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
                 try:
                     os.mkdir(otdir)
