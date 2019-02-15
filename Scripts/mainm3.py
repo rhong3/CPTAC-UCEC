@@ -214,7 +214,7 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
     except FileNotFoundError:
         alll = Sample_prep.big_image_sum(level, path=img_dir)
-        tes, trs = Sample_prep.set_sep(alll, path=data_dir)
+        trs, tes = Sample_prep.set_sep(alll, path=data_dir)
         trc, tec = counters(data_dir)
         loader(data_dir)
     # have trained model or not; train from scratch if not
