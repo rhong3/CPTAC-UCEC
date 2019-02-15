@@ -17,13 +17,11 @@ import multiprocessing as mp
 def bgcheck(img):
     the_imagea = np.array(img)[:, :, :3]
     the_imagea = np.nan_to_num(the_imagea)
-    maska = (the_imagea[:, :, 0] > 200).astype(np.uint8)
-    maskb = (the_imagea[:, :, 1] > 200).astype(np.uint8)
-    maskc = (the_imagea[:, :, 2] > 200).astype(np.uint8)
-    mask = maska * maskb * maskc
-
-    white = np.sum(mask)/(299 * 299)
-
+    mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
+    maskb = (the_imagea[:, :, :3] < 10).astype(np.uint8)
+    mask = mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]
+    maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
+    white = (np.sum(mask) + np.sum(maskb)) / (299 * 299)
     return white
 
 
