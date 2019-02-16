@@ -286,7 +286,6 @@ class INCEPTION():
                         mintrain = min(train_cost)
 
                         if cost <= mintrain and i > 9999:
-
                             if cross_validate:
                                 x, y = sessa.run(next_element)
                                 feed_dict = {self.x_in: x, self.y_in: y}
