@@ -283,6 +283,37 @@ class INCEPTION():
 
                         train_cost.append(cost)
 
+                        mintrain = min(train_cost)
+
+                        if cost <= mintrain and i > 9999:
+
+                            if cross_validate:
+                                x, y = sessa.run(next_element)
+                                feed_dict = {self.x_in: x, self.y_in: y}
+                                fetches = [self.pred_cost, self.merged_summary]
+                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
+
+                                self.valid_logger.add_summary(valid_summary, i)
+
+                                minvalid = min(validation_cost)
+
+                                if valid_cost <= minvalid:
+                                    print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
+                                    print("New Min loss model found!")
+                                    if save:
+                                        outfile = os.path.join(os.path.abspath(outdir),
+                                                               "{}_{}".format(self.model,
+                                                                              "_".join(['dropout', str(self.dropout)])))
+                                        saver.save(self.sesh, outfile, global_step=None)
+
+                            else:
+                                print("New Min loss model found!")
+                                if save:
+                                    outfile = os.path.join(os.path.abspath(outdir),
+                                                           "{}_{}".format(self.model,
+                                                                          "_".join(['dropout', str(self.dropout)])))
+                                    saver.save(self.sesh, outfile, global_step=None)
+
                         if i % 1000 == 0 and verbose:
                             print("round {} --> cost: ".format(i), cost, flush=True)
 
@@ -298,21 +329,17 @@ class INCEPTION():
 
                                 print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
 
-                            if i > 9999:
-                                train_mean_cost = np.mean(train_cost[-3000:-1])
+                            if i > 99999:
+                                train_mean_cost = np.mean(train_cost[-5000:-1])
                                 print('Mean training cost: {}'.format(train_mean_cost))
-                                valid_mean_cost = np.mean(validation_cost[-4:-1])
+                                valid_mean_cost = np.mean(validation_cost[-5:-1])
                                 print('Mean CV cost: {}'.format(valid_mean_cost))
                                 if cost > train_mean_cost and valid_cost > valid_mean_cost:
-                                    print("Early stopped! No improvement for at least 3000 iterations")
+                                    print("Early stopped! No improvement for at least 5000 iterations")
                                     break
                                 else:
                                     print("Passed early stopping evaluation. Continue training!")
-                                    if save:
-                                        outfile = os.path.join(os.path.abspath(outdir),
-                                                               "{}_{}".format(self.model,
-                                                                              "_".join(['dropout', str(self.dropout)])))
-                                        saver.save(self.sesh, outfile, global_step=None)
+
 
                         if i == max_iter-int(i/1000)-2 and verbose:
 
