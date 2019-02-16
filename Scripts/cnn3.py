@@ -298,6 +298,7 @@ class INCEPTION():
                                 minvalid = min(validation_cost)
 
                                 if valid_cost <= minvalid:
+                                    print("round {} --> cost: ".format(i), cost, flush=True)
                                     print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
                                     print("New Min loss model found!")
                                     if save:
@@ -307,6 +308,7 @@ class INCEPTION():
                                         saver.save(self.sesh, outfile, global_step=None)
 
                             else:
+                                print("round {} --> cost: ".format(i), cost, flush=True)
                                 print("New Min loss model found!")
                                 if save:
                                     outfile = os.path.join(os.path.abspath(outdir),
