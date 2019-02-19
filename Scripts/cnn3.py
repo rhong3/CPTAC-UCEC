@@ -287,19 +287,23 @@ class INCEPTION():
 
                         if cost <= mintrain and i > 9999:
                             if cross_validate:
-                                x, y = sessa.run(next_element)
-                                feed_dict = {self.x_in: x, self.y_in: y}
-                                fetches = [self.pred_cost, self.merged_summary]
-                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
-
-                                self.valid_logger.add_summary(valid_summary, i)
+                                temp_valid = []
+                                for iii in range(3):
+                                    x, y = sessa.run(next_element)
+                                    feed_dict = {self.x_in: x, self.y_in: y}
+                                    fetches = [self.pred_cost, self.merged_summary]
+                                    valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
+                                    self.valid_logger.add_summary(valid_summary, i)
+                                    temp_valid.append(valid_cost)
 
                                 minvalid = min(validation_cost)
+                                tempminvalid = np.mean(temp_valid)
 
-                                if valid_cost <= minvalid:
-                                    print("round {} --> cost: ".format(i), cost, flush=True)
-                                    print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
+                                if tempminvalid <= minvalid:
+                                    print("round {} --> loss: ".format(i), cost, flush=True)
+                                    print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
                                     print("New Min loss model found!")
+                                    validation_cost.append(tempminvalid)
                                     if save:
                                         outfile = os.path.join(os.path.abspath(outdir),
                                                                "{}_{}".format(self.model,
@@ -307,7 +311,7 @@ class INCEPTION():
                                         saver.save(self.sesh, outfile, global_step=None)
 
                             else:
-                                print("round {} --> cost: ".format(i), cost, flush=True)
+                                print("round {} --> loss: ".format(i), cost, flush=True)
                                 print("New Min loss model found!")
                                 if save:
                                     outfile = os.path.join(os.path.abspath(outdir),
@@ -316,7 +320,7 @@ class INCEPTION():
                                     saver.save(self.sesh, outfile, global_step=None)
 
                         if i % 1000 == 0 and verbose:
-                            print("round {} --> cost: ".format(i), cost, flush=True)
+                            print("round {} --> loss: ".format(i), cost, flush=True)
 
                             if cross_validate:
                                 x, y = sessa.run(next_element)
@@ -328,13 +332,13 @@ class INCEPTION():
 
                                 validation_cost.append(valid_cost)
 
-                                print("round {} --> CV cost: ".format(i), valid_cost, flush=True)
+                                print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
 
                             if i > 99999:
                                 train_mean_cost = np.mean(train_cost[-5000:-1])
-                                print('Mean training cost: {}'.format(train_mean_cost))
+                                print('Mean training loss: {}'.format(train_mean_cost))
                                 valid_mean_cost = np.mean(validation_cost[-5:-1])
-                                print('Mean CV cost: {}'.format(valid_mean_cost))
+                                print('Mean validation loss: {}'.format(valid_mean_cost))
                                 if cost > train_mean_cost and valid_cost > valid_mean_cost:
                                     print("Early stopped! No improvement for at least 5000 iterations")
                                     break
@@ -354,14 +358,14 @@ class INCEPTION():
 
                                 self.valid_logger.add_summary(valid_summary, i)
 
-                                print("round {} --> Last CV cost: ".format(i), valid_cost, flush=True)
+                                print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
                                 ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                                 ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Validation end: {} -------\n".format(now), flush=True)
 
                     except tf.errors.OutOfRangeError:
-                        print("final avg cost (@ step {} = epoch {}): {}".format(
+                        print("final avg loss (@ step {} = epoch {}): {}".format(
                             i+1, np.around(i / ct * bs), err_train / i), flush=True)
 
                         now = datetime.now().isoformat()[11:]
@@ -392,13 +396,22 @@ class INCEPTION():
 
                         self.valid_logger.add_summary(valid_summary, i)
 
-                        print("round {} --> Last CV cost: ".format(i), valid_cost, flush=True)
+                        print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
                         ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                         ac.metrics(pred, y, dirr, 'Validation')
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation end: {} -------\n".format(now), flush=True)
 
-                    print("final avg cost (@ step {} = epoch {}): {}".format(
+                    if not os.path.isfile(os.path.join(os.path.abspath(outdir),
+                                                   "{}_{}.meta".format(self.model,
+                                                                  "_".join(['dropout', str(self.dropout)])))):
+                        if save:
+                            print("Save the last model as the best model.")
+                            outfile = os.path.join(os.path.abspath(outdir),
+                                                   "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
+                            saver.save(self.sesh, outfile, global_step=None)
+
+                    print("final avg loss (@ step {} = epoch {}): {}".format(
                         i + 1, np.around(i / ct * bs), err_train / i), flush=True)
 
                     now = datetime.now().isoformat()[11:]
@@ -419,7 +432,7 @@ class INCEPTION():
 
         except(KeyboardInterrupt):
 
-            print("final avg cost (@ step {} = epoch {}): {}".format(
+            print("final avg loss (@ step {} = epoch {}): {}".format(
                 i, np.around(i / ct * bs), err_train / i), flush=True)
 
             now = datetime.now().isoformat()[11:]
