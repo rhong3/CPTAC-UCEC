@@ -281,8 +281,6 @@ class INCEPTION():
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 
-                        train_cost.append(cost)
-
                         mintrain = min(train_cost)
 
                         if cost <= mintrain and i > 9999:
@@ -300,6 +298,7 @@ class INCEPTION():
                                 tempminvalid = np.mean(temp_valid)
 
                                 if tempminvalid <= minvalid:
+                                    train_cost.append(cost)
                                     print("round {} --> loss: ".format(i), cost, flush=True)
                                     print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
                                     print("New Min loss model found!")
@@ -311,6 +310,7 @@ class INCEPTION():
                                         saver.save(self.sesh, outfile, global_step=None)
 
                             else:
+                                train_cost.append(cost)
                                 print("round {} --> loss: ".format(i), cost, flush=True)
                                 print("New Min loss model found!")
                                 if save:
@@ -318,6 +318,8 @@ class INCEPTION():
                                                            "{}_{}".format(self.model,
                                                                           "_".join(['dropout', str(self.dropout)])))
                                     saver.save(self.sesh, outfile, global_step=None)
+                        else:
+                            train_cost.append(cost)
 
                         if i % 1000 == 0 and verbose:
                             print("round {} --> loss: ".format(i), cost, flush=True)
