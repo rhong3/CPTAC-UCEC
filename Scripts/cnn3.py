@@ -303,7 +303,7 @@ class INCEPTION():
                                 if tempminvalid <= minvalid:
                                     train_cost.append(cost)
                                     print("round {} --> loss: ".format(i), cost, flush=True)
-                                    print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
+                                    print("round {} --> validation loss: ".format(i), tempminvalid, flush=True)
                                     print("New Min loss model found!")
                                     validation_cost.append(tempminvalid)
                                     if save:
