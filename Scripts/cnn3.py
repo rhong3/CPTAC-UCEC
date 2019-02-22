@@ -283,6 +283,9 @@ class INCEPTION():
 
                         mintrain = min(train_cost)
 
+                        if i < 2:
+                            train_cost.append(cost)
+
                         if cost <= mintrain and i > 9999:
                             if cross_validate:
                                 temp_valid = []
