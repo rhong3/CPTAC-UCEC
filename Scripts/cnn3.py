@@ -281,10 +281,10 @@ class INCEPTION():
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 
-                        mintrain = min(train_cost)
-
                         if i < 2:
                             train_cost.append(cost)
+
+                        mintrain = min(train_cost)
 
                         if cost <= mintrain and i > 9999:
                             if cross_validate:
