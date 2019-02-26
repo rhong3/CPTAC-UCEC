@@ -55,10 +55,12 @@ out_dir = "../Results/{}/out".format(dirr)
 def counters(totlist_dir):
     trlist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
     telist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    valist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
     trcc = len(trlist['label']) - 1
     tecc = len(telist['label']) - 1
+    vacc = len(valist['label']) - 1
 
-    return trcc, tecc
+    return trcc, tecc, vacc
 
 
 # read images
@@ -82,10 +84,13 @@ def _bytes_feature(value):
 def loader(totlist_dir):
     trlist = pd.read_csv(totlist_dir+'/tr_sample.csv', header=0)
     telist = pd.read_csv(totlist_dir+'/te_sample.csv', header=0)
+    valist = pd.read_csv(totlist_dir+'/va_sample.csv', header=0)
     trimlist = trlist['path'].values.tolist()
     trlblist = trlist['label'].values.tolist()
     teimlist = telist['path'].values.tolist()
     telblist = telist['label'].values.tolist()
+    vaimlist = valist['path'].values.tolist()
+    valblist = valist['label'].values.tolist()
 
     train_filename = data_dir+'/train.tfrecords'
     writer = tf.python_io.TFRecordWriter(train_filename)
@@ -129,19 +134,44 @@ def loader(totlist_dir):
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
         except AttributeError:
-            print('Error image:'+trimlist[i])
+            print('Error image:'+teimlist[i])
+            pass
+    writer.close()
+    sys.stdout.flush()
+
+    val_filename = data_dir+'/validation.tfrecords'
+    writer = tf.python_io.TFRecordWriter(val_filename)
+    for i in range(len(vaimlist)):
+        if not i % 1000:
+            sys.stdout.flush()
+        try:
+            # Load the image
+            img = load_image(vaimlist[i])
+            label = valblist[i]
+            # Create a feature
+            feature = {'validation/label': _int64_feature(label),
+                       'validation/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+            # Create an example protocol buffer
+            example = tf.train.Example(features=tf.train.Features(feature=feature))
+
+            # Serialize to string and write on the file
+            writer.write(example.SerializeToString())
+        except AttributeError:
+            print('Error image:'+vaimlist[i])
             pass
     writer.close()
     sys.stdout.flush()
 
 
 # load tfrecords and prepare datasets
-def tfreloader(mode, ep, bs, ctr, cte):
+def tfreloader(mode, ep, bs, ctr, cte, cva):
     filename = data_dir + '/' + mode + '.tfrecords'
     if mode == 'train':
         ct = ctr
-    else:
+    elif mode == 'test':
         ct = cte
+    else:
+        ct = cva
 
     datasets = data_input.DataSet(bs, ct, ep=ep, mode=mode, filename=filename)
 
@@ -149,16 +179,16 @@ def tfreloader(mode, ep, bs, ctr, cte):
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
-def main(trc, tec, testset=None, to_reload=None, test=None):
+def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec)
+            HE = tfreloader('test', 1, 1000, trc, tec, vac)
             m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec)
+            HE = tfreloader('test', 1, tec, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
@@ -166,17 +196,18 @@ def main(trc, tec, testset=None, to_reload=None, test=None):
     elif to_reload:  # restore for further training and testing
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
-        HE = tfreloader('train', ep, bs, trc, tec)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep, bs, trc, tec, vac)
         itt = int(trc * ep / bs)
-        if trc <= 2 * bs:
-            print("Not enough training images!")
+        if trc <= 2 * bs or vac <= bs:
+            print("Not enough training/validation images!")
         else:
-            m.train(HE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
+            m.train(HE, VHE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec)
+            HE = tfreloader('test', 1, 1000, trc, tec, vac)
             m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec)
+            HE = tfreloader('test', 1, tec, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
@@ -184,17 +215,18 @@ def main(trc, tec, testset=None, to_reload=None, test=None):
     else:  # train and test
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
-        HE = tfreloader('train', ep, bs, trc, tec)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep, bs, trc, tec, vac)
         itt = int(trc*ep/bs)+1
-        if trc <= 2*bs:
-            print("Not enough training images!")
+        if trc <= 2 * bs or vac <= bs:
+            print("Not enough training/validation images!")
         else:
-            m.train(HE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
+            m.train(HE, VHE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec)
+            HE = tfreloader('test', 1, 1000, trc, tec, vac)
             m.inference(HE, dirr, testset)
         elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec)
+            HE = tfreloader('test', 1, tec, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
@@ -208,14 +240,16 @@ if __name__ == "__main__":
             os.mkdir(DIR)
         except FileExistsError:
             pass
-    # get counts of testing and training dataset; if not exist, prepare testing and training datasets from sampling
+    # get counts of testing, validation, and training datasets;
+    # if not exist, prepare testing and training datasets from sampling
     try:
-        trc, tec = counters(data_dir)
+        trc, tec, vac = counters(data_dir)
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
+        vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
         alll = Sample_prep.big_image_sum(level, path=img_dir)
-        trs, tes = Sample_prep.set_sep(alll, path=data_dir)
-        trc, tec = counters(data_dir)
+        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir)
+        trc, tec, vac = counters(data_dir)
         loader(data_dir)
     # have trained model or not; train from scratch if not
     try:
@@ -223,11 +257,11 @@ if __name__ == "__main__":
         # test or not
         try:
             testmode = sys.argv[7]
-            main(trc, tec, testset=tes, to_reload=modeltoload, test=True)
+            main(trc, tec, vac, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
-            main(trc, tec, testset=tes, to_reload=modeltoload)
+            main(trc, tec, vac, testset=tes, valset=vas, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
-        main(trc, tec, testset=tes)
+        main(trc, tec, vac, testset=tes, valset=vas)
 

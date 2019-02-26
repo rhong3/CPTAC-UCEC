@@ -78,31 +78,41 @@ def big_image_sum(level=None, path="../tiles/"):
 
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
-def set_sep(alll, path, cut=0.15):
+def set_sep(alll, path, cut=0.2):
     trlist = []
     telist = []
+    valist = []
     for i in range(4):
         subset = alll.loc[alll['label'] == i]
         subset = sku.shuffle(subset)
-        test, train = np.split(subset, [int(cut * len(subset))])
+        validation, test, train = np.split(subset, [int(cut/4 * len(subset)), int(cut * len(subset))])
         trlist.append(train)
         telist.append(test)
+        valist.append(validation)
     test = pd.concat(telist)
     train = pd.concat(trlist)
+    validation = pd.concat(valist)
     test_tiles_list = []
     train_tiles_list = []
+    validation_tiles_list = []
     for idx, row in test.iterrows():
         tile_ids = tile_ids_in(row['slide'], row['path'], row['label'])
         test_tiles_list.extend(tile_ids)
     for idx, row in train.iterrows():
         tile_ids = tile_ids_in(row['slide'], row['path'], row['label'])
         train_tiles_list.extend(tile_ids)
+    for idx, row in validation.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['path'], row['label'])
+        validation_tiles_list.extend(tile_ids)
     test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'path', 'label'])
     train_tiles = pd.DataFrame(train_tiles_list, columns=['slide', 'path', 'label'])
+    validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'path', 'label'])
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
+    validation_tiles = sku.shuffle(validation_tiles)
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
+    validation_tiles.to_csv(path+'/va_sample.csv', header=True, index=False)
 
-    return train_tiles, test_tiles
+    return train_tiles, test_tiles, validation_tiles
 

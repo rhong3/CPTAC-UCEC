@@ -251,7 +251,7 @@ class INCEPTION():
         return i
 
     # training
-    def train(self, X, ct, bs, dirr, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
+    def train(self, X, VAX, ct, bs, dirr, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
         start_time = time.time()
         if save:
             saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -262,6 +262,10 @@ class INCEPTION():
             print("------- Training begin: {} -------\n".format(now), flush=True)
             itr, file, ph = X.data()
             next_element = itr.get_next()
+
+            vaitr, vafile, vaph = VAX.data()
+            vanext_element = vaitr.get_next()
+
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
                 train_cost = []
@@ -281,17 +285,52 @@ class INCEPTION():
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 
+                        if i % 200 == 0 and verbose:
+                            if cross_validate:
+                                x, y = sessa.run(vanext_element)
+                                feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
+                                fetches = [self.pred_cost, self.merged_summary]
+                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
+
+                                self.valid_logger.add_summary(valid_summary, i)
+
+                                validation_cost.append(valid_cost)
+
+                            if i > 9999 and verbose:
+                                if cross_validate and save:
+                                    if valid_cost <= min(validation_cost):
+                                        print("round {} --> loss: ".format(i), cost, flush=True)
+                                        print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
+                                        print("New Min loss model found!")
+                                        outfile = os.path.join(os.path.abspath(outdir),
+                                                               "{}_{}".format(self.model,
+                                                                              "_".join(['dropout', str(self.dropout)])))
+                                        saver.save(self.sesh, outfile, global_step=None)
+
+                        if i % 1000 == 0 and verbose:
+                            print("round {} --> loss: ".format(i), cost, flush=True)
+                            print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
+
+                            if i > 59999 and cross_validate:
+                                valid_mean_cost = np.mean(validation_cost[-60:-1])
+                                print('Mean validation loss: {}'.format(valid_mean_cost))
+                                if valid_cost > valid_mean_cost:
+                                    print("Early stopped! No improvement for at least 6000 iterations")
+                                    break
+                                else:
+                                    print("Passed early stopping evaluation. Continue training!")
+
                         if i < 2:
                             train_cost.append(cost)
 
                         mintrain = min(train_cost)
 
-                        if cost <= mintrain and i > 9999:
+                        if cost <= mintrain and i > 29999:
                             if cross_validate:
                                 temp_valid = []
-                                for iii in range(3):
-                                    x, y = sessa.run(next_element)
-                                    feed_dict = {self.x_in: x, self.y_in: y}
+                                for iii in range(10):
+                                    x, y = sessa.run(vanext_element)
+                                    feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
                                     fetches = [self.pred_cost, self.merged_summary]
                                     valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
                                     self.valid_logger.add_summary(valid_summary, i)
@@ -324,46 +363,20 @@ class INCEPTION():
                         else:
                             train_cost.append(cost)
 
-                        if i % 1000 == 0 and verbose:
-                            print("round {} --> loss: ".format(i), cost, flush=True)
-
-                            if cross_validate:
-                                x, y = sessa.run(next_element)
-                                feed_dict = {self.x_in: x, self.y_in: y}
-                                fetches = [self.pred_cost, self.merged_summary]
-                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
-
-                                self.valid_logger.add_summary(valid_summary, i)
-
-                                validation_cost.append(valid_cost)
-
-                                print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
-
-                            if i > 99999:
-                                train_mean_cost = np.mean(train_cost[-5000:-1])
-                                print('Mean training loss: {}'.format(train_mean_cost))
-                                valid_mean_cost = np.mean(validation_cost[-5:-1])
-                                print('Mean validation loss: {}'.format(valid_mean_cost))
-                                if cost > train_mean_cost and valid_cost > valid_mean_cost:
-                                    print("Early stopped! No improvement for at least 5000 iterations")
-                                    break
-                                else:
-                                    print("Passed early stopping evaluation. Continue training!")
-
 
                         if i == max_iter-int(i/1000)-2 and verbose:
 
                             if cross_validate:
                                 now = datetime.now().isoformat()[11:]
-                                print("------- Validation begin: {} -------\n".format(now), flush=True)
-                                x, y = sessa.run(next_element)
-                                feed_dict = {self.x_in: x, self.y_in: y}
+                                print("------- Final Validation begin: {} -------\n".format(now), flush=True)
+                                x, y = sessa.run(vanext_element)
+                                feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
                                 fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                                 valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
                                 self.valid_logger.add_summary(valid_summary, i)
 
-                                print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
+                                print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
                                 ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                                 ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
@@ -394,8 +407,8 @@ class INCEPTION():
                     if cross_validate:
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation begin: {} -------\n".format(now), flush=True)
-                        x, y = sessa.run(next_element)
-                        feed_dict = {self.x_in: x, self.y_in: y}
+                        x, y = sessa.run(vanext_element)
+                        feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
                         fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                         valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
