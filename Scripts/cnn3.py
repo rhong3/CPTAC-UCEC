@@ -268,6 +268,7 @@ class INCEPTION():
 
             with tf.Session() as sessa:
                 sessa.run(itr.initializer, feed_dict={ph: file})
+                sessa.run(vaitr.initializer, feed_dict={vaph: vafile})
                 train_cost = []
                 validation_cost = []
                 valid_cost = 0
