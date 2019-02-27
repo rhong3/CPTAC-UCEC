@@ -263,7 +263,7 @@ class INCEPTION():
             itr, file, ph = X.data()
             next_element = itr.get_next()
 
-            vaitr, vafile, vaph = VAX.data()
+            vaitr, vafile, vaph = VAX.data(train=False)
             vanext_element = vaitr.get_next()
 
             with tf.Session() as sessa:
