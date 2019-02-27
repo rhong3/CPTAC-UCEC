@@ -44,7 +44,7 @@ class DataSet(object):
                 resize=None,  # (width, height) tuple or None
                 horizontal_flip=True,
                 vertical_flip=True,
-                rotate=0,  # Maximum rotation angle in degrees
+                rotate=True,
                 crop_probability=0,  # How often we do crops
                 crop_min_percent=0.6,  # Minimum linear dimension of a crop
                 crop_max_percent=1.,  # Maximum linear dimension of a crop
@@ -87,9 +87,10 @@ class DataSet(object):
                              tf.tile(tf.expand_dims(flip_transform, 0), [batch_size, 1]),
                              tf.tile(tf.expand_dims(identity, 0), [batch_size, 1])))
 
-            if rotate > 0:
-                angle_rad = rotate / 180 * math.pi
-                angles = tf.random_uniform([batch_size], -angle_rad, angle_rad)
+            if rotate:
+                angles = tf.random_uniform([batch_size], -2, 2)
+                angles = tf.round(angles)
+                angles = angles * math.pi/2
                 transforms.append(
                     tf.contrib.image.angles_to_projective_transforms(
                         angles, height, width))
