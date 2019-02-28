@@ -286,53 +286,6 @@ class INCEPTION():
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 
-                        if i % 200 == 0 and verbose:
-                            if cross_validate:
-                                x, y = sessa.run(vanext_element)
-                                feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
-                                fetches = [self.pred_cost, self.merged_summary]
-                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
-
-                                self.valid_logger.add_summary(valid_summary, i)
-
-                                validation_cost.append(valid_cost)
-
-                                if i > 9999 and save:
-                                    if valid_cost <= min(validation_cost):
-                                        temp_valid = []
-                                        for iii in range(5):
-                                            x, y = sessa.run(vanext_element)
-                                            feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
-                                            fetches = [self.pred_cost, self.merged_summary]
-                                            valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
-                                            self.valid_logger.add_summary(valid_summary, i)
-                                            temp_valid.append(valid_cost)
-
-                                        tempminvalid = np.mean(temp_valid)
-
-                                        if tempminvalid <= min(validation_cost):
-                                            print("round {} --> loss: ".format(i), cost, flush=True)
-                                            print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
-                                            print("New Min loss model found!")
-                                            validation_cost.append(tempminvalid)
-                                            outfile = os.path.join(os.path.abspath(outdir),
-                                                                   "{}_{}".format(self.model,
-                                                                                  "_".join(['dropout', str(self.dropout)])))
-                                            saver.save(self.sesh, outfile, global_step=None)
-
-                        if i % 1000 == 0 and verbose:
-                            print("round {} --> loss: ".format(i), cost, flush=True)
-                            print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
-
-                            if i > 59999 and cross_validate:
-                                valid_mean_cost = np.mean(validation_cost[-60:-1])
-                                print('Mean validation loss: {}'.format(valid_mean_cost))
-                                if valid_cost > valid_mean_cost:
-                                    print("Early stopped! No improvement for at least 6000 iterations")
-                                    break
-                                else:
-                                    print("Passed early stopping evaluation. Continue training!")
-
                         if i < 2:
                             train_cost.append(cost)
 
@@ -350,8 +303,9 @@ class INCEPTION():
                                     temp_valid.append(valid_cost)
 
                                 tempminvalid = np.mean(temp_valid)
+                                minvalid = np.mean(validation_cost)
 
-                                if tempminvalid <= min(validation_cost):
+                                if tempminvalid <= minvalid:
                                     train_cost.append(cost)
                                     print("round {} --> loss: ".format(i), cost, flush=True)
                                     print("round {} --> validation loss: ".format(i), tempminvalid, flush=True)
@@ -375,6 +329,50 @@ class INCEPTION():
                         else:
                             train_cost.append(cost)
 
+                        if i % 1000 == 0 and verbose:
+                            if cross_validate:
+                                x, y = sessa.run(vanext_element)
+                                feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
+                                fetches = [self.pred_cost, self.merged_summary]
+                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
+                                self.valid_logger.add_summary(valid_summary, i)
+                                validation_cost.append(valid_cost)
+                            print("round {} --> loss: ".format(i), cost, flush=True)
+                            print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
+
+                            if i > 69999 and cross_validate:
+                                mean_cost = np.mean(train_cost[-6000:-1])
+                                valid_mean_cost = np.mean(validation_cost[-6:-1])
+                                print('Mean validation loss: {}'.format(valid_mean_cost))
+                                if valid_cost > valid_mean_cost and cost > mean_cost:
+                                    print("Early stopped! No improvement for at least 6000 iterations")
+                                    break
+                                else:
+                                    print("Passed early stopping evaluation. Continue training!")
+
+                        if i % 6002 == 0 and verbose:
+                            if cross_validate:
+                                temp_valid = []
+                                for iii in range(200):
+                                    x, y = sessa.run(vanext_element)
+                                    feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
+                                    fetches = [self.pred_cost, self.merged_summary]
+                                    valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
+                                    self.valid_logger.add_summary(valid_summary, i)
+                                    temp_valid.append(valid_cost)
+                                tempminvalid = np.mean(temp_valid)
+                                minvalid = np.mean(validation_cost)
+                                validation_cost.append(tempminvalid)
+                                print("round {} --> Step Average validation loss: ".format(i), tempminvalid, flush=True)
+
+                                if save and tempminvalid <= minvalid:
+                                    print("New Min loss model found!")
+                                    print("round {} --> loss: ".format(i), cost, flush=True)
+                                    outfile = os.path.join(os.path.abspath(outdir),
+                                                           "{}_{}".format(self.model,
+                                                                          "_".join(['dropout', str(self.dropout)])))
+                                    saver.save(self.sesh, outfile, global_step=None)
+
                         if i == max_iter-int(i/1000)-2 and verbose:
 
                             if cross_validate:
@@ -391,7 +389,7 @@ class INCEPTION():
                                 ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                                 ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
-                                print("------- Validation end: {} -------\n".format(now), flush=True)
+                                print("------- Final Validation end: {} -------\n".format(now), flush=True)
 
                     except tf.errors.OutOfRangeError:
                         print("final avg loss (@ step {} = epoch {}): {}".format(

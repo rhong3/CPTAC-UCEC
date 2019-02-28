@@ -197,7 +197,7 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
         HE = tfreloader('train', ep, bs, trc, tec, vac)
-        VHE = tfreloader('validation', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc * ep / bs)
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
@@ -216,7 +216,7 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
         m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
         HE = tfreloader('train', ep, bs, trc, tec, vac)
-        VHE = tfreloader('validation', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc*ep/bs)+1
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
