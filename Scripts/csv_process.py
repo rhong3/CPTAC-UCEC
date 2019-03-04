@@ -92,7 +92,7 @@ with open(csvfile, "w") as output:
 
 filtered_PID = PID[PID["Parent Sample ID(s)"].isin(reverse_inlist)]
 
-tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometroid', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
+tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometrioid', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
 a = filtered_PID['TCGA_subtype']
 filtered_PID['Subtype'] = a
 filtered_PID.Subtype = filtered_PID.Subtype.replace(tpdict)

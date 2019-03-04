@@ -145,11 +145,11 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur):
 
 # slide level; need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
 def slide_metrics(inter_pd, path, name, fordict):
-    inter_pd = inter_pd.drop(['path', 'label', 'Prediction'], axis=1)
+    inter_pd = inter_pd.drop(['path', 'label', 'Prediction', 'level'], axis=1)
     inter_pd = inter_pd.groupby(['slide']).mean()
     inter_pd = inter_pd.round({'True_label': 0})
-    inter_pd['Prediction'] = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
-    redict = {'MSI_score': int(0), 'Endometroid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
+    inter_pd['Prediction'] = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
+    redict = {'MSI_score': int(0), 'Endometrioid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
     inter_pd['Prediction'] = inter_pd['Prediction'].replace(redict)
 
     # accuracy calculations
@@ -189,8 +189,8 @@ def slide_metrics(inter_pd, path, name, fordict):
     try:
         accubr = round(accub / totb, 5)
     except ZeroDivisionError:
-        accubr = "No data for Endometroid."
-    print('Slide Endometroid Accuracy:')
+        accubr = "No data for Endometrioid."
+    print('Slide Endometrioid Accuracy:')
     print(accubr)
     try:
         accucr = round(accuc / totc, 5)
@@ -207,7 +207,7 @@ def slide_metrics(inter_pd, path, name, fordict):
 
     try:
         outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
-        pdx_slide = inter_pd[['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
+        pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
         ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr)
     except ValueError:
         print('Not able to generate plots based on this set!')
@@ -217,12 +217,12 @@ def slide_metrics(inter_pd, path, name, fordict):
 
 # for real image prediction, just output the prediction scores as csv
 def realout(pdx, path, name):
-    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
     prl = prl.replace(lbdict)
-    out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score'])
+    out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     out = pd.concat([out, prl], axis=1)
     out.insert(loc=0, column='Num', value=out.index)
     out.to_csv("../Results/{}/out/{}.csv".format(path, name), index=False)
@@ -233,11 +233,11 @@ def metrics(pdx, tl, path, name, ori_test=None):
     # format clean up
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
-    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     pdxt = np.asmatrix(pdx)
     prl = pdxt.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
-    outt = pd.DataFrame(pdxt, columns = ['MSI_score', 'Endometroid_score', 'Serous-like_score', 'POLE_score'])
+    outt = pd.DataFrame(pdxt, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     outtlt = pd.DataFrame(tl, columns = ['True_label'])
     if name == 'Validation' or name == 'Training':
         outtlt = outtlt.round(0)
@@ -289,8 +289,8 @@ def metrics(pdx, tl, path, name, ori_test=None):
     try:
         accubr = round(accub/totb,5)
     except ZeroDivisionError:
-        accubr = "No data for Endometroid."
-    print('Tile Endometroid Accuracy:')
+        accubr = "No data for Endometrioid."
+    print('Tile Endometrioid Accuracy:')
     print(accubr)
     try:
         accucr = round(accuc/totc,5)
@@ -347,9 +347,9 @@ def py_map2jpg(imgmap, rang, colorMap):
 def CAM(net, w, pred, x, y, path, name, rd=0):
     y = np.asmatrix(y)
     y = y.argmax(axis=1).astype('uint8')
-    lbdict = {0: 'MSI', 1: 'Endometroid', 2: 'Serous-like', 3: 'POLE'}
+    lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
-    DIRB = "../Results/{}/out/{}_Endometroid_img".format(path, name)
+    DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
     DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
     DIRD = "../Results/{}/out/{}_POLE_img".format(path, name)
     rd = rd*1000
@@ -424,7 +424,7 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
         elif prl[ij, 0] == 1:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[1], :])
             DIRR = DIRB
-            catt = 'Endometroid'
+            catt = 'Endometrioid'
         elif prl[ij, 0] == 2:
             curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[2], :])
             DIRR = DIRC

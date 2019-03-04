@@ -11,6 +11,7 @@ import matplotlib
 import os
 import shutil
 import pandas as pd
+import numpy as np
 matplotlib.use('Agg')
 import Slicer
 
@@ -38,27 +39,24 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
 start_time = time.time()
 CPTAClist = image_ids_in(CPTACpath, 'CPTAC')
 TCGAlist = image_ids_in(TCGApath, 'TCGA')
-for DIR in ("../tiles/", "../tiles/level0/", "../tiles/level1/", "../tiles/level2/"):
+for DIR in ("../tiles/", "../tiles/POLE/", "../tiles/Serous-like/", "../tiles/MSI/", "../tiles/Endometrioid/"):
     try:
         os.mkdir(DIR)
     except(FileExistsError):
         pass
 
-for level in range(3):
-    for DIR in ("../tiles/level{}/POLE/".format(str(level)), "../tiles/level{}/Serous-like/".format(str(level)),
-                "../tiles/level{}/MSI/".format(str(level)), "../tiles/level{}/Endometroid/".format(str(level))):
-        try:
-            os.mkdir(DIR)
-        except(FileExistsError):
-            pass
-
-    for i in CPTAClist:
-        matchrow = CPTAC_ref.loc[CPTAC_ref['Parent Sample ID(s)'] == i[1]]
-        if matchrow.empty:
-            continue
-        label = matchrow['Subtype'].to_string(index=False, header=False).strip()
-        print(label)
-        otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+for i in CPTAClist:
+    matchrow = CPTAC_ref.loc[CPTAC_ref['Parent Sample ID(s)'] == i[1]]
+    if matchrow.empty:
+        continue
+    label = matchrow['Subtype'].to_string(index=False, header=False).strip()
+    print(label)
+    try:
+        os.mkdir("../tiles/{}/{}".format(label, i[1]))
+    except(FileExistsError):
+        pass
+    for level in range(3):
+        otdir = "../tiles/{}/{}/level{}".format(label, i[1], str(level))
         try:
             os.mkdir(otdir)
         except(FileExistsError):
@@ -70,14 +68,19 @@ for level in range(3):
         if len(os.listdir(otdir)) < 2:
             shutil.rmtree(otdir, ignore_errors=True)
 
-    for i in TCGAlist:
-        matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
-        if matchrow.empty:
-            continue
-        label = matchrow['label'].to_string(index=False, header=False).strip()
-        print(label)
+for i in TCGAlist:
+    matchrow = TCGA_ref.loc[TCGA_ref['File Name'] == i[0]]
+    if matchrow.empty:
+        continue
+    label = matchrow['label'].to_string(index=False, header=False).strip()
+    print(label)
+    try:
+        os.mkdir("../tiles/{}/{}".format(label, i[1]))
+    except(FileExistsError):
+        pass
+    for level in range(3):
         if level != 0:
-            otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+            otdir = "../tiles/{}/{}/level{}".format(label, i[1], str(level))
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
@@ -90,15 +93,30 @@ for level in range(3):
                 shutil.rmtree(otdir, ignore_errors=True)
 
         else:
-            if label != 'Endometroid':
-                otdir = "../tiles/level{}/{}/{}".format(str(level), label, i[1])
+            if label == 'Endometrioid':
+                rand = np.random.rand(1)[0]
+                if rand < 0.25:
+                    otdir = "../tiles/{}/{}/level{}".format(label, i[1], str(level))
+                    try:
+                        os.mkdir(otdir)
+                    except(FileExistsError):
+                        pass
+                    try:
+                        n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
+                                                                        level=(level+1))
+                    except(IndexError):
+                        pass
+                    if len(os.listdir(otdir)) < 2:
+                        shutil.rmtree(otdir, ignore_errors=True)
+            else:
+                otdir = "../tiles/{}/{}/level{}".format(label, i[1], str(level))
                 try:
                     os.mkdir(otdir)
                 except(FileExistsError):
                     pass
                 try:
                     n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
-                                                                    level=(level+1))
+                                                                    level=(level + 1))
                 except(IndexError):
                     pass
                 if len(os.listdir(otdir)) < 2:

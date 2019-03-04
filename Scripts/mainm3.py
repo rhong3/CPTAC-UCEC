@@ -247,8 +247,8 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep.big_image_sum(level, path=img_dir)
-        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir)
+        alll = Sample_prep.big_image_sum(path=img_dir)
+        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, level=level)
         trc, tec, vac = counters(data_dir)
         loader(data_dir)
     # have trained model or not; train from scratch if not
@@ -262,6 +262,10 @@ if __name__ == "__main__":
             main(trc, tec, vac, testset=tes, valset=vas, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
+            loader(data_dir)
+        if not os.path.isfile(data_dir + '/train.tfrecords'):
+            loader(data_dir)
+        if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir)
         main(trc, tec, vac, testset=tes, valset=vas)
 

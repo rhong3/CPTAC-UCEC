@@ -45,7 +45,7 @@ TCGA_list['label'] = labellist
 
 TCGA_list = TCGA_list[TCGA_list.label != 'Mixed']
 TCGA_list = TCGA_list[TCGA_list.label != 'Serous']
-lbdict = {'CN low': 'Endometroid', 'CN high': 'Serous-like'}
+lbdict = {'CN low': 'Endometrioid', 'CN high': 'Serous-like'}
 TCGA_list['label'] = TCGA_list['label'].replace(lbdict)
 
 TCGA_list.to_csv('../new_TCGA_list.csv', header=True, index=False)
