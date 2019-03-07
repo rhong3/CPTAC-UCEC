@@ -27,16 +27,20 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
 
 def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', 'all.csv']):
     ids = []
-    for id in os.listdir(root_dir):
-        if id in ignore:
-            print('Skipping ID:', id)
-        else:
-            ids.append([slide, level, root_dir+'/'+id, label])
+    try:
+        for id in os.listdir(root_dir):
+            if id in ignore:
+                print('Skipping ID:', id)
+            else:
+                ids.append([slide, level, root_dir+'/'+id, label])
+    except FileNotFoundError:
+        print('Ignore:', root_dir)
+
     return ids
 
 
 # Get all svs images with its label as one file; level is the tile resolution level
-def big_image_sum(path="../tiles/"):
+def big_image_sum(path='../tiles/'):
     if not os.path.isdir(path):
         Cutter()
     big_images = []
@@ -73,11 +77,11 @@ def set_sep(alll, path, level=None, cut=0.2):
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
         validation = unq[:int(len(unq)*cut/4)]
-        valist.append(subset[subset.isin(validation)])
+        valist.append(subset[subset['slide'].isin(validation)])
         test = unq[int(len(unq)*cut/4):int(len(unq)*cut)]
-        telist.append(subset[subset.isin(test)])
+        telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq)*cut):]
-        trlist.append(subset[subset.isin(train)])
+        trlist.append(subset[subset['slide'].isin(train)])
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
