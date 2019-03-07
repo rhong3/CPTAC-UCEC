@@ -95,7 +95,7 @@ for i in TCGAlist:
         else:
             if label == 'Endometrioid':
                 rand = np.random.rand(1)[0]
-                if rand < 0.25:
+                if rand < 0.1:
                     otdir = "../tiles/{}/{}/level{}".format(label, i[1], str(level))
                     try:
                         os.mkdir(otdir)
