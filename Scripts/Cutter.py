@@ -16,26 +16,27 @@ matplotlib.use('Agg')
 import Slicer
 
 
-if __name__ == "__main__":
+# Get all images in the root directory
+def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
+    ids = []
+    for id in os.listdir(root_dir):
+        if id in ignore:
+            print('Skipping ID:', id)
+        else:
+            if mode == 'CPTAC':
+                dirname = id.split('_')[-2]
+                ids.append((id, dirname))
+            if mode == 'TCGA':
+                dirname = id.split('.')[0]
+                ids.append((id, dirname))
+    return ids
+
+
+def cut():
     CPTACpath = '../images/CPTAC/'
     TCGApath = '../images/TCGA/'
     CPTAC_ref = pd.read_csv('../Filtered_joined_PID.csv', header=0)
     TCGA_ref = pd.read_csv('../new_TCGA_list.csv', header=0)
-
-    # Get all images in the root directory
-    def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
-        ids = []
-        for id in os.listdir(root_dir):
-            if id in ignore:
-                print('Skipping ID:', id)
-            else:
-                if mode == 'CPTAC':
-                    dirname = id.split('_')[-2]
-                    ids.append((id, dirname))
-                if mode == 'TCGA':
-                    dirname = id.split('.')[0]
-                    ids.append((id, dirname))
-        return ids
 
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
