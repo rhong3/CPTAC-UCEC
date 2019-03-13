@@ -350,7 +350,7 @@ class INCEPTION():
                                 else:
                                     print("Passed early stopping evaluation. Continue training!")
 
-                        if i % 6002 == 0 and verbose:
+                        if i % 1001 == 0 and verbose:
                             if cross_validate:
                                 temp_valid = []
                                 for iii in range(200):
