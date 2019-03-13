@@ -330,30 +330,10 @@ class INCEPTION():
                             train_cost.append(cost)
 
                         if i % 1000 == 0 and verbose:
-                            if cross_validate:
-                                x, y = sessa.run(vanext_element)
-                                feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
-                                fetches = [self.pred_cost, self.merged_summary]
-                                valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
-                                self.valid_logger.add_summary(valid_summary, i)
-                                validation_cost.append(valid_cost)
                             print("round {} --> loss: ".format(i), cost, flush=True)
-                            print("round {} --> validation loss: ".format(i), valid_cost, flush=True)
-
-                            if i > 69999 and cross_validate:
-                                mean_cost = np.mean(train_cost[-6000:-1])
-                                valid_mean_cost = np.mean(validation_cost[-6:-1])
-                                print('Mean validation loss: {}'.format(valid_mean_cost))
-                                if valid_cost > valid_mean_cost and cost > mean_cost:
-                                    print("Early stopped! No improvement for at least 6000 iterations")
-                                    break
-                                else:
-                                    print("Passed early stopping evaluation. Continue training!")
-
-                        if i % 1001 == 0 and verbose:
                             if cross_validate:
                                 temp_valid = []
-                                for iii in range(200):
+                                for iii in range(100):
                                     x, y = sessa.run(vanext_element)
                                     feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
                                     fetches = [self.pred_cost, self.merged_summary]
@@ -372,6 +352,16 @@ class INCEPTION():
                                                            "{}_{}".format(self.model,
                                                                           "_".join(['dropout', str(self.dropout)])))
                                     saver.save(self.sesh, outfile, global_step=None)
+
+                                if i > 69999:
+                                    mean_cost = np.mean(train_cost[-10000:-1])
+                                    valid_mean_cost = np.mean(validation_cost[-10:-1])
+                                    print('Mean validation loss: {}'.format(valid_mean_cost))
+                                    if valid_cost > valid_mean_cost and cost > mean_cost:
+                                        print("Early stopped! No improvement for at least 10000 iterations")
+                                        break
+                                    else:
+                                        print("Passed early stopping evaluation. Continue training!")
 
                         if i == max_iter-int(i/1000)-2 and verbose:
 
