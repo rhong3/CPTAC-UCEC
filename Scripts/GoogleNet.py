@@ -10,7 +10,6 @@ import tensorflow.contrib.layers as layers
 import tensorflow.contrib.framework as ops
 
 
-
 def get_inception_layer(inputs, conv11_size, conv33_11_size, conv33_size,
                         conv55_11_size, conv55_size, pool11_size):
     with tf.variable_scope("conv_1x1"):
@@ -51,7 +50,6 @@ def googlenet(inputs,
               dropout_keep_prob=0.8,
               num_classes=1000,
               is_training=True,
-              restore_logits=None,
               scope='GoogleNet'):
     '''
     Implementation of https://arxiv.org/pdf/1409.4842.pdf

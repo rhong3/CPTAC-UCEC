@@ -82,16 +82,16 @@ class INCEPTION():
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
 
-        if model == 'IG':
-            import GoogleNet
-            logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
+        if model == 'I1':
+            import InceptionV1
+            logits, nett, ww = InceptionV1.googlenet(x_in_reshape,
                                                    num_classes=4,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='GoogleNet')
             print('Using Inception-V1')
         elif model == 'I2':
-            import inception_v2
+            import InceptionV2
             logits, nett, ww = inception_v2.inception_v2(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -104,7 +104,7 @@ class INCEPTION():
                                                          global_pool=False)
             print('Using Inception-V2')
         elif model == 'I3':
-            import inception_v3
+            import InceptionV3
             logits, nett, ww = inception_v3.inception_v3(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -118,7 +118,7 @@ class INCEPTION():
                                                          global_pool=False)
             print('Using Inception-V3')
         elif model == 'I4':
-            import inception_v4
+            import InceptionV4
             logits, nett, ww = inception_v4.inception_v4(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
@@ -127,8 +127,8 @@ class INCEPTION():
                                                          create_aux_logits=True,
                                                          scope='InceptionV4')
             print('Using Inception-V4')
-        elif model == 'IR1':
-            import inception_resnet_v1
+        elif model == 'I5':
+            import InceptionV5
             logits, nett, ww = inception_resnet_v1.inception_resnet_v1(x_in_reshape,
                                                                        num_classes=4,
                                                                        is_training=is_train,
@@ -136,8 +136,8 @@ class INCEPTION():
                                                                        reuse=None,
                                                                        scope='InceptionRes1')
             print('Using Inception-Resnet-V1')
-        elif model == 'IR2':
-            import inception_resnet_v2
+        elif model == 'I6':
+            import InceptionV6
             logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
                                                                        num_classes=4,
                                                                        is_training=is_train,
@@ -147,8 +147,8 @@ class INCEPTION():
                                                                        scope='InceptionRes2')
             print('Using Inception-Resnet-V2')
         else:
-            import GoogleNet
-            logits, nett, ww = GoogleNet.googlenet(x_in_reshape,
+            import InceptionV1
+            logits, nett, ww = InceptionV1.googlenet(x_in_reshape,
                                                    num_classes=4,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
