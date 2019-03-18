@@ -9,9 +9,7 @@ Created on 03/18/2019
 """
 
 import tensorflow as tf
-from keras.layers import Input, Dense, Convolution2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D, Dropout, Flatten, \
-    merge, Activation
-from keras.models import Model
+from keras.layers import Dense, Convolution2D, MaxPooling2D, AveragePooling2D, ZeroPadding2D, Dropout, Flatten, merge
 from keras.regularizers import l2
 from keras.layers.core import Layer
 import theano.tensor as T
@@ -69,8 +67,7 @@ def googlenet(input,
               dropout_keep_prob=0.8,
               num_classes=1000,
               is_training=True,
-              scope='GoogleNet',
-              weights_path=None):
+              scope='GoogleNet'):
     # creates GoogLeNet a.k.a. Inception v1 (Szegedy, 2015)
     with tf.name_scope(scope, "googlenet", [input]):
 

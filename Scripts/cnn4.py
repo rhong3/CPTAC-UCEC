@@ -92,20 +92,15 @@ class INCEPTION():
             print('Using Inception-V1')
         elif model == 'I2':
             import InceptionV2
-            logits, nett, ww = inception_v2.inception_v2(x_in_reshape,
-                                                         num_classes=4,
-                                                         is_training=is_train,
-                                                         dropout_keep_prob=dropout,
-                                                         min_depth=16,
-                                                         depth_multiplier=1.0,
-                                                         spatial_squeeze=True,
-                                                         reuse=None,
-                                                         scope='InceptionV2',
-                                                         global_pool=False)
+            logits, nett, ww = InceptionV2.inceptionv2(x_in_reshape,
+                                                   num_classes=4,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='InceptionV2')
             print('Using Inception-V2')
         elif model == 'I3':
             import InceptionV3
-            logits, nett, ww = inception_v3.inception_v3(x_in_reshape,
+            logits, nett, ww = InceptionV3.inceptionv3(x_in_reshape,
                                                          num_classes=4,
                                                          is_training=is_train,
                                                          dropout_keep_prob=dropout,
