@@ -277,7 +277,10 @@ class INCEPTION():
                         if i < 2:
                             train_cost.append(cost)
 
-                        mintrain = min(train_cost)
+                        try:
+                            mintrain = min(train_cost)
+                        except ValueError:
+                            mintrain = 0
 
                         if cost <= mintrain and i > 29999:
                             if cross_validate:
