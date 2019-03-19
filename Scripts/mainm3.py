@@ -12,6 +12,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 import data_input
+import data_input2
 import cnn3
 import pandas as pd
 import cv2
@@ -173,7 +174,7 @@ def tfreloader(mode, ep, bs, ctr, cte, cva):
     else:
         ct = cva
 
-    datasets = data_input.DataSet(bs, ct, ep=ep, mode=mode, filename=filename)
+    datasets = data_input2.DataSet(bs, ct, ep=ep, mode=mode, filename=filename)
 
     return datasets
 
