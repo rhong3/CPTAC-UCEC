@@ -81,11 +81,12 @@ class INCEPTION():
         y_in = tf.placeholder(dtype=tf.float32, name="y")
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
+        classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
 
         if model == 'I1':
             import InceptionV1
             logits, nett, ww = InceptionV1.googlenet(x_in_reshape,
-                                                   num_classes=4,
+                                                   num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='GoogleNet')
@@ -93,7 +94,7 @@ class INCEPTION():
         elif model == 'I2':
             import InceptionV2
             logits, nett, ww = InceptionV2.inceptionv2(x_in_reshape,
-                                                   num_classes=4,
+                                                   num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='InceptionV2')
@@ -101,50 +102,39 @@ class INCEPTION():
         elif model == 'I3':
             import InceptionV3
             logits, nett, ww = InceptionV3.inceptionv3(x_in_reshape,
-                                                         num_classes=4,
-                                                         is_training=is_train,
-                                                         dropout_keep_prob=dropout,
-                                                         min_depth=16,
-                                                         depth_multiplier=1.0,
-                                                         spatial_squeeze=True,
-                                                         reuse=None,
-                                                         create_aux_logits=True,
-                                                         scope='InceptionV3',
-                                                         global_pool=False)
+                                                   num_classes=classes,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='InceptionV3')
             print('Using Inception-V3')
         elif model == 'I4':
             import InceptionV4
-            logits, nett, ww = inception_v4.inception_v4(x_in_reshape,
-                                                         num_classes=4,
-                                                         is_training=is_train,
-                                                         dropout_keep_prob=dropout,
-                                                         reuse=None,
-                                                         create_aux_logits=True,
-                                                         scope='InceptionV4')
+            logits, nett, ww = InceptionV4.inceptionv4(x_in_reshape,
+                                                   num_classes=classes,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='InceptionV4')
             print('Using Inception-V4')
         elif model == 'I5':
             import InceptionV5
-            logits, nett, ww = inception_resnet_v1.inception_resnet_v1(x_in_reshape,
-                                                                       num_classes=4,
-                                                                       is_training=is_train,
-                                                                       dropout_keep_prob=dropout,
-                                                                       reuse=None,
-                                                                       scope='InceptionRes1')
+            logits, nett, ww = InceptionV5.inceptionresnetv1(x_in_reshape,
+                                                   num_classes=classes,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='InceptionResV1')
             print('Using Inception-Resnet-V1')
         elif model == 'I6':
             import InceptionV6
-            logits, nett, ww = inception_resnet_v2.inception_resnet_v2(x_in_reshape,
-                                                                       num_classes=4,
-                                                                       is_training=is_train,
-                                                                       dropout_keep_prob=dropout,
-                                                                       reuse=None,
-                                                                       create_aux_logits=True,
-                                                                       scope='InceptionRes2')
+            logits, nett, ww = InceptionV6.inceptionresnetv2(x_in_reshape,
+                                                   num_classes=classes,
+                                                   is_training=is_train,
+                                                   dropout_keep_prob=dropout,
+                                                   scope='InceptionResV2')
             print('Using Inception-Resnet-V2')
         else:
             import InceptionV1
             logits, nett, ww = InceptionV1.googlenet(x_in_reshape,
-                                                   num_classes=4,
+                                                   num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
                                                    scope='GoogleNet')

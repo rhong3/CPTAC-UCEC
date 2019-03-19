@@ -41,7 +41,7 @@ def conv2d_bn(x,
 
 def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionV3', channel_axis=3):
 
-    with tf.name_scope(scope, "InceptionV2", [input]):
+    with tf.name_scope(scope, "InceptionV3", [input]):
 
         x = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
         x = conv2d_bn(x, 32, 3, 3, padding='valid')
@@ -191,9 +191,10 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss2_ave_pool = AveragePooling2D(pool_size=(5, 5), strides=(3, 3), name='loss2/ave_pool')(x)
 
-        loss2_conv = conv2d_bn(loss2_ave_pool, 128, 1, 1)
+        loss2_conv_a = conv2d_bn(loss2_ave_pool, 128, 1, 1)
+        loss2_conv_b = conv2d_bn(loss2_conv_a, 768, 5, 5)
 
-        loss2_flat = Flatten()(loss2_conv)
+        loss2_flat = Flatten()(loss2_conv_b)
 
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', W_regularizer=l2(0.0002))(loss2_flat)
 
