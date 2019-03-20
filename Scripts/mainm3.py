@@ -11,9 +11,8 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
-import data_input
 import data_input2
-import cnn3
+import cnn4
 import pandas as pd
 import cv2
 import Sample_prep
@@ -183,7 +182,7 @@ def tfreloader(mode, ep, bs, ctr, cte, cva):
 def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
-        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
+        m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= 1000:
             HE = tfreloader('test', 1, 1000, trc, tec, vac)
@@ -195,7 +194,7 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
             print("Not enough testing images!")
 
     elif to_reload:  # restore for further training and testing
-        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
+        m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
         HE = tfreloader('train', ep, bs, trc, tec, vac)
         VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
@@ -214,7 +213,7 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
             print("Not enough testing images!")
 
     else:  # train and test
-        m = cnn3.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
+        m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
         HE = tfreloader('train', ep, bs, trc, tec, vac)
         VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
