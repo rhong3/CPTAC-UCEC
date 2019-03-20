@@ -41,7 +41,7 @@ class DataSet(object):
     # augmentation including onehot encoding
     def augment(self, images, labels):
 
-        angles = tf.round(tf.random_uniform([], 0, 4))
+        angles = tf.cast(tf.random_uniform([], 0, 4), tf.int32)
         images = tf.image.rot90(images, k=angles)
         images = tf.image.random_flip_left_right(images)
         images = tf.image.random_flip_up_down(images)
