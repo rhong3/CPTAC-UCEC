@@ -33,7 +33,7 @@ def googlenet(input,
         pool1_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), border_mode='valid', name='pool1/3x3_s2')(
             conv1_zero_pad)
 
-        pool1_norm1 = BatchNormalization(axis=3, scale=False, name='pool1/norm1')(pool1_3x3_s2)
+        pool1_norm1 = BatchNormalization(axis=-1, scale=False, name='pool1/norm1')(pool1_3x3_s2)
 
         conv2_3x3_reduce = Conv2D(64, (1, 1), border_mode='same', activation='relu', name='conv2/3x3_reduce',
                                          W_regularizer=l2(0.0002))(pool1_norm1)
@@ -41,7 +41,7 @@ def googlenet(input,
         conv2_3x3 = Conv2D(192, (3, 3), border_mode='same', activation='relu', name='conv2/3x3',
                                   W_regularizer=l2(0.0002))(conv2_3x3_reduce)
 
-        conv2_norm2 = BatchNormalization(axis=3, scale=False, name='conv2/norm2')(conv2_3x3)
+        conv2_norm2 = BatchNormalization(axis=-1, scale=False, name='conv2/norm2')(conv2_3x3)
 
         conv2_zero_pad = ZeroPadding2D(padding=(1, 1))(conv2_norm2)
 
@@ -70,7 +70,7 @@ def googlenet(input,
                                                name='inception_3a/pool_proj', W_regularizer=l2(0.0002))(inception_3a_pool)
 
         inception_3a_output = Concatenate([inception_3a_1x1, inception_3a_3x3, inception_3a_5x5, inception_3a_pool_proj],
-                                          axis=3, name='inception_3a/output')
+                                          axis=-1, name='inception_3a/output')
 
         inception_3b_1x1 = Conv2D(128, (1, 1), border_mode='same', activation='relu', name='inception_3b/1x1',
                                          W_regularizer=l2(0.0002))(inception_3a_output)
@@ -96,7 +96,7 @@ def googlenet(input,
                                                name='inception_3b/pool_proj', W_regularizer=l2(0.0002))(inception_3b_pool)
 
         inception_3b_output = Concatenate([inception_3b_1x1, inception_3b_3x3, inception_3b_5x5, inception_3b_pool_proj],
-                                          axis=3, name='inception_3b/output')
+                                          axis=-1, name='inception_3b/output')
 
         inception_3b_output_zero_pad = ZeroPadding2D(padding=(1, 1))(inception_3b_output)
 
@@ -125,7 +125,7 @@ def googlenet(input,
                                                name='inception_4a/pool_proj', W_regularizer=l2(0.0002))(inception_4a_pool)
 
         inception_4a_output = Concatenate([inception_4a_1x1, inception_4a_3x3, inception_4a_5x5, inception_4a_pool_proj],
-                                          axis=3, name='inception_4a/output')
+                                          axis=-1, name='inception_4a/output')
 
         loss1_ave_pool = AveragePooling2D(pool_size=(5, 5), strides=(3, 3), name='loss1/ave_pool')(inception_4a_output)
 
@@ -167,7 +167,7 @@ def googlenet(input,
                                                name='inception_4b/pool_proj', W_regularizer=l2(0.0002))(inception_4b_pool)
 
         inception_4b_output = Concatenate([inception_4b_1x1, inception_4b_3x3, inception_4b_5x5, inception_4b_pool_proj],
-                                          axis=3, name='inception_4b_output')
+                                          axis=-1, name='inception_4b_output')
 
         inception_4c_1x1 = Conv2D(128, (1, 1), border_mode='same', activation='relu', name='inception_4c/1x1',
                                          W_regularizer=l2(0.0002))(inception_4b_output)
@@ -193,7 +193,7 @@ def googlenet(input,
                                                name='inception_4c/pool_proj', W_regularizer=l2(0.0002))(inception_4c_pool)
 
         inception_4c_output = Concatenate([inception_4c_1x1, inception_4c_3x3, inception_4c_5x5, inception_4c_pool_proj],
-                                          axis=3, name='inception_4c/output')
+                                          axis=-1, name='inception_4c/output')
 
         inception_4d_1x1 = Conv2D(112, (1, 1), border_mode='same', activation='relu', name='inception_4d/1x1',
                                          W_regularizer=l2(0.0002))(inception_4c_output)
@@ -219,7 +219,7 @@ def googlenet(input,
                                                name='inception_4d/pool_proj', W_regularizer=l2(0.0002))(inception_4d_pool)
 
         inception_4d_output = Concatenate([inception_4d_1x1, inception_4d_3x3, inception_4d_5x5, inception_4d_pool_proj],
-                                          axis=3, name='inception_4d/output')
+                                          axis=-1, name='inception_4d/output')
 
         loss2_ave_pool = AveragePooling2D(pool_size=(5, 5), strides=(3, 3), name='loss2/ave_pool')(inception_4d_output)
 
@@ -261,7 +261,7 @@ def googlenet(input,
                                                name='inception_4e/pool_proj', W_regularizer=l2(0.0002))(inception_4e_pool)
 
         inception_4e_output = Concatenate([inception_4e_1x1, inception_4e_3x3, inception_4e_5x5, inception_4e_pool_proj],
-                                          axis=3, name='inception_4e/output')
+                                          axis=-1, name='inception_4e/output')
 
         inception_4e_output_zero_pad = ZeroPadding2D(padding=(1, 1))(inception_4e_output)
 
@@ -290,7 +290,7 @@ def googlenet(input,
                                                name='inception_5a/pool_proj', W_regularizer=l2(0.0002))(inception_5a_pool)
 
         inception_5a_output = Concatenate([inception_5a_1x1, inception_5a_3x3, inception_5a_5x5, inception_5a_pool_proj],
-                                          axis=3, name='inception_5a/output')
+                                          axis=-1, name='inception_5a/output')
 
         inception_5b_1x1 = Conv2D(384, (1, 1), border_mode='same', activation='relu', name='inception_5b/1x1',
                                          W_regularizer=l2(0.0002))(inception_5a_output)
@@ -316,7 +316,7 @@ def googlenet(input,
                                                name='inception_5b/pool_proj', W_regularizer=l2(0.0002))(inception_5b_pool)
 
         inception_5b_output = Concatenate([inception_5b_1x1, inception_5b_3x3, inception_5b_5x5, inception_5b_pool_proj],
-                                          axis=3, name='inception_5b/output')
+                                          axis=-1, name='inception_5b/output')
 
         net = inception_5b_output
 
