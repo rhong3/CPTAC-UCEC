@@ -9,7 +9,6 @@ Modified on 1/22/2019 (add a inlist filter so that only images on file are liste
 """
 
 import pandas as pd
-import csv
 
 
 def flatten(l, a):
