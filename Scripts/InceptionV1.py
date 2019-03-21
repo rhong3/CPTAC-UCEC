@@ -49,20 +49,6 @@ class LRN(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class PoolHelper(Layer):
-
-    def __init__(self, **kwargs):
-        super(PoolHelper, self).__init__(**kwargs)
-
-    def call(self, x, mask=None):
-        return x[:, :, 1:, 1:]
-
-    def get_config(self):
-        config = {}
-        base_config = super(PoolHelper, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-
 def googlenet(input,
               dropout_keep_prob=0.8,
               num_classes=1000,
@@ -76,10 +62,8 @@ def googlenet(input,
 
         conv1_zero_pad = ZeroPadding2D(padding=(1, 1))(conv1_7x7_s2)
 
-        pool1_helper = PoolHelper()(conv1_zero_pad)
-
         pool1_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), border_mode='valid', name='pool1/3x3_s2')(
-            pool1_helper)
+            conv1_zero_pad)
 
         pool1_norm1 = LRN(name='pool1/norm1')(pool1_3x3_s2)
 
@@ -93,10 +77,8 @@ def googlenet(input,
 
         conv2_zero_pad = ZeroPadding2D(padding=(1, 1))(conv2_norm2)
 
-        pool2_helper = PoolHelper()(conv2_zero_pad)
-
         pool2_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), border_mode='valid', name='pool2/3x3_s2')(
-            pool2_helper)
+            conv2_zero_pad)
 
         inception_3a_1x1 = Convolution2D(64, (1, 1), border_mode='same', activation='relu', name='inception_3a/1x1',
                                          W_regularizer=l2(0.0002))(pool2_3x3_s2)
@@ -150,10 +132,8 @@ def googlenet(input,
 
         inception_3b_output_zero_pad = ZeroPadding2D(padding=(1, 1))(inception_3b_output)
 
-        pool3_helper = PoolHelper()(inception_3b_output_zero_pad)
-
         pool3_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), border_mode='valid', name='pool3/3x3_s2')(
-            pool3_helper)
+            inception_3b_output_zero_pad)
 
         inception_4a_1x1 = Convolution2D(192, (1, 1), border_mode='same', activation='relu', name='inception_4a/1x1',
                                          W_regularizer=l2(0.0002))(pool3_3x3_s2)
@@ -311,10 +291,8 @@ def googlenet(input,
 
         inception_4e_output_zero_pad = ZeroPadding2D(padding=(1, 1))(inception_4e_output)
 
-        pool4_helper = PoolHelper()(inception_4e_output_zero_pad)
-
         pool4_3x3_s2 = MaxPooling2D(pool_size=(3, 3), strides=(2, 2), border_mode='valid', name='pool4/3x3_s2')(
-            pool4_helper)
+            inception_4e_output_zero_pad)
 
         inception_5a_1x1 = Convolution2D(256, (1, 1), border_mode='same', activation='relu', name='inception_5a/1x1',
                                          W_regularizer=l2(0.0002))(pool4_3x3_s2)

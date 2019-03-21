@@ -60,7 +60,7 @@ class INCEPTION():
                 os.mkdir(log_dir + '/training')
                 os.mkdir(log_dir + '/validation')
 
-            except(FileExistsError):
+            except FileExistsError:
                 pass
 
             self.train_logger = tf.summary.FileWriter(log_dir + '/training', self.sesh.graph)
