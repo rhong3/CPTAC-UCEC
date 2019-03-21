@@ -45,5 +45,8 @@ jj = pd.concat([TCGA_lite, CPTAC_lite])
 
 jj.to_csv('../MUT_joined.csv', header=True, index=False)
 
+jjx = pd.get_dummies(jj, columns=['subtype'])
+
+jjx.to_csv('../dummy_MUT_joined.csv', header=True, index=False)
 
 
