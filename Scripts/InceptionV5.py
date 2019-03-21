@@ -8,8 +8,11 @@ Created on 03/19/2019
 @author: RH
 """
 import tensorflow as tf
-from keras.layers import Dense, Convolution2D, MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D, \
-    Dropout, Flatten, BatchNormalization, Activation, concatenate, Lambda, add
+from keras.layers.convolutional import Conv2D
+from keras.layers.pooling import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
+from keras.layers.core import Dense, Dropout, Flatten, Activation, Lambda
+from keras.layers.normalization import BatchNormalization
+from keras.layers.merge import Concatenate, add
 from keras.regularizers import l2
 
 
@@ -17,15 +20,15 @@ def resnet_v1_stem(input):
     '''The stem of the Inception-ResNet-v1 network.'''
 
     # Input shape is 299 * 299 * 3 (Tensorflow dimension ordering)
-    x = Convolution2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(input)  # 149 * 149 * 32
-    x = Convolution2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 147 * 147 * 32
-    x = Convolution2D(64, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 147 * 147 * 64
+    x = Conv2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(input)  # 149 * 149 * 32
+    x = Conv2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 147 * 147 * 32
+    x = Conv2D(64, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 147 * 147 * 64
 
     x = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)  # 73 * 73 * 64
 
-    x = Convolution2D(80, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 73 * 73 * 80
-    x = Convolution2D(192, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 71 * 71 * 192
-    x = Convolution2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(x)  # 35 * 35 * 256
+    x = Conv2D(80, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 73 * 73 * 80
+    x = Conv2D(192, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 71 * 71 * 192
+    x = Conv2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(x)  # 35 * 35 * 256
 
     x = BatchNormalization(axis=-1)(x)
     x = Activation("relu")(x)
@@ -36,18 +39,18 @@ def resnet_v1_stem(input):
 def inception_resnet_v1_A(input, scale_residual=True):
     '''Architecture of Inception_ResNet_A block which is a 35 * 35 grid module.'''
 
-    ar1 = Convolution2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    ar1 = Conv2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
 
-    ar2 = Convolution2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    ar2 = Convolution2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar2)
+    ar2 = Conv2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    ar2 = Conv2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar2)
 
-    ar3 = Convolution2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    ar3 = Convolution2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
-    ar3 = Convolution2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
+    ar3 = Conv2D(32, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    ar3 = Conv2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
+    ar3 = Conv2D(32, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
 
-    merged = concatenate([ar1, ar2, ar3], axis=-1)
+    merged = Concatenate([ar1, ar2, ar3], axis=-1)
 
-    ar = Convolution2D(256, (1, 1), activation="linear", padding="same")(merged)
+    ar = Conv2D(256, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: ar = Lambda(lambda a: a * 0.1)(ar)
 
     output = add([input, ar])
@@ -60,15 +63,15 @@ def inception_resnet_v1_A(input, scale_residual=True):
 def inception_resnet_v1_B(input, scale_residual=True):
     '''Architecture of Inception_ResNet_B block which is a 17 * 17 grid module.'''
 
-    br1 = Convolution2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    br1 = Conv2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
 
-    br2 = Convolution2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    br2 = Convolution2D(128, (1, 7), W_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
-    br2 = Convolution2D(128, (7, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
+    br2 = Conv2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    br2 = Conv2D(128, (1, 7), W_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
+    br2 = Conv2D(128, (7, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
 
-    merged = concatenate([br1, br2], axis=-1)
+    merged = Concatenate([br1, br2], axis=-1)
 
-    br = Convolution2D(896, (1, 1), activation="linear", padding="same")(merged)
+    br = Conv2D(896, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: br = Lambda(lambda b: b * 0.1)(br)
 
     output = add([input, br])
@@ -81,15 +84,15 @@ def inception_resnet_v1_B(input, scale_residual=True):
 def inception_resnet_v1_C(input, scale_residual=True):
     '''Architecture of Inception_ResNet_C block which is a 8 * 8 grid module.'''
 
-    cr1 = Convolution2D(192, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    cr1 = Conv2D(192, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
 
-    cr2 = Convolution2D(192, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    cr2 = Convolution2D(192, (1, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
-    cr2 = Convolution2D(192, (3, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
+    cr2 = Conv2D(192, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    cr2 = Conv2D(192, (1, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
+    cr2 = Conv2D(192, (3, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
 
-    merged = concatenate([cr1, cr2], axis=-1)
+    merged = Concatenate([cr1, cr2], axis=-1)
 
-    cr = Convolution2D(1792, (1, 1), activation="linear", padding="same")(merged)
+    cr = Conv2D(1792, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: cr = Lambda(lambda c: c * 0.1)(cr)
 
     output = add([input, cr])
@@ -104,13 +107,13 @@ def reduction_resnet_A(input, k=192, l=224, m=256, n=384):
 
     rar1 = MaxPooling2D((3, 3), strides=(2, 2))(input)
 
-    rar2 = Convolution2D(n, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(input)
+    rar2 = Conv2D(n, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(input)
 
-    rar3 = Convolution2D(k, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    rar3 = Convolution2D(l, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(rar3)
-    rar3 = Convolution2D(m, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
+    rar3 = Conv2D(k, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    rar3 = Conv2D(l, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(rar3)
+    rar3 = Conv2D(m, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
 
-    merged = concatenate([rar1, rar2, rar3], axis=-1)
+    merged = Concatenate([rar1, rar2, rar3], axis=-1)
     rar = BatchNormalization(axis=-1)(merged)
     rar = Activation("relu")(rar)
 
@@ -122,17 +125,17 @@ def reduction_resnet_v1_B(input):
 
     rbr1 = MaxPooling2D((3, 3), strides=(2, 2), padding="valid")(input)
 
-    rbr2 = Convolution2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    rbr2 = Convolution2D(384, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr2)
+    rbr2 = Conv2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    rbr2 = Conv2D(384, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr2)
 
-    rbr3 = Convolution2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    rbr3 = Convolution2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr3)
+    rbr3 = Conv2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    rbr3 = Conv2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr3)
 
-    rbr4 = Convolution2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
-    rbr4 = Convolution2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(rbr4)
-    rbr4 = Convolution2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
+    rbr4 = Conv2D(256, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(input)
+    rbr4 = Conv2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", padding="same")(rbr4)
+    rbr4 = Conv2D(256, (3, 3), W_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
 
-    merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=-1)
+    merged = Concatenate([rbr1, rbr2, rbr3, rbr4], axis=-1)
     rbr = BatchNormalization(axis=-1)(merged)
     rbr = Activation("relu")(rbr)
 
@@ -161,14 +164,17 @@ def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
         # auxiliary
         loss2_ave_pool = AveragePooling2D(pool_size=(5, 5), strides=(3, 3), name='loss2/ave_pool')(x)
 
-        loss2_conv_a = Convolution2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_ave_pool)
-        loss2_conv_b = Convolution2D(768, (5, 5), W_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_conv_a)
+        loss2_conv_a = Conv2D(128, (1, 1), W_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_ave_pool)
+        loss2_conv_b = Conv2D(768, (5, 5), W_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_conv_a)
 
         loss2_flat = Flatten()(loss2_conv_b)
 
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', W_regularizer=l2(0.0002))(loss2_flat)
 
-        loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
+        if is_training:
+            loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc)
+        else:
+            loss2_drop_fc = loss2_fc
 
         loss2_classifier = Dense(num_classes, name='loss2/classifier', W_regularizer=l2(0.0002))(loss2_drop_fc)
 
@@ -187,7 +193,10 @@ def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
 
         loss3_flat = Flatten()(x)
 
-        pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat, training=is_training)
+        if is_training:
+            pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat)
+        else:
+            pool5_drop_10x10_s1 = loss3_flat
 
         loss3_classifier = Dense(num_classes, name='loss3/classifier', W_regularizer=l2(0.0002))(pool5_drop_10x10_s1)
 

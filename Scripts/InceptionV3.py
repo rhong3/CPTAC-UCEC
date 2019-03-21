@@ -8,9 +8,13 @@ Created on 03/18/2019
 @author: RH
 """
 import tensorflow as tf
-from keras.layers import Dense, Convolution2D, MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D, \
-    Dropout, Flatten, BatchNormalization, Activation, concatenate
+from keras.layers.convolutional import Conv2D
+from keras.layers.pooling import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
+from keras.layers.core import Dense, Dropout, Flatten, Activation
+from keras.layers.normalization import BatchNormalization
+from keras.layers.merge import Concatenate
 from keras.regularizers import l2
+
 
 def conv2d_bn(x,
               filters,
@@ -27,7 +31,7 @@ def conv2d_bn(x,
         bn_name = None
         conv_name = None
     bn_axis = 3
-    x = Convolution2D(
+    x = Conv2D(
         filters, (num_row, num_col),
         strides=strides,
         padding=padding,
@@ -66,7 +70,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                                               strides=(1, 1),
                                               padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 32, 1, 1)
-        x = concatenate(
+        x = Concatenate(
             [branch1x1, branch5x5, branch3x3dbl, branch_pool],
             axis=channel_axis,
             name='mixed0')
@@ -85,7 +89,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                                               strides=(1, 1),
                                               padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 64, 1, 1)
-        x = concatenate(
+        x = Concatenate(
             [branch1x1, branch5x5, branch3x3dbl, branch_pool],
             axis=channel_axis,
             name='mixed1')
@@ -104,7 +108,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                                               strides=(1, 1),
                                               padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 64, 1, 1)
-        x = concatenate(
+        x = Concatenate(
             [branch1x1, branch5x5, branch3x3dbl, branch_pool],
             axis=channel_axis,
             name='mixed2')
@@ -118,7 +122,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
             branch3x3dbl, 96, 3, 3, strides=(2, 2), padding='valid')
 
         branch_pool = MaxPooling2D((3, 3), strides=(2, 2))(x)
-        x = concatenate(
+        x = Concatenate(
             [branch3x3, branch3x3dbl, branch_pool],
             axis=channel_axis,
             name='mixed3')
@@ -140,7 +144,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                                               strides=(1, 1),
                                               padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-        x = concatenate(
+        x = Concatenate(
             [branch1x1, branch7x7, branch7x7dbl, branch_pool],
             axis=channel_axis,
             name='mixed4')
@@ -162,7 +166,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
             branch_pool = AveragePooling2D(
                 (3, 3), strides=(1, 1), padding='same')(x)
             branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-            x = concatenate(
+            x = Concatenate(
                 [branch1x1, branch7x7, branch7x7dbl, branch_pool],
                 axis=channel_axis,
                 name='mixed' + str(5 + i))
@@ -184,7 +188,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                                               strides=(1, 1),
                                               padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-        x = concatenate(
+        x = Concatenate(
             [branch1x1, branch7x7, branch7x7dbl, branch_pool],
             axis=channel_axis,
             name='mixed7')
@@ -198,7 +202,10 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', W_regularizer=l2(0.0002))(loss2_flat)
 
-        loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
+        if is_training:
+            loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc)
+        else:
+            loss2_drop_fc = loss2_fc
 
         loss2_classifier = Dense(num_classes, name='loss2/classifier', W_regularizer=l2(0.0002))(loss2_drop_fc)
 
@@ -214,7 +221,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
             branch7x7x3, 192, 3, 3, strides=(2, 2), padding='valid')
 
         branch_pool = MaxPooling2D((3, 3), strides=(2, 2))(x)
-        x = concatenate(
+        x = Concatenate(
             [branch3x3, branch7x7x3, branch_pool],
             axis=channel_axis,
             name='mixed8')
@@ -226,7 +233,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
             branch3x3 = conv2d_bn(x, 384, 1, 1)
             branch3x3_1 = conv2d_bn(branch3x3, 384, 1, 3)
             branch3x3_2 = conv2d_bn(branch3x3, 384, 3, 1)
-            branch3x3 = concatenate(
+            branch3x3 = Concatenate(
                 [branch3x3_1, branch3x3_2],
                 axis=channel_axis,
                 name='mixed9_' + str(i))
@@ -235,13 +242,13 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
             branch3x3dbl = conv2d_bn(branch3x3dbl, 384, 3, 3)
             branch3x3dbl_1 = conv2d_bn(branch3x3dbl, 384, 1, 3)
             branch3x3dbl_2 = conv2d_bn(branch3x3dbl, 384, 3, 1)
-            branch3x3dbl = concatenate(
+            branch3x3dbl = Concatenate(
                 [branch3x3dbl_1, branch3x3dbl_2], axis=channel_axis)
 
             branch_pool = AveragePooling2D(
                 (3, 3), strides=(1, 1), padding='same')(x)
             branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-            x = concatenate(
+            x = Concatenate(
                 [branch1x1, branch3x3, branch3x3dbl, branch_pool],
                 axis=channel_axis,
                 name='mixed' + str(9 + i))
@@ -252,7 +259,10 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss3_flat = Flatten()(x)
 
-        pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat, training=is_training)
+        if is_training:
+            pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat)
+        else:
+            pool5_drop_10x10_s1 = loss3_flat
 
         loss3_classifier = Dense(num_classes, name='loss3/classifier', W_regularizer=l2(0.0002))(pool5_drop_10x10_s1)
 
