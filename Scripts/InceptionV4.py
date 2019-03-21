@@ -12,7 +12,7 @@ from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
 from keras.layers.core import Dense, Dropout, Flatten, Activation
 from keras.layers.normalization import BatchNormalization
-from keras.layers.merge import Concatenate
+from keras.layers.merge import concatenate
 from keras.regularizers import l2
 
 
@@ -54,7 +54,7 @@ def stem(input):
     x1 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
     x2 = conv2d_bn(x, 96, 3, 3, strides=(2, 2), padding="same")
 
-    x = Concatenate([x1, x2], axis=-1)  # 73 * 73 * 160
+    x = concatenate([x1, x2], axis=-1)  # 73 * 73 * 160
 
     x1 = conv2d_bn(x, 64, 1, 1)
     x1 = conv2d_bn(x1, 96, 3, 3, padding="same")
@@ -64,13 +64,13 @@ def stem(input):
     x2 = conv2d_bn(x2, 64, 7, 1)
     x2 = conv2d_bn(x2, 96, 3, 3, padding="same")
 
-    x = Concatenate([x1, x2], axis=-1)  # 71 * 71 * 192
+    x = concatenate([x1, x2], axis=-1)  # 71 * 71 * 192
 
     x1 = conv2d_bn(x, 192, 3, 3, strides=(2, 2), padding="same")
 
     x2 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
 
-    x = Concatenate([x1, x2], axis=-1)  # 35 * 35 * 384
+    x = concatenate([x1, x2], axis=-1)  # 35 * 35 * 384
 
     return x
 
@@ -90,7 +90,7 @@ def inception_A(input):
     a4 = conv2d_bn(a4, 96, 3, 3)
     a4 = conv2d_bn(a4, 96, 3, 3)
 
-    merged = Concatenate([a1, a2, a3, a4], axis=-1)
+    merged = concatenate([a1, a2, a3, a4], axis=-1)
 
     return merged
 
@@ -113,7 +113,7 @@ def inception_B(input):
     b4 = conv2d_bn(b4, 224, 7, 1)
     b4 = conv2d_bn(b4, 256, 1, 7)
 
-    merged = Concatenate([b1, b2, b3, b4], axis=-1)
+    merged = concatenate([b1, b2, b3, b4], axis=-1)
 
     return merged
 
@@ -129,16 +129,16 @@ def inception_C(input):
     c3 = conv2d_bn(input, 384, 1, 1)
     c31 = conv2d_bn(c2, 256, 1, 3)
     c32 = conv2d_bn(c2, 256, 3, 1)
-    c3 = Concatenate([c31, c32], axis=-1)
+    c3 = concatenate([c31, c32], axis=-1)
 
     c4 = conv2d_bn(input, 384, 1, 1)
     c4 = conv2d_bn(c3, 448, 3, 1)
     c4 = conv2d_bn(c3, 512, 1, 3)
     c41 = conv2d_bn(c3, 256, 1, 3)
     c42 = conv2d_bn(c3, 256, 3, 1)
-    c4 = Concatenate([c41, c42], axis=-1)
+    c4 = concatenate([c41, c42], axis=-1)
 
-    merged = Concatenate([c1, c2, c3, c4], axis=-1)
+    merged = concatenate([c1, c2, c3, c4], axis=-1)
 
     return merged
 
@@ -154,7 +154,7 @@ def reduction_A(input, k=192, l=224, m=256, n=384):
     ra3 = conv2d_bn(ra3, l, 3, 3)
     ra3 = conv2d_bn(ra3, m, 3, 3, strides=(2, 2), padding="same")
 
-    merged = Concatenate([ra1, ra2, ra3], axis=-1)
+    merged = concatenate([ra1, ra2, ra3], axis=-1)
 
     return merged
 
@@ -172,7 +172,7 @@ def reduction_B(input):
     rb3 = conv2d_bn(rb3, 320, 7, 1)
     rb3 = conv2d_bn(rb3, 320, 3, 3, strides=(2, 2), padding="same")
 
-    merged = Concatenate([rb1, rb2, rb3], axis=-1)
+    merged = concatenate([rb1, rb2, rb3], axis=-1)
 
     return merged
 
