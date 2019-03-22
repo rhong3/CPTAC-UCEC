@@ -20,8 +20,9 @@ class INCEPTION():
     # hyper parameters
     DEFAULTS = {
         "batch_size": 128,
-        "dropout": 0.8,
-        "learning_rate": 1E-3
+        "dropout": 0.5,
+        "learning_rate": 1E-3,
+        "classes": 4
     }
 
     RESTORE_KEY = "cnn_to_restore"
@@ -51,8 +52,8 @@ class INCEPTION():
             self.sesh.run(tf.global_variables_initializer())
 
         # unpack handles for tensor ops to feed or fetch for lower layers
-        (self.x_in, self.dropout_, self.is_train,
-         self.y_in, self.logits, self.net, self.w, self.pred, self.pred_cost,
+        (self.x_in, self.is_train, self.y_in, self.logits,
+         self.net, self.w, self.pred, self.pred_cost,
          self.global_step, self.train_op, self.merged_summary) = handles
 
         if save_graph_def:  # tensorboard
@@ -76,12 +77,14 @@ class INCEPTION():
         x_in = tf.placeholder(tf.float32, name="x")
         x_in_reshape = tf.reshape(x_in, [-1, self.input_dim[1], self.input_dim[2], 3])
         # dropout
-        dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
+        dropout = self.dropout
+        # dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
         # label input
         y_in = tf.placeholder(dtype=tf.float32, name="y")
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
-        classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
+        # classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
+        classes = self.classes
 
         if model == 'I1':
             import InceptionV1
@@ -151,12 +154,13 @@ class INCEPTION():
 
         tf.summary.tensor_summary("{}_pred".format(model), pred)
 
-        opt = tf.optimizers.Adam(learning_rate=self.learning_rate)
+        # opt = tf.optimizers.Adam(learning_rate=self.learning_rate) ---------TF2.0
+        opt = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
         train_op = opt.minimize(loss=pred_cost, global_step=global_step)
 
         merged_summary = tf.summary.merge_all()
 
-        return (x_in, dropout, is_train,
+        return (x_in, is_train,
                 y_in, logits, nett, ww, pred, pred_cost,
                 global_step, train_op, merged_summary)
 
@@ -253,8 +257,7 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-                        feed_dict = {self.x_in: x, self.y_in: y,
-                                     self.dropout_: self.dropout}
+                        feed_dict = {self.x_in: x, self.y_in: y}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
                                    self.pred_cost, self.global_step, self.train_op]

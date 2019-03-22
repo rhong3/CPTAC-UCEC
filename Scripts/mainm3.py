@@ -39,8 +39,10 @@ INPUT_DIM = [bs, IMG_DIM, IMG_DIM, 3]
 HYPERPARAMS = {
     "batch_size": bs,
     "dropout": 0.5,
-    "learning_rate": 1E-4
+    "learning_rate": 1E-4,
+    "classes": 4
 }
+
 MAX_ITER = np.inf
 MAX_EPOCHS = ep
 # paths to directories

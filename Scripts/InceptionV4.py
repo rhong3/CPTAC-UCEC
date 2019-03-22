@@ -37,7 +37,7 @@ def conv2d_bn(x,
         padding=padding,
         use_bias=False,
         name=conv_name,
-        W_regularizer=l2(0.0002))(x)
+        kernel_regularizer=l2(0.0002))(x)
     x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
     x = Activation('relu', name=name)(x)
     return x
@@ -204,14 +204,11 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss2_flat = Flatten()(loss2_conv_b)
 
-        loss2_fc = Dense(1024, activation='relu', name='loss2/fc', W_regularizer=l2(0.0002))(loss2_flat)
+        loss2_fc = Dense(1024, activation='relu', name='loss2/fc', kernel_regularizer=l2(0.0002))(loss2_flat)
 
-        if is_training:
-            loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc)
-        else:
-            loss2_drop_fc = loss2_fc
+        loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
-        loss2_classifier = Dense(num_classes, name='loss2/classifier', W_regularizer=l2(0.0002))(loss2_drop_fc)
+        loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
 
         # Reduction B
         x = reduction_B(x)  # Output: 8 * 8 * 1536
@@ -228,14 +225,13 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss3_flat = Flatten()(x)
 
-        if is_training:
-            pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat)
-        else:
-            pool5_drop_10x10_s1 = loss3_flat
+        pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat, training=is_training)
 
-        loss3_classifier = Dense(num_classes, name='loss3/classifier', W_regularizer=l2(0.0002))(pool5_drop_10x10_s1)
+        loss3_classifier_W = Dense(num_classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))
 
-        w_variables = loss3_classifier.weights()
+        loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
+
+        w_variables = loss3_classifier_W.get_weights()
 
         logits = tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier))
 
