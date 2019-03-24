@@ -30,7 +30,7 @@ def conv2d_bn(x,
     else:
         bn_name = None
         conv_name = None
-    bn_axis = 3
+    bn_axis = -1
     x = Conv2D(
         filters, (num_row, num_col),
         strides=strides,

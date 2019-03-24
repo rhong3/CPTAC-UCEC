@@ -30,7 +30,7 @@ def conv2d_bn(x,
     else:
         bn_name = None
         conv_name = None
-    bn_axis = 3
+    bn_axis = -1
     x = Conv2D(
         filters, (num_row, num_col),
         strides=strides,
@@ -127,15 +127,15 @@ def inception_C(input):
     c2 = conv2d_bn(input, 256, 1, 1)
 
     c3 = conv2d_bn(input, 384, 1, 1)
-    c31 = conv2d_bn(c2, 256, 1, 3)
-    c32 = conv2d_bn(c2, 256, 3, 1)
+    c31 = conv2d_bn(c3, 256, 1, 3)
+    c32 = conv2d_bn(c3, 256, 3, 1)
     c3 = concatenate([c31, c32], axis=-1)
 
     c4 = conv2d_bn(input, 384, 1, 1)
-    c4 = conv2d_bn(c3, 448, 3, 1)
-    c4 = conv2d_bn(c3, 512, 1, 3)
-    c41 = conv2d_bn(c3, 256, 1, 3)
-    c42 = conv2d_bn(c3, 256, 3, 1)
+    c4 = conv2d_bn(c4, 448, 3, 1)
+    c4 = conv2d_bn(c4, 512, 1, 3)
+    c41 = conv2d_bn(c4, 256, 1, 3)
+    c42 = conv2d_bn(c4, 256, 3, 1)
     c4 = concatenate([c41, c42], axis=-1)
 
     merged = concatenate([c1, c2, c3, c4], axis=-1)
