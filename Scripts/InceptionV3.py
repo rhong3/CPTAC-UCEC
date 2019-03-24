@@ -254,9 +254,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
         # Classification block
         x = GlobalAveragePooling2D(name='avg_pool')(x)
 
-        loss3_flat = Flatten()(x)
-
-        pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat, training=is_training)
+        pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(x, training=is_training)
 
         loss3_classifier_W = Dense(num_classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))
 
