@@ -151,7 +151,7 @@ def reduction_B(input):
 
 
 def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionResnetV2'):
-    '''Creates the Inception_ResNet_v2 network.'''
+    '''Creates the Inception_v4 network.'''
     with tf.variable_scope(scope, 'InceptionV4', [input]):
         # Input shape is 299 * 299 * 3
         x = resnet_v2_stem(input)  # Output: 35 * 35 * 256
