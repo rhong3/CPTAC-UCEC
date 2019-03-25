@@ -344,7 +344,7 @@ def py_map2jpg(imgmap, rang, colorMap):
 
 # generating CAM plots of each tile; net is activation; w is weight; pred is prediction scores; x are input images;
 # y are labels; path is output folder, name is test/validation; rd is current batch number
-def CAM(net, w, pred, x, y, path, name, rd=0):
+def CAM(net, w, pred, x, y, path, name, bs, rd=0):
     y = np.asmatrix(y)
     y = y.argmax(axis=1).astype('uint8')
     lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
@@ -352,7 +352,7 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
     DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
     DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
     DIRD = "../Results/{}/out/{}_POLE_img".format(path, name)
-    rd = rd*1000
+    rd = rd*bs
 
     try:
         os.mkdir(DIRA)
@@ -467,9 +467,9 @@ def CAM(net, w, pred, x, y, path, name, rd=0):
 
 
 # CAM for real test; no need to determine correct or wrong
-def CAM_R(net, w, pred, x, path, name, rd=0):
+def CAM_R(net, w, pred, x, path, name, bs, rd=0):
     DIRR = "../Results/{}/out/{}_img".format(path, name)
-    rd = rd * 1000
+    rd = rd * bs
 
     try:
         os.mkdir(DIRR)

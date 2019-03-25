@@ -183,7 +183,7 @@ class INCEPTION():
                 global_step, train_op, merged_summary)
 
     # inference using trained models
-    def inference(self, X, dirr, testset, train_status=False, Not_Realtest=True):
+    def inference(self, X, dirr, testset, bs, train_status=False, Not_Realtest=True):
         now = datetime.now().isoformat()[11:]
         print("------- Testing begin: {} -------\n".format(now), flush=True)
         rd = 0
@@ -200,7 +200,7 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        # ac.CAM(net, w, pred, x, y, dirr, 'Test', rd)
+                        # ac.CAM(net, w, pred, x, y, dirr, 'Test', bs, rd)
                         if rd == 0:
                             pdx = pred
                             yl = y
@@ -222,7 +222,7 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        # ac.CAM_R(net, w, pred, x, dirr, 'Test', rd)
+                        # ac.CAM_R(net, w, pred, x, dirr, 'Test', bs, rd)
                         if rd == 0:
                             pdx = pred
                         else:
@@ -378,7 +378,7 @@ class INCEPTION():
                                 self.valid_logger.add_summary(valid_summary, i)
 
                                 print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
-                                ac.CAM(net, w, pred, x, y, dirr, 'Validation')
+                                ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
                                 ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Final Validation end: {} -------\n".format(now), flush=True)
@@ -416,7 +416,7 @@ class INCEPTION():
                         self.valid_logger.add_summary(valid_summary, i)
 
                         print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
-                        ac.CAM(net, w, pred, x, y, dirr, 'Validation')
+                        ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
                         ac.metrics(pred, y, dirr, 'Validation')
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation end: {} -------\n".format(now), flush=True)
