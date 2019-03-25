@@ -214,11 +214,11 @@ def inceptionresnetv2(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
 
         loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
 
-        w_variables = loss3_classifier_W
+        w_variables = loss3_classifier_W.get_weights()
 
         logits = tf.cond(tf.equal(is_training, tf.constant(True)),
                          lambda: tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier)),
                          lambda: loss3_classifier)
 
-        return logits, net, w_variables
+        return logits, net, tf.convert_to_tensor(w_variables)
 
