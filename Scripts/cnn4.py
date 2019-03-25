@@ -182,6 +182,7 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
+                        w = w.get_weights()
                         # ac.CAM(net, w, pred, x, y, dirr, 'Test', rd)
                         if rd == 0:
                             pdx = pred
@@ -204,6 +205,7 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
+                        w = w.get_weights()
                         # ac.CAM_R(net, w, pred, x, dirr, 'Test', rd)
                         if rd == 0:
                             pdx = pred
@@ -358,7 +360,7 @@ class INCEPTION():
                                 valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
                                 self.valid_logger.add_summary(valid_summary, i)
-
+                                w = w.get_weights()
                                 print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
                                 ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                                 ac.metrics(pred, y, dirr, 'Validation')
@@ -396,7 +398,7 @@ class INCEPTION():
                         valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
                         self.valid_logger.add_summary(valid_summary, i)
-
+                        w = w.get_weights()
                         print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
                         ac.CAM(net, w, pred, x, y, dirr, 'Validation')
                         ac.metrics(pred, y, dirr, 'Validation')

@@ -325,7 +325,7 @@ def googlenet(input,
 
         loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
 
-        w_variables = loss3_classifier_W.get_weights()
+        w_variables = loss3_classifier_W
 
         aux = tf.math.add(loss1_classifier, loss2_classifier)
 

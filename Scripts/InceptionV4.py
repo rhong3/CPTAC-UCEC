@@ -16,7 +16,7 @@ from keras.layers.merge import concatenate
 from keras.regularizers import l2
 
 
-def conv2d_bn(x,
+def Conv2D_n(x,
               filters,
               num_row,
               num_col,
@@ -25,20 +25,17 @@ def conv2d_bn(x,
               name=None):
 
     if name is not None:
-        bn_name = name + '_bn'
         conv_name = name + '_conv'
     else:
-        bn_name = None
         conv_name = None
-    bn_axis = -1
     x = Conv2D(
         filters, (num_row, num_col),
         strides=strides,
         padding=padding,
         use_bias=False,
         name=conv_name,
+        data_format="channels_last",
         kernel_regularizer=l2(0.0002))(x)
-    x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
     x = Activation('relu', name=name)(x)
     return x
 
@@ -47,30 +44,34 @@ def stem(input):
     '''The stem of the pure Inception-v4 and Inception-ResNet-v2 networks. This is input part of those networks.'''
 
     # Input shape is 299 * 299 * 3 (Tensorflow dimension ordering)
-    x = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding="same")  # 149 * 149 * 32
-    x = conv2d_bn(x, 32, 3, 3, padding="same")  # 147 * 147 * 32
-    x = conv2d_bn(x, 64, 3, 3)  # 147 * 147 * 64
+    x = Conv2D_n(input, 32, 3, 3, strides=(2, 2), padding="same")  # 149 * 149 * 32
+    x = Conv2D_n(x, 32, 3, 3, padding="same")  # 147 * 147 * 32
+    x = Conv2D_n(x, 64, 3, 3)  # 147 * 147 * 64
 
     x1 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
-    x2 = conv2d_bn(x, 96, 3, 3, strides=(2, 2), padding="same")
+    x2 = Conv2D_n(x, 96, 3, 3, strides=(2, 2), padding="same")
 
     x = concatenate([x1, x2], axis=-1)  # 73 * 73 * 160
 
-    x1 = conv2d_bn(x, 64, 1, 1)
-    x1 = conv2d_bn(x1, 96, 3, 3, padding="same")
+    x1 = Conv2D_n(x, 64, 1, 1)
+    x1 = Conv2D_n(x1, 96, 3, 3, padding="same")
 
-    x2 = conv2d_bn(x, 64, 1, 1)
-    x2 = conv2d_bn(x2, 64, 1, 7)
-    x2 = conv2d_bn(x2, 64, 7, 1)
-    x2 = conv2d_bn(x2, 96, 3, 3, padding="same")
+    x2 = Conv2D_n(x, 64, 1, 1)
+    x2 = Conv2D_n(x2, 64, 1, 7)
+    x2 = Conv2D_n(x2, 64, 7, 1)
+    x2 = Conv2D_n(x2, 96, 3, 3, padding="same")
 
     x = concatenate([x1, x2], axis=-1)  # 71 * 71 * 192
 
-    x1 = conv2d_bn(x, 192, 3, 3, strides=(2, 2), padding="same")
+    x1 = Conv2D_n(x, 192, 3, 3, strides=(2, 2), padding="same")
 
     x2 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
 
     x = concatenate([x1, x2], axis=-1)  # 35 * 35 * 384
+
+    x = BatchNormalization(axis=-1)(x)
+
+    x = Activation('relu')(x)
 
     return x
 
@@ -79,18 +80,22 @@ def inception_A(input):
     '''Architecture of Inception_A block which is a 35 * 35 grid module.'''
 
     a1 = AveragePooling2D((3, 3), strides=(1, 1), padding="same")(input)
-    a1 = conv2d_bn(a1, 96, 1, 1)
+    a1 = Conv2D_n(a1, 96, 1, 1)
 
-    a2 = conv2d_bn(input, 96, 1, 1)
+    a2 = Conv2D_n(input, 96, 1, 1)
 
-    a3 = conv2d_bn(input, 64, 1, 1)
-    a3 = conv2d_bn(a3, 96, 3, 3)
+    a3 = Conv2D_n(input, 64, 1, 1)
+    a3 = Conv2D_n(a3, 96, 3, 3)
 
-    a4 = conv2d_bn(input, 64, 1, 1)
-    a4 = conv2d_bn(a4, 96, 3, 3)
-    a4 = conv2d_bn(a4, 96, 3, 3)
+    a4 = Conv2D_n(input, 64, 1, 1)
+    a4 = Conv2D_n(a4, 96, 3, 3)
+    a4 = Conv2D_n(a4, 96, 3, 3)
 
     merged = concatenate([a1, a2, a3, a4], axis=-1)
+
+    merged = BatchNormalization(axis=-1)(merged)
+
+    merged = Activation('relu')(merged)
 
     return merged
 
@@ -99,21 +104,25 @@ def inception_B(input):
     '''Architecture of Inception_B block which is a 17 * 17 grid module.'''
 
     b1 = AveragePooling2D((3, 3), strides=(1, 1), padding="same")(input)
-    b1 = conv2d_bn(b1, 128, 1, 1)
+    b1 = Conv2D_n(b1, 128, 1, 1)
 
-    b2 = conv2d_bn(input, 384, 1, 1)
+    b2 = Conv2D_n(input, 384, 1, 1)
 
-    b3 = conv2d_bn(input, 192, 1, 1)
-    b3 = conv2d_bn(b3, 224, 1, 7)
-    b3 = conv2d_bn(b3, 256, 7, 1)
+    b3 = Conv2D_n(input, 192, 1, 1)
+    b3 = Conv2D_n(b3, 224, 1, 7)
+    b3 = Conv2D_n(b3, 256, 7, 1)
 
-    b4 = conv2d_bn(input, 192, 1, 1)
-    b4 = conv2d_bn(b4, 192, 7, 1)
-    b4 = conv2d_bn(b4, 224, 1, 7)
-    b4 = conv2d_bn(b4, 224, 7, 1)
-    b4 = conv2d_bn(b4, 256, 1, 7)
+    b4 = Conv2D_n(input, 192, 1, 1)
+    b4 = Conv2D_n(b4, 192, 7, 1)
+    b4 = Conv2D_n(b4, 224, 1, 7)
+    b4 = Conv2D_n(b4, 224, 7, 1)
+    b4 = Conv2D_n(b4, 256, 1, 7)
 
     merged = concatenate([b1, b2, b3, b4], axis=-1)
+
+    merged = BatchNormalization(axis=-1)(merged)
+
+    merged = Activation('relu')(merged)
 
     return merged
 
@@ -122,23 +131,27 @@ def inception_C(input):
     '''Architecture of Inception_C block which is a 8 * 8 grid module.'''
 
     c1 = AveragePooling2D((3, 3), strides=(1, 1), padding="same")(input)
-    c1 = conv2d_bn(c1, 256, 1, 1)
+    c1 = Conv2D_n(c1, 256, 1, 1)
 
-    c2 = conv2d_bn(input, 256, 1, 1)
+    c2 = Conv2D_n(input, 256, 1, 1)
 
-    c3 = conv2d_bn(input, 384, 1, 1)
-    c31 = conv2d_bn(c3, 256, 1, 3)
-    c32 = conv2d_bn(c3, 256, 3, 1)
+    c3 = Conv2D_n(input, 384, 1, 1)
+    c31 = Conv2D_n(c3, 256, 1, 3)
+    c32 = Conv2D_n(c3, 256, 3, 1)
     c3 = concatenate([c31, c32], axis=-1)
 
-    c4 = conv2d_bn(input, 384, 1, 1)
-    c4 = conv2d_bn(c4, 448, 3, 1)
-    c4 = conv2d_bn(c4, 512, 1, 3)
-    c41 = conv2d_bn(c4, 256, 1, 3)
-    c42 = conv2d_bn(c4, 256, 3, 1)
+    c4 = Conv2D_n(input, 384, 1, 1)
+    c4 = Conv2D_n(c4, 448, 3, 1)
+    c4 = Conv2D_n(c4, 512, 1, 3)
+    c41 = Conv2D_n(c4, 256, 1, 3)
+    c42 = Conv2D_n(c4, 256, 3, 1)
     c4 = concatenate([c41, c42], axis=-1)
 
     merged = concatenate([c1, c2, c3, c4], axis=-1)
+
+    merged = BatchNormalization(axis=-1)(merged)
+
+    merged = Activation('relu')(merged)
 
     return merged
 
@@ -148,13 +161,17 @@ def reduction_A(input, k=192, l=224, m=256, n=384):
 
     ra1 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(input)
 
-    ra2 = conv2d_bn(input, n, 3, 3, strides=(2, 2), padding="same")
+    ra2 = Conv2D_n(input, n, 3, 3, strides=(2, 2), padding="same")
 
-    ra3 = conv2d_bn(input, k, 1, 1)
-    ra3 = conv2d_bn(ra3, l, 3, 3)
-    ra3 = conv2d_bn(ra3, m, 3, 3, strides=(2, 2), padding="same")
+    ra3 = Conv2D_n(input, k, 1, 1)
+    ra3 = Conv2D_n(ra3, l, 3, 3)
+    ra3 = Conv2D_n(ra3, m, 3, 3, strides=(2, 2), padding="same")
 
     merged = concatenate([ra1, ra2, ra3], axis=-1)
+
+    merged = BatchNormalization(axis=-1)(merged)
+
+    merged = Activation('relu')(merged)
 
     return merged
 
@@ -164,15 +181,19 @@ def reduction_B(input):
 
     rb1 = MaxPooling2D((3, 3), strides=(2, 2), padding="same")(input)
 
-    rb2 = conv2d_bn(input, 192, 1, 1)
-    rb2 = conv2d_bn(rb2, 192, 3, 3, strides=(2, 2), padding="same")
+    rb2 = Conv2D_n(input, 192, 1, 1)
+    rb2 = Conv2D_n(rb2, 192, 3, 3, strides=(2, 2), padding="same")
 
-    rb3 = conv2d_bn(input, 256, 1, 1)
-    rb3 = conv2d_bn(rb3, 256, 1, 7)
-    rb3 = conv2d_bn(rb3, 320, 7, 1)
-    rb3 = conv2d_bn(rb3, 320, 3, 3, strides=(2, 2), padding="same")
+    rb3 = Conv2D_n(input, 256, 1, 1)
+    rb3 = Conv2D_n(rb3, 256, 1, 7)
+    rb3 = Conv2D_n(rb3, 320, 7, 1)
+    rb3 = Conv2D_n(rb3, 320, 3, 3, strides=(2, 2), padding="same")
 
     merged = concatenate([rb1, rb2, rb3], axis=-1)
+
+    merged = BatchNormalization(axis=-1)(merged)
+
+    merged = Activation('relu')(merged)
 
     return merged
 
@@ -199,8 +220,12 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
         #Auxiliary
         loss2_ave_pool = AveragePooling2D(pool_size=(5, 5), strides=(3, 3), name='loss2/ave_pool')(x)
 
-        loss2_conv_a = conv2d_bn(loss2_ave_pool, 128, 1, 1)
-        loss2_conv_b = conv2d_bn(loss2_conv_a, 768, 5, 5)
+        loss2_conv_a = Conv2D_n(loss2_ave_pool, 128, 1, 1)
+        loss2_conv_b = Conv2D_n(loss2_conv_a, 768, 5, 5)
+
+        loss2_conv_b = BatchNormalization(axis=-1)(loss2_conv_b)
+
+        loss2_conv_b = Activation('relu')(loss2_conv_b)
 
         loss2_flat = Flatten()(loss2_conv_b)
 
@@ -229,7 +254,7 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
 
-        w_variables = loss3_classifier_W.get_weights()
+        w_variables = loss3_classifier_W
 
         logits = tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier))
 

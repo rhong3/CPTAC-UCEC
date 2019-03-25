@@ -37,6 +37,7 @@ def conv2d_bn(x,
         padding=padding,
         use_bias=False,
         name=conv_name,
+        data_format="channels_last",
         kernel_regularizer=l2(0.0002))(x)
     x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
     x = Activation('relu', name=name)(x)
@@ -260,7 +261,7 @@ def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
 
         loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
 
-        w_variables = loss3_classifier_W.get_weights()
+        w_variables = loss3_classifier_W
 
         logits = tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier))
 

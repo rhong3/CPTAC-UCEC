@@ -167,6 +167,10 @@ def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
         loss2_conv_a = Conv2D(128, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_ave_pool)
         loss2_conv_b = Conv2D(768, (5, 5), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_conv_a)
 
+        loss2_conv_b = BatchNormalization(axis=-1)(loss2_conv_b)
+
+        loss2_conv_b = Activation('relu')(loss2_conv_b)
+
         loss2_flat = Flatten()(loss2_conv_b)
 
         loss2_fc = Dense(1024, activation='relu', name='loss2/fc', kernel_regularizer=l2(0.0002))(loss2_flat)
@@ -194,7 +198,7 @@ def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
 
         loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
 
-        w_variables = loss3_classifier_W.get_weights()
+        w_variables = loss3_classifier_W
 
         logits = tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier))
 
