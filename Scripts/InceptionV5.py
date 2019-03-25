@@ -30,7 +30,7 @@ def resnet_v1_stem(input):
     x = Conv2D(192, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 71 * 71 * 192
     x = Conv2D(256, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(x)  # 35 * 35 * 256
 
-    x = BatchNormalization(axis=-1)(x)
+    x = BatchNormalization(axis=3)(x)
     x = Activation("relu")(x)
 
     return x
@@ -48,13 +48,13 @@ def inception_resnet_v1_A(input, scale_residual=True):
     ar3 = Conv2D(32, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
     ar3 = Conv2D(32, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(ar3)
 
-    merged = concatenate([ar1, ar2, ar3], axis=-1)
+    merged = concatenate([ar1, ar2, ar3], axis=3)
 
     ar = Conv2D(256, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: ar = Lambda(lambda a: a * 0.1)(ar)
 
     output = add([input, ar])
-    output = BatchNormalization(axis=-1)(output)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -69,13 +69,13 @@ def inception_resnet_v1_B(input, scale_residual=True):
     br2 = Conv2D(128, (1, 7), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
     br2 = Conv2D(128, (7, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(br2)
 
-    merged = concatenate([br1, br2], axis=-1)
+    merged = concatenate([br1, br2], axis=3)
 
     br = Conv2D(896, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: br = Lambda(lambda b: b * 0.1)(br)
 
     output = add([input, br])
-    output = BatchNormalization(axis=-1)(output)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -90,13 +90,13 @@ def inception_resnet_v1_C(input, scale_residual=True):
     cr2 = Conv2D(192, (1, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
     cr2 = Conv2D(192, (3, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(cr2)
 
-    merged = concatenate([cr1, cr2], axis=-1)
+    merged = concatenate([cr1, cr2], axis=3)
 
     cr = Conv2D(1792, (1, 1), activation="linear", padding="same")(merged)
     if scale_residual: cr = Lambda(lambda c: c * 0.1)(cr)
 
     output = add([input, cr])
-    output = BatchNormalization(axis=-1)(output)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -113,8 +113,8 @@ def reduction_resnet_A(input, k=192, l=224, m=256, n=384):
     rar3 = Conv2D(l, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(rar3)
     rar3 = Conv2D(m, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
 
-    merged = concatenate([rar1, rar2, rar3], axis=-1)
-    rar = BatchNormalization(axis=-1)(merged)
+    merged = concatenate([rar1, rar2, rar3], axis=3)
+    rar = BatchNormalization(axis=3)(merged)
     rar = Activation("relu")(rar)
 
     return rar
@@ -135,8 +135,8 @@ def reduction_resnet_v1_B(input):
     rbr4 = Conv2D(256, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(rbr4)
     rbr4 = Conv2D(256, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
 
-    merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=-1)
-    rbr = BatchNormalization(axis=-1)(merged)
+    merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=3)
+    rbr = BatchNormalization(axis=3)(merged)
     rbr = Activation("relu")(rbr)
 
     return rbr
@@ -167,7 +167,7 @@ def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
         loss2_conv_a = Conv2D(128, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_ave_pool)
         loss2_conv_b = Conv2D(768, (5, 5), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_conv_a)
 
-        loss2_conv_b = BatchNormalization(axis=-1)(loss2_conv_b)
+        loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b)
 
         loss2_conv_b = Activation('relu')(loss2_conv_b)
 

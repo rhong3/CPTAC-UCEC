@@ -30,7 +30,7 @@ def conv2d_bn(x,
     else:
         bn_name = None
         conv_name = None
-    bn_axis = -1
+    bn_axis = 3
     x = Conv2D(
         filters, (num_row, num_col),
         strides=strides,
@@ -44,7 +44,7 @@ def conv2d_bn(x,
     return x
 
 
-def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionV3', channel_axis=-1):
+def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionV3', channel_axis=3):
 
     with tf.name_scope(scope, "InceptionV3", [input]):
 

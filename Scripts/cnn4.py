@@ -259,6 +259,7 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
+
                         feed_dict = {self.x_in: x, self.y_in: y}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
