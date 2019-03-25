@@ -186,11 +186,8 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
     if test:  # restore for testing only
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
-        if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec, vac)
-            m.inference(HE, dirr, testset)
-        elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec, vac)
+        if tec >= bs:
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
@@ -205,11 +202,8 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
-        if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec, vac)
-            m.inference(HE, dirr, testset)
-        elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec, vac)
+        if tec >= bs:
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
@@ -224,11 +218,8 @@ def main(trc, tec, vac, testset=None, valset=None, to_reload=None, test=None):
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
-        if tec >= 1000:
-            HE = tfreloader('test', 1, 1000, trc, tec, vac)
-            m.inference(HE, dirr, testset)
-        elif 100 < tec < 1000:
-            HE = tfreloader('test', 1, tec, trc, tec, vac)
+        if tec >= bs:
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset)
         else:
             print("Not enough testing images!")
