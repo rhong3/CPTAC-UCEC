@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import os
 import numpy as np
-import sklearn as skl
+import sklearn.metrics
 from scipy import interp
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,10 +31,10 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur):
     microy = []
     microscore = []
     for i in range(4):
-        fpr[i], tpr[i], _ = skl.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+        fpr[i], tpr[i], _ = sklearn.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
                                                   np.asarray(pdx[:, i]).ravel())
         try:
-            roc_auc[i] = skl.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+            roc_auc[i] = sklearn.metrics.roc_auc_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
                                                    np.asarray(pdx[:, i]).ravel())
         except ValueError:
             roc_auc[i] = np.nan
@@ -43,24 +43,24 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur):
         microscore.extend(np.asarray(pdx[:, i]).ravel())
 
         precision[i], recall[i], _ = \
-            skl.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+            sklearn.metrics.precision_recall_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
                                                np.asarray(pdx[:, i]).ravel())
         try:
             average_precision[i] = \
-                skl.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
+                sklearn.metrics.average_precision_score(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
                                                     np.asarray(pdx[:, i]).ravel())
         except ValueError:
             average_precision[i] = np.nan
 
     # Compute micro-average ROC curve and ROC area
-    fpr["micro"], tpr["micro"], _ = skl.metrics.roc_curve(np.asarray(microy).ravel(),
+    fpr["micro"], tpr["micro"], _ = sklearn.metrics.roc_curve(np.asarray(microy).ravel(),
                                                           np.asarray(microscore).ravel())
-    roc_auc["micro"] = skl.metrics.auc(fpr["micro"], tpr["micro"])
+    roc_auc["micro"] = sklearn.metrics.auc(fpr["micro"], tpr["micro"])
 
     # A "micro-average": quantifying score on all classes jointly
-    precision["micro"], recall["micro"], _ = skl.metrics.precision_recall_curve(np.asarray(microy).ravel(),
+    precision["micro"], recall["micro"], _ = sklearn.metrics.precision_recall_curve(np.asarray(microy).ravel(),
                                                                                 np.asarray(microscore).ravel())
-    average_precision["micro"] = skl.metrics.average_precision_score(np.asarray(microy).ravel(),
+    average_precision["micro"] = sklearn.metrics.average_precision_score(np.asarray(microy).ravel(),
                                                                      np.asarray(microscore).ravel(),
                                                                      average="micro")
 
@@ -79,7 +79,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur):
 
     fpr["macro"] = all_fpr
     tpr["macro"] = mean_tpr
-    roc_auc["macro"] = skl.metrics.auc(fpr["macro"], tpr["macro"])
+    roc_auc["macro"] = sklearn.metrics.auc(fpr["macro"], tpr["macro"])
 
     # Plot all ROC curves
     plt.figure()
