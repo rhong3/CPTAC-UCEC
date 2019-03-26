@@ -21,6 +21,25 @@ for a in ['ATM', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN']:
 
     TCGA = TCGA.fillna(0)
 
+for a in ['ATM', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN']:
+    cl = pd.read_csv("../TCGA_MUT/TCGA_clinical/{}_MUT_clinical.tsv".format(str(a)), sep='\t', header=0)
+
+    cl[a] = 1
+
+    cl.to_csv("../TCGA_MUT/TCGA_clinical/{}_MUT_clinical.csv".format(str(a)), header=True, index=False)
+
+    cll = cl[['submitter_id', a]]
+
+    TCGA = TCGA.join(cll.set_index(['submitter_id', a]), how='outer', rsuffix='rt', on=['bcr_patient_barcode', a])
+
+    TCGA = TCGA.fillna(0)
+
+
+
+TCGA = TCGA.groupby('bcr_patient_barcode').max()
+
+TCGA.insert(0, 'bcr_patient_barcode', TCGA.index, allow_duplicates=False)
+
 TCGA.to_csv('../MUT_TCGA_list.csv', header=True, index=False)
 
 CPTAC_MUTt = CPTAC_MUT[['Participant_ID', 'TP53_TP53', 'TP53_ATM', 'PI3K_PIK3R1', 'PI3K_PIK3CA', 'PI3K_PTEN']]
@@ -42,6 +61,10 @@ CPTAC_lite = CPTAC[['Participant_ID', 'Subtype', 'ATM', 'TP53', 'CTNNB1', 'PIK3C
 CPTAC_lite = CPTAC_lite.rename(index=str, columns={'Participant_ID': 'name', 'Subtype': 'subtype'})
 
 jj = pd.concat([TCGA_lite, CPTAC_lite])
+
+ddd = {0: '0NA'}
+
+jj['subtype'] = jj['subtype'].replace(ddd)
 
 jj.to_csv('../MUT_joined.csv', header=True, index=False)
 
