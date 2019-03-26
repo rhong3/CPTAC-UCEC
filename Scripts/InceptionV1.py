@@ -331,5 +331,5 @@ def googlenet(input,
                          lambda: tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), tf.math.add(loss1_classifier, loss2_classifier))),
                          lambda: loss3_classifier)
 
-    return logits, net, tf.convert_to_tensor(w_variables)
+    return logits, net, tf.convert_to_tensor(w_variables[0])
 

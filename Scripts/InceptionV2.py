@@ -358,5 +358,5 @@ def inceptionv2(input,
                                                                              tf.math.add(loss1_classifier,
                                                                                          loss2_classifier))),
                          lambda: loss3_classifier)
-    return logits, net, tf.convert_to_tensor(w_variables)
+    return logits, net, tf.convert_to_tensor(w_variables[0])
 

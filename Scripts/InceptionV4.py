@@ -214,5 +214,5 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
                          lambda: tf.math.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3), loss2_classifier)),
                          lambda: loss3_classifier)
 
-        return logits, net, tf.convert_to_tensor(w_variables)
+        return logits, net, tf.convert_to_tensor(w_variables[0])
 
