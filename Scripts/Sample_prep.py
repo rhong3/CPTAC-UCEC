@@ -9,7 +9,6 @@ import os
 import pandas as pd
 import sklearn.utils as sku
 import numpy as np
-import Cutter
 
 tile_path = "../tiles/"
 
@@ -42,6 +41,7 @@ def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', '
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(path='../tiles/'):
     if not os.path.isdir(path):
+        import Cutter
         Cutter.cut()
     big_images = []
     for level in range(3):
