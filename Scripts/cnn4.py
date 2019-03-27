@@ -364,6 +364,7 @@ class INCEPTION():
                                 ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Final Validation end: {} -------\n".format(now), flush=True)
+                                break
 
                     except tf.errors.OutOfRangeError:
                         print("final avg loss (@ step {} = epoch {}): {}".format(
