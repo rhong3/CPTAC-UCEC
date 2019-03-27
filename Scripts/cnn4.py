@@ -351,32 +351,55 @@ class INCEPTION():
                         if i >= max_iter-2 and verbose:
 
                             if cross_validate:
+                                print("final avg loss (@ step {} = epoch {}): {}".format(
+                                    i + 1, np.around(i / ct * bs), err_train / i), flush=True)
+
+                                now = datetime.now().isoformat()[11:]
+                                print("------- Training end: {} -------\n".format(now), flush=True)
+
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Final Validation begin: {} -------\n".format(now), flush=True)
                                 x, y = sessa.run(vanext_element)
                                 feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
-                                fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
-                                valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
+                                fetches = [self.pred_cost, self.merged_summary]
+                                valid_cost, valid_summary= self.sesh.run(fetches, feed_dict)
 
                                 self.valid_logger.add_summary(valid_summary, i)
                                 print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
-                                ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
-                                ac.metrics(pred, y, dirr, 'Validation')
                                 now = datetime.now().isoformat()[11:]
                                 print("------- Final Validation end: {} -------\n".format(now), flush=True)
-                                break
+                            try:
+                                self.train_logger.flush()
+                                self.train_logger.close()
+                                self.valid_logger.flush()
+                                self.valid_logger.close()
+
+                            except(AttributeError):  # not logging
+                                print('Not logging', flush=True)
+                            break
 
                     except tf.errors.OutOfRangeError:
-                        print("final avg loss (@ step {} = epoch {}): {}".format(
-                            i+1, np.around(i / ct * bs), err_train / i), flush=True)
+                        if cross_validate:
+                            print("final avg loss (@ step {} = epoch {}): {}".format(
+                                i + 1, np.around(i / ct * bs), err_train / i), flush=True)
 
-                        now = datetime.now().isoformat()[11:]
-                        print("------- Training end: {} -------\n".format(now), flush=True)
+                            now = datetime.now().isoformat()[11:]
+                            print("------- Training end: {} -------\n".format(now), flush=True)
 
-                        if save:
-                            outfile = os.path.join(os.path.abspath(outdir),
-                                                   "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
-                            saver.save(self.sesh, outfile, global_step=None)
+                            now = datetime.now().isoformat()[11:]
+                            print("------- Final Validation begin: {} -------\n".format(now), flush=True)
+                            x, y = sessa.run(vanext_element)
+                            feed_dict = {self.x_in: x, self.y_in: y, self.is_train: False}
+                            fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
+                            valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
+
+                            self.valid_logger.add_summary(valid_summary, i)
+                            print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
+                            ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
+                            ac.metrics(pred, y, dirr, 'Validation')
+                            now = datetime.now().isoformat()[11:]
+                            print("------- Final Validation end: {} -------\n".format(now), flush=True)
+
                         try:
                             self.train_logger.flush()
                             self.train_logger.close()
@@ -388,6 +411,12 @@ class INCEPTION():
 
                         break
                 try:
+                    print("final avg loss (@ step {} = epoch {}): {}".format(
+                        i + 1, np.around(i / ct * bs), err_train / i), flush=True)
+
+                    now = datetime.now().isoformat()[11:]
+                    print("------- Training end: {} -------\n".format(now), flush=True)
+
                     if cross_validate:
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation begin: {} -------\n".format(now), flush=True)
@@ -412,12 +441,6 @@ class INCEPTION():
                                                    "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
                             saver.save(self.sesh, outfile, global_step=None)
 
-                    print("final avg loss (@ step {} = epoch {}): {}".format(
-                        i + 1, np.around(i / ct * bs), err_train / i), flush=True)
-
-                    now = datetime.now().isoformat()[11:]
-                    print("------- Training end: {} -------\n".format(now), flush=True)
-
                     try:
                         self.train_logger.flush()
                         self.train_logger.close()
@@ -426,7 +449,13 @@ class INCEPTION():
 
                     except(AttributeError):  # not logging
                         print('Not logging', flush=True)
+
                 except tf.errors.OutOfRangeError:
+                    print("final avg loss (@ step {} = epoch {}): {}".format(
+                        i + 1, np.around(i / ct * bs), err_train / i), flush=True)
+
+                    now = datetime.now().isoformat()[11:]
+                    print("------- Training end: {} -------\n".format(now), flush=True)
                     print('No more validation needed!')
 
             print("--- %s seconds ---" % (time.time() - start_time))
