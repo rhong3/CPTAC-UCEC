@@ -216,7 +216,7 @@ def slide_metrics(inter_pd, path, name, fordict):
     inter_pd.to_csv("../Results/{}/out/{}_slide.csv".format(path, name), index=True)
 
 # for real image prediction, just output the prediction scores as csv
-def realout(pdx, path, name):
+def realout(pdx, path, name, pmd):
     lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
@@ -229,15 +229,16 @@ def realout(pdx, path, name):
 
 
 # tile level; need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
-def metrics(pdx, tl, path, name, ori_test=None):
+def metrics(pdx, tl, path, name, pmd, ori_test=None):
     # format clean up
     tl = np.asmatrix(tl)
     tl = tl.argmax(axis=1).astype('uint8')
-    lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     pdxt = np.asmatrix(pdx)
     prl = pdxt.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns = ['Prediction'])
-    outt = pd.DataFrame(pdxt, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+    if pmd == 'subtype':
+        lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
+        outt = pd.DataFrame(pdxt, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     outtlt = pd.DataFrame(tl, columns = ['True_label'])
     if name == 'Validation' or name == 'Training':
         outtlt = outtlt.round(0)
@@ -344,10 +345,9 @@ def py_map2jpg(imgmap, rang, colorMap):
 
 # generating CAM plots of each tile; net is activation; w is weight; pred is prediction scores; x are input images;
 # y are labels; path is output folder, name is test/validation; rd is current batch number
-def CAM(net, w, pred, x, y, path, name, bs, rd=0):
+def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
     y = np.asmatrix(y)
     y = y.argmax(axis=1).astype('uint8')
-    lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
     DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
     DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
@@ -467,7 +467,7 @@ def CAM(net, w, pred, x, y, path, name, bs, rd=0):
 
 
 # CAM for real test; no need to determine correct or wrong
-def CAM_R(net, w, pred, x, path, name, bs, rd=0):
+def CAM_R(net, w, pred, x, path, name, bs, pmd, rd=0):
     DIRR = "../Results/{}/out/{}_img".format(path, name)
     rd = rd * bs
 

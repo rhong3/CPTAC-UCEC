@@ -165,7 +165,7 @@ class INCEPTION():
                 global_step, train_op, merged_summary)
 
     # inference using trained models
-    def inference(self, X, dirr, testset, bs, train_status=False, Not_Realtest=True):
+    def inference(self, X, dirr, testset, pmd, train_status=False, Not_Realtest=True):
         now = datetime.now().isoformat()[11:]
         print("------- Testing begin: {} -------\n".format(now), flush=True)
         rd = 0
@@ -182,7 +182,7 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        # ac.CAM(net, w, pred, x, y, dirr, 'Test', bs, rd)
+                        # ac.CAM(net, w, pred, x, y, dirr, 'Test', bs, pmd, rd)
                         if rd == 0:
                             pdx = pred
                             yl = y
@@ -191,7 +191,7 @@ class INCEPTION():
                             yl = np.concatenate((yl, y), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
-                        ac.metrics(pdx, yl, dirr, 'Test', testset)
+                        ac.metrics(pdx, yl, dirr, 'Test', pmd, testset)
                         break
         else:
             itr, img, ph = X.data(Not_Realtest=False, train=False)
@@ -204,14 +204,14 @@ class INCEPTION():
                         feed_dict = {self.x_in: x, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        # ac.CAM_R(net, w, pred, x, dirr, 'Test', bs, rd)
+                        # ac.CAM_R(net, w, pred, x, dirr, 'Test', bs, pmd, rd)
                         if rd == 0:
                             pdx = pred
                         else:
                             pdx = np.concatenate((pdx, pred), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
-                        ac.realout(pdx, dirr, 'Test')
+                        ac.realout(pdx, dirr, 'Test', pmd)
                         break
 
         now = datetime.now().isoformat()[11:]
@@ -233,7 +233,7 @@ class INCEPTION():
         return i
 
     # training
-    def train(self, X, VAX, ct, bs, dirr, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
+    def train(self, X, VAX, ct, bs, dirr, pmd, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
         start_time = time.time()
         if save:
             saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
@@ -395,8 +395,8 @@ class INCEPTION():
 
                             self.valid_logger.add_summary(valid_summary, i)
                             print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
-                            ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
-                            ac.metrics(pred, y, dirr, 'Validation')
+                            ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs, pmd)
+                            ac.metrics(pred, y, dirr, 'Validation', pmd)
                             now = datetime.now().isoformat()[11:]
                             print("------- Final Validation end: {} -------\n".format(now), flush=True)
 
@@ -427,8 +427,8 @@ class INCEPTION():
 
                         self.valid_logger.add_summary(valid_summary, i)
                         print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
-                        ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs)
-                        ac.metrics(pred, y, dirr, 'Validation')
+                        ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs, pmd)
+                        ac.metrics(pred, y, dirr, 'Validation', pmd)
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation end: {} -------\n".format(now), flush=True)
 
