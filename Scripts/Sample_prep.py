@@ -24,6 +24,12 @@ def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
     return ids
 
 
+# Get intersection of 2 lists
+def intersection(lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
+
 def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', 'all.csv']):
     ids = []
     try:
@@ -39,25 +45,45 @@ def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', '
 
 
 # Get all svs images with its label as one file; level is the tile resolution level
-def big_image_sum(path='../tiles/'):
+def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_MUT_joined.csv'):
     if not os.path.isdir(path):
         import Cutter
         Cutter.cut()
+    allimg = image_ids_in(path)
+    ref = pd.read_csv(ref_file, header=0)
     big_images = []
     for level in range(3):
         level = str(level)
-        POLEimg = image_ids_in(path + "POLE/")
-        SLimg = image_ids_in(path + "Serous-like/")
-        MSIimg = image_ids_in(path + "MSI/")
-        EMimg = image_ids_in(path + "Endometrioid/")
-        for i in MSIimg:
-            big_images.append([i, level, path + "MSI/{}/level{}".format(i, level), 0])
-        for i in EMimg:
-            big_images.append([i, level, path + "Endometrioid/{}/level{}".format(i, level), 1])
-        for i in SLimg:
-            big_images.append([i, level, path + "Serous-like/{}/level{}".format(i, level), 2])
-        for i in POLEimg:
-            big_images.append([i, level, path + "POLE/{}/level{}".format(i, level), 3])
+        if pmd == 'subtype':
+            ref = ref.loc[ref['subtype_0NA'] == 0]
+            MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
+            EMimg = intersection(ref.loc[ref['subtype_Endometrioid'] == 1]['name'].tolist(), allimg)
+            SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
+            POLEimg = intersection(ref.loc[ref['subtype_POLE'] == 1]['name'].tolist(), allimg)
+            for i in MSIimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
+            for i in EMimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
+            for i in SLimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 2])
+            for i in POLEimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 3])
+        elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
+            ref = ref.loc[ref['subtype_0NA'] == 0]
+            negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
+            posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
+            for i in negimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
+            for i in posimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
+        else:
+            negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
+            posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
+            for i in negimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
+            for i in posimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
+
     datapd = pd.DataFrame(big_images, columns=['slide', 'level', 'path', 'label'])
     datapd.to_csv(path + "All_images.csv", header=True, index=False)
 
@@ -66,13 +92,13 @@ def big_image_sum(path='../tiles/'):
 
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
-def set_sep(alll, path, level=None, cut=0.2):
+def set_sep(alll, path, cls, level=None, cut=0.2):
     trlist = []
     telist = []
     valist = []
     if level:
         alll = alll[alll.level == level]
-    for i in range(4):
+    for i in range(cls):
         subset = alll.loc[alll['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)

@@ -24,10 +24,16 @@ dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
 ep = sys.argv[3]    # epochs to train
 md = sys.argv[4]    # structure to use
+pdmd = sys.argv[5]  # feature to predict
 try:
-    level = sys.argv[5]  # level of tiles to use
+    level = sys.argv[6]  # level of tiles to use
 except IndexError:
     level = None
+
+if pdmd == 'subtype':
+    classes = 4
+else:
+    classes = 2
 
 bs = int(bs)
 ep = int(ep)
@@ -40,7 +46,7 @@ HYPERPARAMS = {
     "batch_size": bs,
     "dropout": 0.5,
     "learning_rate": 1E-4,
-    "classes": 4
+    "classes": classes
 }
 
 MAX_ITER = np.inf
@@ -240,16 +246,16 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep.big_image_sum(path=img_dir)
-        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, level=level)
+        alll = Sample_prep.big_image_sum(pmd=pdmd, path=img_dir)
+        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, cls=classes, level=level)
         trc, tec, vac = counters(data_dir)
         loader(data_dir)
     # have trained model or not; train from scratch if not
     try:
-        modeltoload = sys.argv[6]
+        modeltoload = sys.argv[7]
         # test or not
         try:
-            testmode = sys.argv[7]
+            testmode = sys.argv[8]
             main(trc, tec, vac, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
             main(trc, tec, vac, testset=tes, valset=vas, to_reload=modeltoload)
