@@ -348,7 +348,7 @@ class INCEPTION():
                                     else:
                                         print("Passed early stopping evaluation. Continue training!")
 
-                        if i == max_iter-int(i/1000)-2 and verbose:
+                        if i == max_iter-2 and verbose:
 
                             if cross_validate:
                                 now = datetime.now().isoformat()[11:]
