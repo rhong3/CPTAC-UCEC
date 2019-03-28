@@ -66,6 +66,8 @@ ddd = {0: '0NA'}
 
 jj['subtype'] = jj['subtype'].replace(ddd)
 
+jj = jj.drop_duplicates()
+
 jj.to_csv('../MUT_joined.csv', header=True, index=False)
 
 jjx = pd.get_dummies(jj, columns=['subtype'])
