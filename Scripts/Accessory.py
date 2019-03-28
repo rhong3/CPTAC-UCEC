@@ -332,66 +332,42 @@ def py_map2jpg(imgmap, rang, colorMap):
 # generating CAM plots of each tile; net is activation; w is weight; pred is prediction scores; x are input images;
 # y are labels; path is output folder, name is test/validation; rd is current batch number
 def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
+    if pmd == 'subtype':
+        DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
+        DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
+        DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
+        DIRD = "../Results/{}/out/{}_POLE_img".format(path, name)
+        for DIR in (DIRA, DIRB, DIRC, DIRD):
+            try:
+                os.mkdir(DIR)
+            except FileExistsError:
+                pass
+        catdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
+        dirdict = {0: DIRA, 1: DIRB, 2: DIRC, 3: DIRD}
+    else:
+        DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
+        DIRB = "../Results/{}/out/{}_POS_img".format(path, name)
+        for DIR in (DIRA, DIRB):
+            try:
+                os.mkdir(DIR)
+            except FileExistsError:
+                pass
+        catdict = {0: 'negative', 1: pmd}
+        dirdict = {0: DIRA, 1: DIRB}
+
     y = np.asmatrix(y)
     y = y.argmax(axis=1).astype('uint8')
-    DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
-    DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
-    DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
-    DIRD = "../Results/{}/out/{}_POLE_img".format(path, name)
     rd = rd*bs
-
-    try:
-        os.mkdir(DIRA)
-    except(FileExistsError):
-        pass
-
-    try:
-        os.mkdir(DIRB)
-    except(FileExistsError):
-        pass
-
-    try:
-        os.mkdir(DIRC)
-    except(FileExistsError):
-        pass
-
-    try:
-        os.mkdir(DIRD)
-    except(FileExistsError):
-        pass
-
     pdx = np.asmatrix(pred)
 
     prl = pdx.argmax(axis=1).astype('uint8')
 
     for ij in range(len(y)):
         id = str(ij + rd)
-        if prl[ij, 0] == 0:
-            if y[ij] == 0:
-                ddt = 'Correct'
-            else:
-                ddt = 'Wrong'
-
-        elif prl[ij, 0] == 1:
-            if y[ij] == 1:
-                ddt = 'Correct'
-            else:
-                ddt = 'Wrong'
-
-        elif prl[ij, 0] == 2:
-            if y[ij] == 2:
-                ddt = 'Correct'
-            else:
-                ddt = 'Wrong'
-
-        elif prl[ij, 0] == 3:
-            if y[ij] == 3:
-                ddt = 'Correct'
-            else:
-                ddt = 'Wrong'
+        if prl[ij, 0] == y[ij]:
+            ddt = 'Correct'
         else:
-            ddt = 'Error'
-            print("Prediction value error!")
+            ddt = 'Wrong'
 
         weights_LR = w
         activation_lastconv = np.array([net[ij]])
@@ -403,26 +379,10 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         scoresMean = np.mean(scores, axis=0)
         ascending_order = np.argsort(scoresMean)
         IDX_category = ascending_order[::-1]  # [::-1] to sort in descending order
-        if prl[ij, 0] == 0:
-            curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[0], :])
-            DIRR = DIRA
-            catt = 'MSI'
-        elif prl[ij, 0] == 1:
-            curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[1], :])
-            DIRR = DIRB
-            catt = 'Endometrioid'
-        elif prl[ij, 0] == 2:
-            curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[2], :])
-            DIRR = DIRC
-            catt = 'Serous-like'
-        elif prl[ij, 0] == 3:
-            curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[3], :])
-            DIRR = DIRD
-            catt = 'POLE'
-        else:
-            curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[0], :])
-            DIRR = DIRA
-            catt = 'MSI'
+        prdd = prl[ij, 0]
+        curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[prdd], :])
+        DIRR = dirdict[prdd]
+        catt = catdict[prdd]
         for kk in range(topNum):
             curCAMmap_crops = curCAMmapAll[:, :, kk]
             curCAMmapLarge_crops = cv2.resize(curCAMmap_crops, (299, 299))
@@ -453,7 +413,7 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
 
 
 # CAM for real test; no need to determine correct or wrong
-def CAM_R(net, w, pred, x, path, name, bs, pmd, rd=0):
+def CAM_R(net, w, pred, x, path, name, bs, rd=0):
     DIRR = "../Results/{}/out/{}_img".format(path, name)
     rd = rd * bs
 
@@ -464,7 +424,7 @@ def CAM_R(net, w, pred, x, path, name, bs, pmd, rd=0):
 
     pdx = np.asmatrix(pred)
 
-    prl = (pdx[:,1] > 0.5).astype('uint8')
+    prl = pdx.argmax(axis=1).astype('uint8')
 
     for ij in range(len(prl)):
         id = str(ij + rd)
