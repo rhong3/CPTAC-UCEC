@@ -87,7 +87,7 @@ def cut():
 
             # else:
             #     rand = np.random.rand(1)[0]
-            #     if rand < 0.7:
+            #     if rand < 0.5:
             #         otdir = "../tiles/{}/level{}".format(i[1], str(level))
             #         try:
             #             os.mkdir(otdir)
