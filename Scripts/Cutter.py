@@ -72,7 +72,7 @@ def cut():
         except(FileExistsError):
             pass
         for level in range(3):
-            # if level != 0:
+            if level != 0:
                 otdir = "../tiles/{}/level{}".format(i[1], str(level))
                 try:
                     os.mkdir(otdir)
@@ -85,21 +85,21 @@ def cut():
                 if len(os.listdir(otdir)) < 2:
                     shutil.rmtree(otdir, ignore_errors=True)
 
-            # else:
-            #     rand = np.random.rand(1)[0]
-            #     if rand < 0.5:
-            #         otdir = "../tiles/{}/level{}".format(i[1], str(level))
-            #         try:
-            #             os.mkdir(otdir)
-            #         except(FileExistsError):
-            #             pass
-            #         try:
-            #             n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
-            #                                                             level=(level+1))
-            #         except(IndexError):
-            #             pass
-            #         if len(os.listdir(otdir)) < 2:
-            #             shutil.rmtree(otdir, ignore_errors=True)
+            else:
+                rand = np.random.rand(1)[0]
+                if rand < 0.5:
+                    otdir = "../tiles/{}/level{}".format(i[1], str(level))
+                    try:
+                        os.mkdir(otdir)
+                    except(FileExistsError):
+                        pass
+                    try:
+                        n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
+                                                                        level=(level+1))
+                    except(IndexError):
+                        pass
+                    if len(os.listdir(otdir)) < 2:
+                        shutil.rmtree(otdir, ignore_errors=True)
 
 
     print("--- %s seconds ---" % (time.time() - start_time))

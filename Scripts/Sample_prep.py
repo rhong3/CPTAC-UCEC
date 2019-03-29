@@ -47,6 +47,7 @@ def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', '
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_MUT_joined.csv'):
     if not os.path.isdir(path):
+        os.mkdir(path)
         import Cutter
         Cutter.cut()
     allimg = image_ids_in(path)
