@@ -24,10 +24,10 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
             print('Skipping ID:', id)
         else:
             if mode == 'CPTAC':
-                dirname = id.split('_')[-2]
+                dirname = id.split('_')[-3]
                 ids.append((id, dirname))
             if mode == 'TCGA':
-                dirname = id.split('.')[0]
+                dirname = id.split('-01Z')[0]
                 ids.append((id, dirname))
     return ids
 
