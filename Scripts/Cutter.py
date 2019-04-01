@@ -48,7 +48,9 @@ def cut():
             continue
         try:
             os.mkdir("../tiles/{}".format(i[1]))
+            dup = False
         except(FileExistsError):
+            dup = True
             pass
         for level in range(3):
             otdir = "../tiles/{}/level{}".format(i[1], str(level))
@@ -57,7 +59,8 @@ def cut():
             except(FileExistsError):
                 pass
             try:
-                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir, level=level)
+                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
+                                                                level=level, dp=dup)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
@@ -69,7 +72,9 @@ def cut():
             continue
         try:
             os.mkdir("../tiles/{}".format(i[1]))
+            dup = False
         except(FileExistsError):
+            dup = True
             pass
         for level in range(3):
             if level != 0:
@@ -79,7 +84,8 @@ def cut():
                 except(FileExistsError):
                     pass
                 try:
-                    n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir, level=(level+1))
+                    n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
+                                                                    level=(level+1), dp=dup)
                 except(IndexError):
                     pass
                 if len(os.listdir(otdir)) < 2:
@@ -87,7 +93,7 @@ def cut():
 
             else:
                 rand = np.random.rand(1)[0]
-                if rand < 0.5:
+                if rand < 0.1:
                     otdir = "../tiles/{}/level{}".format(i[1], str(level))
                     try:
                         os.mkdir(otdir)
@@ -95,7 +101,7 @@ def cut():
                         pass
                     try:
                         n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/' + i[0], outdir=otdir,
-                                                                        level=(level+1))
+                                                                        level=(level+1), dp=dup)
                     except(IndexError):
                         pass
                     if len(os.listdir(otdir)) < 2:
