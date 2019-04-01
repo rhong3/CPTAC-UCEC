@@ -44,8 +44,9 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         wscore = bgcheck(img)
         if wscore < 0.25:
             if dp:
-                img.save(outdir + "/region_x-{}-y-{}_dp.png".format(target_x, target_y))
-                strr = outdir + "/region_x-{}-y-{}_dp.png".format(target_x, target_y)
+                ran = np.random.randint(10000)
+                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
+                strr = outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran))
             else:
                 img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
                 strr = outdir + "/region_x-{}-y-{}.png".format(target_x, target_y)
