@@ -106,7 +106,10 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False):
     imlocpd = imlocpd.reset_index(drop=True)
     imlocpd = imlocpd.reset_index(drop=False)
     imlocpd.columns = ["Num", "X_pos", "Y_pos", "X", "Y", "Loc"]
-    imlocpd.to_csv(outdir + "/dict.csv", index = False)
+    if dp:
+        imlocpd.to_csv(outdir + "/dict.csv", index=False, mode='a', header=False)
+    else:
+        imlocpd.to_csv(outdir + "/dict.csv", index=False)
     tempdict = None
     ct = len(imloc)
     print(ct)
