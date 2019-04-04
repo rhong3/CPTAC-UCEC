@@ -235,6 +235,7 @@ class INCEPTION():
     # training
     def train(self, X, VAX, ct, bs, dirr, pmd, max_iter=np.inf, cross_validate=True, verbose=True, save=True, outdir="./out"):
         start_time = time.time()
+        svs = 0
         if save:
             saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
 
@@ -301,6 +302,7 @@ class INCEPTION():
                                                                "{}_{}".format(self.model,
                                                                               "_".join(['dropout', str(self.dropout)])))
                                         saver.save(self.sesh, outfile, global_step=None)
+                                        svs = i
 
                             else:
                                 train_cost.append(cost)
@@ -311,6 +313,7 @@ class INCEPTION():
                                                            "{}_{}".format(self.model,
                                                                           "_".join(['dropout', str(self.dropout)])))
                                     saver.save(self.sesh, outfile, global_step=None)
+                                    svs = i
                         else:
                             train_cost.append(cost)
 
@@ -337,6 +340,7 @@ class INCEPTION():
                                                            "{}_{}".format(self.model,
                                                                           "_".join(['dropout', str(self.dropout)])))
                                     saver.save(self.sesh, outfile, global_step=None)
+                                    svs = i
 
                                 if i > 69999:
                                     mean_cost = np.mean(train_cost[-10000:-1])
@@ -432,10 +436,7 @@ class INCEPTION():
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation end: {} -------\n".format(now), flush=True)
 
-                    if not os.path.isfile(os.path.join(os.path.abspath(outdir),
-                                                   "{}_{}.meta".format(self.model,
-                                                                  "_".join(['dropout', str(self.dropout)])))):
-                        if save:
+                    if svs < 15000 and save:
                             print("Save the last model as the best model.")
                             outfile = os.path.join(os.path.abspath(outdir),
                                                    "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
