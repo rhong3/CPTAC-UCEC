@@ -421,6 +421,12 @@ class INCEPTION():
                     now = datetime.now().isoformat()[11:]
                     print("------- Training end: {} -------\n".format(now), flush=True)
 
+                    if svs < 15000 and save:
+                            print("Save the last model as the best model.")
+                            outfile = os.path.join(os.path.abspath(outdir),
+                                                   "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
+                            saver.save(self.sesh, outfile, global_step=None)
+
                     if cross_validate:
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation begin: {} -------\n".format(now), flush=True)
@@ -435,12 +441,6 @@ class INCEPTION():
                         ac.metrics(pred, y, dirr, 'Validation', pmd)
                         now = datetime.now().isoformat()[11:]
                         print("------- Validation end: {} -------\n".format(now), flush=True)
-
-                    if svs < 15000 and save:
-                            print("Save the last model as the best model.")
-                            outfile = os.path.join(os.path.abspath(outdir),
-                                                   "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
-                            saver.save(self.sesh, outfile, global_step=None)
 
                     try:
                         self.train_logger.flush()
