@@ -11,17 +11,19 @@ from openslide import OpenSlide
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
+import cv2
 
 
 # check if a tile is background or not; return a blank pixel percentage score
-def bgcheck(img):
+def bgcheck(img, ts):
     the_imagea = np.array(img)[:, :, :3]
     the_imagea = np.nan_to_num(the_imagea)
     mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
+    grey = (np.mean(np.ptp(the_imagea, axis=2)) < 80).astype(np.uint8)
     mask = mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]
     maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
-    white = (np.sum(mask) + np.sum(maskb)) / (299 * 299)
+    white = (np.sum(mask) + np.sum(maskb)) / (ts * ts) + grey
     return white
 
 
@@ -41,8 +43,9 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         target_y = y0 * stepsize
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
-        wscore = bgcheck(img)
-        if wscore < 0.25:
+        wscore = bgcheck(img, tile_size)
+        if wscore < 0.3:
+            img = cv2.resize(img, (299, 299))
             if dp:
                 ran = np.random.randint(10000)
                 img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
@@ -60,7 +63,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
 # First open the slide, determine how many tiles can be cut, record the residue edges width,
 # and calculate the final output prediction heat map size should be. Then, using multithread to cut tiles, and stack up
 # tiles and their position dictionaries.
-def tile(image_file, outdir, level, path_to_slide="../images/", dp=False):
+def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
     print(slp)
@@ -70,8 +73,8 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False):
     bounds_height = slide.level_dimensions[level][1]
     x = 0
     y = 0
-    half_width_region = 49
-    full_width_region = 299
+    half_width_region = 49*ft
+    full_width_region = 299*ft
     stepsize = full_width_region - half_width_region
 
     n_x = int((bounds_width - 1) / stepsize)

@@ -60,7 +60,7 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
-                                                                level=level, dp=dup)
+                                                                level=level, dp=dup, ft=2)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
