@@ -43,9 +43,15 @@ def loader(totlist_dir):
             img = load_image(imlist[i])
             the_imagea = np.array(img)[:, :, :3]
             the_imagea = np.nan_to_num(the_imagea)
-            BB = np.mean(the_imagea[:, :, 0])
-            GG = np.mean(the_imagea[:, :, 1])
-            RR = np.mean(the_imagea[:, :, 2])
+            mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
+            maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
+            mask = (~(mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]).astype(bool)).astype(np.uint8)
+            maskb = (~(maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]).astype(bool)).astype(np.uint8)
+            mask = mask*maskb
+            masksum = np.sum(mask)
+            BB = np.sum(the_imagea[:, :, 0]*mask)/masksum
+            GG = np.sum(the_imagea[:, :, 1]*mask)/masksum
+            RR = np.sum(the_imagea[:, :, 2]*mask)/masksum
             RGB.append([imlist[i], RR, GG, BB])
         except AttributeError:
             print('Error image:'+imlist[i])
