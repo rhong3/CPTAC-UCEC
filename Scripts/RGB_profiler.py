@@ -1,6 +1,7 @@
 import cv2
 import pandas as pd
 import numpy as np
+import os
 
 
 def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', 'all.csv']):
