@@ -42,9 +42,9 @@ def loader(totlist_dir):
             img = load_image(imlist[i])
             the_imagea = np.array(img)[:, :, :3]
             the_imagea = np.nan_to_num(the_imagea)
-            RR = np.mean(the_imagea[:, :, 0])
+            BB = np.mean(the_imagea[:, :, 0])
             GG = np.mean(the_imagea[:, :, 1])
-            BB = np.mean(the_imagea[:, :, 2])
+            RR = np.mean(the_imagea[:, :, 2])
             RGB.append([imlist[i], RR, GG, BB])
         except AttributeError:
             print('Error image:'+imlist[i])
