@@ -20,7 +20,7 @@ def bgcheck(img, ts):
     the_imagea = np.nan_to_num(the_imagea)
     mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
-    grey = (np.mean(np.ptp(the_imagea, axis=2)) < 80).astype(np.uint8)
+    grey = ((np.mean(np.ptp(the_imagea, axis=2))) < 80).astype(np.uint8)
     mask = mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]
     maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
     white = (np.sum(mask) + np.sum(maskb)) / (ts * ts) + grey
