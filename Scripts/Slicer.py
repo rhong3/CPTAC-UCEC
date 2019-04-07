@@ -20,11 +20,45 @@ def bgcheck(img, ts):
     the_imagea = np.nan_to_num(the_imagea)
     mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
-    grey = ((np.mean(np.ptp(the_imagea, axis=2))) < 80).astype(np.uint8)
+    greya = ((np.ptp(the_imagea[0])) < 100).astype(np.uint8)
+    greyb = ((np.ptp(the_imagea[1])) < 100).astype(np.uint8)
+    greyc = ((np.ptp(the_imagea[2])) < 100).astype(np.uint8)
+    grey = greya * greyb * greyc
     mask = mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]
     maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
     white = (np.sum(mask) + np.sum(maskb)) / (ts * ts) + grey
     return white
+
+
+def normalization(img, Rm=165, Gm=106, Bm=146):
+    imga = np.array(img)[:, :, :3]
+    imga = cv2.resize(imga, (299, 299))
+    imga = np.nan_to_num(imga)
+    mask = (imga[:, :, :3] > 200).astype(np.uint8)
+    maskb = (imga[:, :, :3] < 50).astype(np.uint8)
+    mask = (~(mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]).astype(bool)).astype(np.uint8)
+    maskb = (~(maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]).astype(bool)).astype(np.uint8)
+    mask = mask * maskb
+    invert_mask = (~mask.astype(bool)).astype(np.uint8)
+    masksum = np.sum(mask)
+    BB = np.sum(imga[:, :, 0] * mask) / masksum
+    GG = np.sum(imga[:, :, 1] * mask) / masksum
+    RR = np.sum(imga[:, :, 2] * mask) / masksum
+    mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
+    invert_mask = np.repeat(invert_mask[:, :, np.newaxis], 3, axis=2)
+    imgb = mask * imga
+    imgb[:, :, 0] = imgb[:, :, 0] * (Bm / BB)
+    imgb[:, :, 1] = imgb[:, :, 1] * (Gm / GG)
+    imgb[:, :, 2] = imgb[:, :, 2] * (Rm / RR)
+    imgb = np.clip(imgb, 0, 255).astype(np.uint8)
+    imgb = imgb + (invert_mask * imga)
+    postmaska = (imgb[:, :, 1] < 150).astype(np.uint8)
+    postmaskb = (imgb[:, :, 2] > 80).astype(np.uint8)
+    postmask = postmaska * postmaskb
+    postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
+    iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
+    imgc = imgb * postmask + (iv_postmask * imga)
+    return imgc
 
 
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
@@ -45,7 +79,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
         if wscore < 0.3:
-            img = cv2.resize(img, (299, 299))
+            img = normalization(img)
             if dp:
                 ran = np.random.randint(10000)
                 img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
