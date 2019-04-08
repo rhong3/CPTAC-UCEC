@@ -45,7 +45,7 @@ def normalization(img, Rm=165, Gm=106, Bm=146, Rstd=29, Gstd=24, Bstd=22):
     BB = np.sum(imga[:, :, 0] * mask) / masksum
     GG = np.sum(imga[:, :, 1] * mask) / masksum
     RR = np.sum(imga[:, :, 2] * mask) / masksum
-    if (Rm-Rstd) < RR < (Rm-Rstd) and (Gm-Gstd) < GG < (Gm-Gstd) and (Bm-Bstd) < BB < (Bm-Bstd):
+    if (Rm-Rstd) < RR < (Rm+Rstd) and (Gm-Gstd) < GG < (Gm+Gstd) and (Bm-Bstd) < BB < (Bm+Bstd):
         return imga
     else:
         mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
