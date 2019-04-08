@@ -62,6 +62,7 @@ def normalization(img, Rm=165, Gm=106, Bm=146):
         postmaskd = (imgb[:, :, 2] > 80).astype(np.uint8)
         postmaske = (imgb[:, :, 0] < 170).astype(np.uint8)
         postmask = (postmaska * postmaskb) + (postmaskc * postmaskd * postmaske)
+        postmask = np.clip(postmask, 0, 1).astype(np.uint8)
         postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
         iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
         imgc = imgb * postmask + (iv_postmask * imga)
