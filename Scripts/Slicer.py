@@ -31,7 +31,7 @@ def bgcheck(img, ts):
 
 
 # Tile color normalization
-def normalization(img, Rm=165, Gm=106, Bm=146):
+def normalization(img, Rm=165, Gm=106, Bm=146, Rstd=29, Gstd=24, Bstd=22):
     imga = np.array(img)[:, :, :3]
     imga = cv2.resize(imga, (299, 299))
     imga = np.nan_to_num(imga)
@@ -45,21 +45,26 @@ def normalization(img, Rm=165, Gm=106, Bm=146):
     BB = np.sum(imga[:, :, 0] * mask) / masksum
     GG = np.sum(imga[:, :, 1] * mask) / masksum
     RR = np.sum(imga[:, :, 2] * mask) / masksum
-    mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
-    invert_mask = np.repeat(invert_mask[:, :, np.newaxis], 3, axis=2)
-    imgb = mask * imga
-    imgb[:, :, 0] = imgb[:, :, 0] * (Bm / BB)
-    imgb[:, :, 1] = imgb[:, :, 1] * (Gm / GG)
-    imgb[:, :, 2] = imgb[:, :, 2] * (Rm / RR)
-    imgb = np.clip(imgb, 0, 255).astype(np.uint8)
-    imgb = imgb + (invert_mask * imga)
-    postmaska = (imgb[:, :, 1] < 150).astype(np.uint8)
-    postmaskb = (imgb[:, :, 2] > 80).astype(np.uint8)
-    postmask = postmaska * postmaskb
-    postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
-    iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
-    imgc = imgb * postmask + (iv_postmask * imga)
-    return imgc
+    if (Rm-Rstd) < RR < (Rm-Rstd) and (Gm-Gstd) < GG < (Gm-Gstd) and (Bm-Bstd) < BB < (Bm-Bstd):
+        return imga
+    else:
+        mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
+        invert_mask = np.repeat(invert_mask[:, :, np.newaxis], 3, axis=2)
+        imgb = mask * imga
+        imgb[:, :, 0] = imgb[:, :, 0] * (Bm / BB)
+        imgb[:, :, 1] = imgb[:, :, 1] * (Gm / GG)
+        imgb[:, :, 2] = imgb[:, :, 2] * (Rm / RR)
+        imgb = np.clip(imgb, 0, 255).astype(np.uint8)
+        imgb = imgb + (invert_mask * imga)
+        postmaska = (imgb[:, :, 1] < 150).astype(np.uint8)
+        postmaskb = (imgb[:, :, 2] > 80).astype(np.uint8)
+        postmaskc = (imgb[:, :, 1] < 25).astype(np.uint8)
+        postmaskd = (imgb[:, :, 2] < 50).astype(np.uint8)
+        postmask = (postmaska * postmaskb) + (postmaskc * postmaskd)
+        postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
+        iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
+        imgc = imgb * postmask + (iv_postmask * imga)
+        return imgc
 
 
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
