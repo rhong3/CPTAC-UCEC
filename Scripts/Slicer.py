@@ -30,6 +30,7 @@ def bgcheck(img, ts):
     return white
 
 
+# Tile color normalization
 def normalization(img, Rm=165, Gm=106, Bm=146):
     imga = np.array(img)[:, :, :3]
     imga = cv2.resize(imga, (299, 299))
@@ -82,10 +83,10 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
             img = normalization(img)
             if dp:
                 ran = np.random.randint(10000)
-                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
+                cv2.imwrite(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)), img)
                 strr = outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran))
             else:
-                img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
+                cv2.imwrite(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y), img)
                 strr = outdir + "/region_x-{}-y-{}.png".format(target_x, target_y)
             imloc.append([x0, y0, target_x, target_y, strr])
         y0 += 1
