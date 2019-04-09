@@ -50,11 +50,11 @@ def loader(totlist_dir):
             mask = mask*maskb
             masksum = np.sum(mask)
             BB = np.sum(the_imagea[:, :, 0]*mask)/masksum
-            B = np.flatnonzero(the_imagea[:, :, 0]*mask)
+            B = (the_imagea[:, :, 0]*mask).ravel()[np.flatnonzero(the_imagea[:, :, 0]*mask)]
             GG = np.sum(the_imagea[:, :, 1]*mask)/masksum
-            G = np.flatnonzero(the_imagea[:, :, 1] * mask)
+            G = (the_imagea[:, :, 1]*mask).ravel()[np.flatnonzero(the_imagea[:, :, 1]*mask)]
             RR = np.sum(the_imagea[:, :, 2]*mask)/masksum
-            R = np.flatnonzero(the_imagea[:, :, 2] * mask)
+            R = (the_imagea[:, :, 2]*mask).ravel()[np.flatnonzero(the_imagea[:, :, 2]*mask)]
             RGB.append([imlist[i], RR, np.percentile(R, 25), np.percentile(R, 75), np.std(R),
                         GG, np.percentile(G, 25), np.percentile(G, 75), np.std(G),
                         BB, np.percentile(B, 25), np.percentile(B, 75), np.std(B)])
