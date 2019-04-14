@@ -46,10 +46,10 @@ class DataSet(object):
         images = tf.image.rot90(images, k=angles)
         images = tf.image.random_flip_left_right(images)
         images = tf.image.random_flip_up_down(images)
-        images = tf.image.random_hue(images, 0.1)
-        images = tf.image.random_brightness(images, 0.1)
-        images = tf.image.random_contrast(images, 0.8, 1.2)
-        images = tf.image.random_saturation(images, 0.8, 1.2)
+        images = tf.image.random_hue(images, 0.02)
+        images = tf.image.random_brightness(images, 0.02)
+        images = tf.image.random_contrast(images, 0.9, 1.1)
+        images = tf.image.random_saturation(images, 0.9, 1.1)
 
         labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=self._classes)
 
