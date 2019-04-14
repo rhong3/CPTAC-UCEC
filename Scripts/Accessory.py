@@ -144,7 +144,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         plt.savefig("../Results/{}/out/{}_{}_PRC.png".format(path, name, dm))
 
     else:
-        tl = np.asarray(outtl[:, 0]).ravel()
+        tl = outtl.values[:, 0].ravel()
         y_score = np.asarray(pdx[:, 1]).ravel()
         auc = sklearn.metrics.roc_auc_score(tl, y_score)
         auc = round(auc, 5)
