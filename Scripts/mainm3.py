@@ -44,7 +44,7 @@ INPUT_DIM = [bs, IMG_DIM, IMG_DIM, 3]
 # hyper parameters
 HYPERPARAMS = {
     "batch_size": bs,
-    "dropout": 0.5,
+    "dropout": 0.3,
     "learning_rate": 1E-4,
     "classes": classes
 }
