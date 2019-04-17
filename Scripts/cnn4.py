@@ -289,7 +289,10 @@ class INCEPTION():
                                     temp_valid.append(valid_cost)
 
                                 tempminvalid = np.mean(temp_valid)
-                                minvalid = np.mean(validation_cost)
+                                try:
+                                    minvalid = min(validation_cost)
+                                except ValueError:
+                                    minvalid = 0
 
                                 if tempminvalid <= minvalid:
                                     train_cost.append(cost)

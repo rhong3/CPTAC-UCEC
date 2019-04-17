@@ -217,9 +217,9 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
     try:
         outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
         if pmd == 'subtype':
-            pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].to_numpy()
+            pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
         else:
-            pdx_slide = inter_pd[['NEG_score', 'POS_score']].to_numpy()
+            pdx_slide = inter_pd[['NEG_score', 'POS_score']].values
         ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr, pmd)
     except ValueError:
         print('Not able to generate plots based on this set!')
