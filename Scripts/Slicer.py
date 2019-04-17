@@ -46,7 +46,10 @@ def normalization(img, Rm=165, Gm=106, Bm=146):
     GG = np.sum(imga[:, :, 1] * mask) / masksum
     RR = np.sum(imga[:, :, 2] * mask) / masksum
     if (Rm-10) < RR < (Rm+10) and (Gm-10) < GG < (Gm+10) and (Bm-10) < BB < (Bm+10):
-        return imga
+        imgd = imga
+        imgd[:, :, 0] = imga[:, :, 2]
+        imgd[:, :, 2] = imga[:, :, 0]
+        return imgd
     else:
         mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
         invert_mask = np.repeat(invert_mask[:, :, np.newaxis], 3, axis=2)
@@ -64,7 +67,10 @@ def normalization(img, Rm=165, Gm=106, Bm=146):
         postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
         iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
         imgc = imgb * postmask + (iv_postmask * imga)
-        return imgc
+        imgd = imgc
+        imgd[:, :, 0] = imgc[:, :, 2]
+        imgd[:, :, 2] = imgc[:, :, 0]
+        return imgd
 
 
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
@@ -84,8 +90,9 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if 0.05 < wscore < 0.4:
-            img = normalization(img)
+        if 0.05 < wscore < 0.35:
+            # img = normalization(img)
+            img = cv2.resize(img, (299, 299))
             if dp:
                 ran = np.random.randint(10000)
                 cv2.imwrite(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)), img)
