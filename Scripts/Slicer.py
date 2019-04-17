@@ -84,7 +84,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if wscore < 0.3:
+        if 0.05 < wscore < 0.4:
             img = normalization(img)
             if dp:
                 ran = np.random.randint(10000)

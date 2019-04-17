@@ -53,6 +53,10 @@ def cut():
             dup = True
             pass
         for level in range(3):
+            if level == 1:
+                tff = 2
+            else:
+                tff = 1
             otdir = "../tiles/{}/level{}".format(i[1], str(level))
             try:
                 os.mkdir(otdir)
@@ -60,7 +64,7 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
-                                                                level=level, dp=dup, ft=2)
+                                                                level=level, dp=dup, ft=tff)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
@@ -77,6 +81,10 @@ def cut():
             dup = True
             pass
         for level in range(3):
+            if level == 1:
+                tff = 1
+            else:
+                tff = 2
             otdir = "../tiles/{}/level{}".format(i[1], str(level))
             try:
                 os.mkdir(otdir)
@@ -84,7 +92,7 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
-                                                                level=(level+1), dp=dup)
+                                                                level=level, dp=dup, ft=tff)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
@@ -98,6 +106,6 @@ def cut():
     # print("--- %s seconds ---" % (time.time() - start_time))
 
 
-
-
+if __name__ == "__main__":
+    cut()
 
