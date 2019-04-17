@@ -52,12 +52,17 @@ def cut():
         except(FileExistsError):
             dup = True
             pass
-        for level in range(3):
-            if level == 1:
+        for m in range(3):
+            if m == 0:
+                tff = 1
+                level = 0
+            elif m == 1:
                 tff = 2
+                level = 0
             else:
                 tff = 1
-            otdir = "../tiles/{}/level{}".format(i[1], str(level))
+                level = 1
+            otdir = "../tiles/{}/level{}".format(i[1], str(m))
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
@@ -80,12 +85,17 @@ def cut():
         except(FileExistsError):
             dup = True
             pass
-        for level in range(3):
-            if level == 1:
+        for m in range(3):
+            if m == 0:
+                tff = 2
+                level = 0
+            elif m == 1:
                 tff = 1
+                level = 1
             else:
                 tff = 2
-            otdir = "../tiles/{}/level{}".format(i[1], str(level))
+                level = 1
+            otdir = "../tiles/{}/level{}".format(i[1], str(m))
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
