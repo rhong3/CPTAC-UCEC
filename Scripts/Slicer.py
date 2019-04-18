@@ -90,15 +90,14 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if 0.05 < wscore < 0.35:
-            # img = normalization(img)
-            img = cv2.resize(img, (299, 299))
+        if 0.1 < wscore < 0.35:
+            img = img.resize((299, 299))
             if dp:
                 ran = np.random.randint(10000)
-                cv2.imwrite(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)), img)
+                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
                 strr = outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran))
             else:
-                cv2.imwrite(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y), img)
+                img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
                 strr = outdir + "/region_x-{}-y-{}.png".format(target_x, target_y)
             imloc.append([x0, y0, target_x, target_y, strr])
         y0 += 1
