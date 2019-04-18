@@ -11,7 +11,8 @@ from openslide import OpenSlide
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
-import cv2
+import staintools
+from PIL import Image
 
 
 # check if a tile is background or not; return a blank pixel percentage score
@@ -31,53 +32,22 @@ def bgcheck(img, ts):
 
 
 # Tile color normalization
-def normalization(img, Rm=165, Gm=106, Bm=146):
-    imga = np.array(img)[:, :, :3]
-    imga = cv2.resize(imga, (299, 299))
-    imga = np.nan_to_num(imga)
-    mask = (imga[:, :, :3] > 200).astype(np.uint8)
-    maskb = (imga[:, :, :3] < 50).astype(np.uint8)
-    mask = (~(mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]).astype(bool)).astype(np.uint8)
-    maskb = (~(maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]).astype(bool)).astype(np.uint8)
-    mask = mask * maskb
-    invert_mask = (~mask.astype(bool)).astype(np.uint8)
-    masksum = np.sum(mask)
-    BB = np.sum(imga[:, :, 0] * mask) / masksum
-    GG = np.sum(imga[:, :, 1] * mask) / masksum
-    RR = np.sum(imga[:, :, 2] * mask) / masksum
-    if (Rm-10) < RR < (Rm+10) and (Gm-10) < GG < (Gm+10) and (Bm-10) < BB < (Bm+10):
-        imgd = imga
-        imgd[:, :, 0] = imga[:, :, 2]
-        imgd[:, :, 2] = imga[:, :, 0]
-        return imgd
-    else:
-        mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
-        invert_mask = np.repeat(invert_mask[:, :, np.newaxis], 3, axis=2)
-        imgb = mask * imga
-        imgb[:, :, 0] = imgb[:, :, 0] * (Bm / BB)
-        imgb[:, :, 1] = imgb[:, :, 1] * (Gm / GG)
-        imgb[:, :, 2] = imgb[:, :, 2] * (Rm / RR)
-        imgb = np.clip(imgb, 0, 255).astype(np.uint8)
-        imgb = imgb + (invert_mask * imga)
-        postmaska = ((imgb[:, :, 0] > 102) & (imgb[:, :, 0] < 190)).astype(np.uint8)
-        postmaskb = ((imgb[:, :, 1] > 58) & (imgb[:, :, 1] < 154)).astype(np.uint8)
-        postmaskc = ((imgb[:, :, 2] > 107) & (imgb[:, :, 2] < 223)).astype(np.uint8)
-        postmask = postmaska * postmaskb * postmaskc
-        postmask = np.clip(postmask, 0, 1).astype(np.uint8)
-        postmask = np.repeat(postmask[:, :, np.newaxis], 3, axis=2)
-        iv_postmask = (~postmask.astype(bool)).astype(np.uint8)
-        imgc = imgb * postmask + (iv_postmask * imga)
-        imgd = imgc
-        imgd[:, :, 0] = imgc[:, :, 2]
-        imgd[:, :, 2] = imgc[:, :, 0]
-        return imgd
+def normalization(img, sttd):
+    img = img.resize((299, 299))
+    img = np.array(img)[:, :, :3]
+    img = staintools.LuminosityStandardizer.standardize(img)
+    normalizer = staintools.StainNormalizer(method='vahadane')
+    normalizer.fit(sttd)
+    img = normalizer.transform(img)
+    img = Image.fromarray(img.astype('uint8'), 'RGB')
+    return img
 
 
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
 # x and y are the upper left position of each tile; tile_size is tile size; stepsize of each step; x0 is the row to cut.
 # outdir is the output directory for images;
 # imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles (Removed 01/24/2019).
-def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
+def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
     # pid = os.getpid()
     # print('{}: start working'.format(pid))
     slide = OpenSlide(slp)
@@ -90,8 +60,8 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if 0.1 < wscore < 0.35:
-            img = img.resize((299, 299))
+        if 0.1 < wscore < 0.33:
+            img = normalization(img, std)
             if dp:
                 ran = np.random.randint(10000)
                 img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
@@ -115,6 +85,9 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
     print(slp)
     print(slide.level_dimensions)
 
+    std_img = staintools.read_image("../colorstandard.png")
+    std_img = staintools.LuminosityStandardizer.standardize(std_img)
+
     bounds_width = slide.level_dimensions[level][0]
     bounds_height = slide.level_dimensions[level][1]
     x = 0
@@ -137,7 +110,7 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
     pool = mp.Pool(processes=mp.cpu_count())
     tasks = []
     while x0 < n_x:
-        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level, dp))
+        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level, dp, std_img))
         tasks.append(task)
         x0 += 1
     # slice images with multiprocessing
