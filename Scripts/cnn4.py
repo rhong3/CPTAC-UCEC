@@ -345,7 +345,7 @@ class INCEPTION():
                                     saver.save(self.sesh, outfile, global_step=None)
                                     svs = i
 
-                                if i > 129999:
+                                if i > 79999:
                                     mean_cost = np.mean(train_cost[-10000:-1])
                                     valid_mean_cost = np.mean(validation_cost[-10:-1])
                                     print('Mean validation loss: {}'.format(valid_mean_cost))
