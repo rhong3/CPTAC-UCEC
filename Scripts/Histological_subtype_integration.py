@@ -24,7 +24,11 @@ dummyc = dummyc.join(CPTAC.set_index('name'), how='left', on='name')
 
 dummy = pd.concat([dummyt, dummyc])
 
+dummy = dummy.fillna('0NA')
+
 dummy = pd.get_dummies(dummy, columns=['histology'])
+
+dummy = dummy.drop(['histology_Clear cell'], axis=1)
 
 dummy.to_csv('../dummy_His_MUT_joined.csv', header=True, index=False)
 
