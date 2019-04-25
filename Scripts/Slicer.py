@@ -33,7 +33,6 @@ def bgcheck(img, ts):
 
 # Tile color normalization
 def normalization(img, sttd):
-    img = img.resize((299, 299))
     img = np.array(img)[:, :, :3]
     img = staintools.LuminosityStandardizer.standardize(img)
     normalizer = staintools.StainNormalizer(method='vahadane')
@@ -61,7 +60,8 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
         if 0.1 < wscore < 0.33:
-            img = normalization(img, std)
+            img = img.resize((299, 299))
+            # img = normalization(img, std)
             if dp:
                 ran = np.random.randint(10000)
                 img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))

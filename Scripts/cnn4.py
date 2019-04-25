@@ -332,7 +332,10 @@ class INCEPTION():
                                     self.valid_logger.add_summary(valid_summary, i)
                                     temp_valid.append(valid_cost)
                                 tempminvalid = np.mean(temp_valid)
-                                minvalid = np.mean(validation_cost)
+                                try:
+                                    minvalid = min(validation_cost)
+                                except ValueError:
+                                    minvalid = 0
                                 validation_cost.append(tempminvalid)
                                 print("round {} --> Step Average validation loss: ".format(i), tempminvalid, flush=True)
 

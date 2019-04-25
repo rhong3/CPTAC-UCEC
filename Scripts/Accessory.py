@@ -19,7 +19,11 @@ from itertools import cycle
 
 # Plot ROC and PRC plots
 def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
-    if pmd == 'subtype':
+    if pmd == 'subtype' or pmd == 'histology':
+        if pmd == 'subtype':
+            rdd = 4
+        else:
+            rdd = 3
         # Compute ROC and PRC curve and ROC and PRC area for each class
         fpr = dict()
         tpr = dict()
@@ -31,7 +35,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         average_precision = dict()
         microy = []
         microscore = []
-        for i in range(4):
+        for i in range(rdd):
             fpr[i], tpr[i], _ = sklearn.metrics.roc_curve(np.asarray((outtl.iloc[:, 0].values == int(i)).astype('uint8')),
                                                       np.asarray(pdx[:, i]).ravel())
             try:
@@ -68,15 +72,15 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         # Compute macro-average ROC curve and ROC area
 
         # First aggregate all false positive rates
-        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(4)]))
+        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(rdd)]))
 
         # Then interpolate all ROC curves at this points
         mean_tpr = np.zeros_like(all_fpr)
-        for i in range(4):
+        for i in range(rdd):
             mean_tpr += interp(all_fpr, fpr[i], tpr[i])
 
         # Finally average it and compute AUC
-        mean_tpr /= 4
+        mean_tpr /= rdd
 
         fpr["macro"] = all_fpr
         tpr["macro"] = mean_tpr
@@ -95,7 +99,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
                  color='navy', linestyle=':', linewidth=4)
 
         colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'red'])
-        for i, color in zip(range(4), colors):
+        for i, color in zip(range(rdd), colors):
             plt.plot(fpr[i], tpr[i], color=color, lw=2,
                      label='ROC curve of {0} (area = {1:0.5f})'.format(fdict[i], roc_auc[i]))
 
@@ -128,7 +132,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         labels.append('micro-average Precision-recall (area = {0:0.5f})'
                       ''.format(average_precision["micro"]))
 
-        for i, color in zip(range(4), colors):
+        for i, color in zip(range(rdd), colors):
             l, = plt.plot(recall[i], precision[i], color=color, lw=2)
             lines.append(l)
             labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(fdict[i], average_precision[i]))
@@ -193,6 +197,10 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         inter_pd['Prediction'] = inter_pd[
             ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
         redict = {'MSI_score': int(0), 'Endometrioid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
+    elif pmd == 'histology':
+        inter_pd['Prediction'] = inter_pd[
+            ['Endometrioid_score', 'Serous_score', 'Mixed_score']].idxmax(axis=1)
+        redict = {'Endometrioid_score': int(0), 'Serous_score': int(1), 'Mixed_score': int(2)}
     else:
         inter_pd['Prediction'] = inter_pd[['NEG_score', 'POS_score']].idxmax(axis=1)
         redict = {'NEG_score': int(0), 'POS_score': int(1)}
@@ -213,11 +221,21 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
                 print('Slide {} Accuracy: '.format(fordict[i])+str(accuar))
             except ZeroDivisionError:
                 print("No data for {}.".format(fordict[i]))
-
+    if pmd == 'histology':
+        for i in range(3):
+            accua = accout[accout.True_label == i].shape[0]
+            tota = inter_pd[inter_pd.True_label == i].shape[0]
+            try:
+                accuar = round(accua / tota, 5)
+                print('Slide {} Accuracy: '.format(fordict[i])+str(accuar))
+            except ZeroDivisionError:
+                print("No data for {}.".format(fordict[i]))
     try:
         outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
         if pmd == 'subtype':
             pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
+        elif pmd == 'histology':
+            pdx_slide = inter_pd[['Endometrioid_score', 'Serous_score', 'Mixed_score']].values
         else:
             pdx_slide = inter_pd[['NEG_score', 'POS_score']].values
         ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr, pmd)
@@ -232,6 +250,8 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
 def realout(pdx, path, name, pmd):
     if pmd == 'subtype':
         lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
+    elif pmd == 'histology':
+        lbdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
     else:
         lbdict = {0: 'negative', 1: pmd}
     pdx = np.asmatrix(pdx)
@@ -240,6 +260,8 @@ def realout(pdx, path, name, pmd):
     prl = prl.replace(lbdict)
     if pmd == 'subtype':
         out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+    elif pmd == 'histology':
+        out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score', 'Mixed_score'])
     else:
         out = pd.DataFrame(pdx, columns=['NEG_score', 'POS_score'])
     out = pd.concat([out, prl], axis=1)
@@ -258,6 +280,9 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
     if pmd == 'subtype':
         lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
         outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+    elif pmd == 'histology':
+        lbdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
+        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score', 'Mixed_score'])
     else:
         lbdict = {0: 'negative', 1: pmd}
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
@@ -291,7 +316,15 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
                 print('Tile {} Accuracy: '.format(lbdict[i])+str(accuar))
             except ZeroDivisionError:
                 print("No data for {}.".format(lbdict[i]))
-
+    elif pmd == 'histology':
+        for i in range(3):
+            accua = accout[accout.True_label == i].shape[0]
+            tota = out[out.True_label == i].shape[0]
+            try:
+                accuar = round(accua / tota, 5)
+                print('Tile {} Accuracy: '.format(lbdict[i])+str(accuar))
+            except ZeroDivisionError:
+                print("No data for {}.".format(lbdict[i]))
     try:
         ROC_PRC(outtlt, pdxt, path, name, lbdict, 'tile', accurw, pmd)
     except ValueError:
@@ -344,6 +377,18 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
                 pass
         catdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
         dirdict = {0: DIRA, 1: DIRB, 2: DIRC, 3: DIRD}
+    elif pmd == 'histology':
+        if pmd == 'subtype':
+            DIRA = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
+            DIRB = "../Results/{}/out/{}_Serous_img".format(path, name)
+            DIRC = "../Results/{}/out/{}_Mixed_img".format(path, name)
+            for DIR in (DIRA, DIRB, DIRC):
+                try:
+                    os.mkdir(DIR)
+                except FileExistsError:
+                    pass
+            catdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
+            dirdict = {0: DIRA, 1: DIRB, 2: DIRC}
     else:
         DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
         DIRB = "../Results/{}/out/{}_POS_img".format(path, name)

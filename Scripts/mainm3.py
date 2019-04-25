@@ -32,6 +32,8 @@ except IndexError:
 
 if pdmd == 'subtype':
     classes = 4
+elif pdmd == 'histology':
+    classes = 3
 else:
     classes = 2
 
