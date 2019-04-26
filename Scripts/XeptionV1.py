@@ -214,8 +214,6 @@ def XecptionV1(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True,
         xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
-        x = BatchNormalization(axis=3)(x)
-        x = Activation("relu")(x)
 
         net = x
 

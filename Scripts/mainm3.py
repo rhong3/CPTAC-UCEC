@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main method for CPTAC-UCEC
+Main method
 
 Created on 11/26/2018
 
