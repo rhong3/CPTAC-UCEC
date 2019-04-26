@@ -13,7 +13,7 @@ import sys
 import time
 import numpy as np
 import tensorflow as tf
-import Accessory as ac
+import Accessory2 as ac
 
 
 class INCEPTION():

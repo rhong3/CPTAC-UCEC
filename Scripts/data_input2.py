@@ -63,7 +63,7 @@ class DataSet(object):
         return images, labels
 
     # dataset preparation; batching; Real test or not; train or test
-    def data(self, Not_Realtest=True, train=True, clss=2):
+    def data(self, Not_Realtest=True, train=True):
         batch_size = self._batchsize
         ep = self._epochs
         if Not_Realtest:

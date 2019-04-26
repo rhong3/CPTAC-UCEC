@@ -91,32 +91,42 @@ def loader(totlist_dir):
     trlist = pd.read_csv(totlist_dir+'/tr_sample.csv', header=0)
     telist = pd.read_csv(totlist_dir+'/te_sample.csv', header=0)
     valist = pd.read_csv(totlist_dir+'/va_sample.csv', header=0)
-    trimlist = trlist['path'].values.tolist()
+    trimlista = trlist['L0path'].values.tolist()
+    trimlistb = trlist['L1path'].values.tolist()
+    trimlistc = trlist['L2path'].values.tolist()
     trlblist = trlist['label'].values.tolist()
-    teimlist = telist['path'].values.tolist()
+    teimlista = telist['L0path'].values.tolist()
+    teimlistb = telist['L1path'].values.tolist()
+    teimlistc = telist['L2path'].values.tolist()
     telblist = telist['label'].values.tolist()
-    vaimlist = valist['path'].values.tolist()
+    vaimlista = valist['L0path'].values.tolist()
+    vaimlistb = valist['L1path'].values.tolist()
+    vaimlistc = valist['L2path'].values.tolist()
     valblist = valist['label'].values.tolist()
 
     train_filename = data_dir+'/train.tfrecords'
     writer = tf.python_io.TFRecordWriter(train_filename)
-    for i in range(len(trimlist)):
+    for i in range(len(trlblist)):
         if not i % 1000:
             sys.stdout.flush()
         try:
             # Load the image
-            img = load_image(trimlist[i])
+            imga = load_image(trimlista[i])
+            imgb = load_image(trimlistb[i])
+            imgc = load_image(trimlistc[i])
             label = trlblist[i]
             # Create a feature
             feature = {'train/label': _int64_feature(label),
-                       'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+                       'train/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
+                       'train/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
+                       'train/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
             # Create an example protocol buffer
             example = tf.train.Example(features=tf.train.Features(feature=feature))
 
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
         except AttributeError:
-            print('Error image:'+trimlist[i])
+            print('Error image: '+ trimlista[i] + '~' + trimlistb[i] + '~' + trimlistc[i])
             pass
 
     writer.close()
@@ -124,53 +134,61 @@ def loader(totlist_dir):
 
     test_filename = data_dir+'/test.tfrecords'
     writer = tf.python_io.TFRecordWriter(test_filename)
-    for i in range(len(teimlist)):
+    for i in range(len(telblist)):
         if not i % 1000:
             sys.stdout.flush()
         try:
             # Load the image
-            img = load_image(teimlist[i])
+            imga = load_image(teimlista[i])
+            imgb = load_image(teimlistb[i])
+            imgc = load_image(teimlistc[i])
             label = telblist[i]
             # Create a feature
             feature = {'test/label': _int64_feature(label),
-                       'test/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+                       'test/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
+                       'test/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
+                       'test/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
             # Create an example protocol buffer
             example = tf.train.Example(features=tf.train.Features(feature=feature))
 
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
         except AttributeError:
-            print('Error image:'+teimlist[i])
+            print('Error image:'+ teimlista[i] + '~' + teimlistb[i] + '~' + teimlistc[i])
             pass
     writer.close()
     sys.stdout.flush()
 
     val_filename = data_dir+'/validation.tfrecords'
     writer = tf.python_io.TFRecordWriter(val_filename)
-    for i in range(len(vaimlist)):
+    for i in range(len(valblist)):
         if not i % 1000:
             sys.stdout.flush()
         try:
             # Load the image
-            img = load_image(vaimlist[i])
+            imga = load_image(vaimlista[i])
+            imgb = load_image(vaimlistb[i])
+            imgc = load_image(vaimlistc[i])
             label = valblist[i]
             # Create a feature
             feature = {'validation/label': _int64_feature(label),
-                       'validation/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+                       'validation/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
+                       'validation/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
+                       'validation/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
             # Create an example protocol buffer
             example = tf.train.Example(features=tf.train.Features(feature=feature))
 
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
         except AttributeError:
-            print('Error image:'+vaimlist[i])
+            print('Error image:'+ vaimlista[i] + '~' + vaimlistb[i] + '~' + vaimlistc[i])
             pass
     writer.close()
     sys.stdout.flush()
 
 
 # load tfrecords and prepare datasets
-def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
+def tfreloader(mode, ep, bs, ctr, cte, cva):
     filename = data_dir + '/' + mode + '.tfrecords'
     if mode == 'train':
         ct = ctr
@@ -179,19 +197,19 @@ def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
     else:
         ct = cva
 
-    datasets = data_input3.DataSet(bs, ct, ep=ep, cls=cls, mode=mode, filename=filename)
+    datasets = data_input3.DataSet(bs, ct, ep=ep, mode=mode, filename=filename)
 
     return datasets
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
-def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=None):
+def main(trc, tec, vac, testset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -199,15 +217,15 @@ def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=
     elif to_reload:  # restore for further training and testing
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
-        HE = tfreloader('train', ep, bs, clss, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, clss, trc, tec, vac)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc * ep / bs)
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -215,15 +233,15 @@ def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=
     else:  # train and test
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
-        HE = tfreloader('train', ep, bs, clss, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, clss, trc, tec, vac)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc*ep/bs)+1
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -254,9 +272,9 @@ if __name__ == "__main__":
         # test or not
         try:
             testmode = sys.argv[7]
-            main(trc, tec, vac, clss=classes, testset=tes, to_reload=modeltoload, test=True)
+            main(trc, tec, vac, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
-            main(trc, tec, vac, clss=classes, testset=tes, valset=vas, to_reload=modeltoload)
+            main(trc, tec, vac, testset=tes, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
@@ -264,5 +282,5 @@ if __name__ == "__main__":
             loader(data_dir)
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir)
-        main(trc, tec, vac, clss=classes, testset=tes, valset=vas)
+        main(trc, tec, vac, testset=tes)
 

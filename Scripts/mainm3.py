@@ -174,7 +174,7 @@ def loader(totlist_dir):
 
 
 # load tfrecords and prepare datasets
-def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
+def tfreloader(mode, ep, bs, ctr, cte, cva):
     filename = data_dir + '/' + mode + '.tfrecords'
     if mode == 'train':
         ct = ctr
@@ -183,19 +183,19 @@ def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
     else:
         ct = cva
 
-    datasets = data_input2.DataSet(bs, ct, ep=ep, cls=cls, mode=mode, filename=filename)
+    datasets = data_input2.DataSet(bs, ct, ep=ep, mode=mode, filename=filename)
 
     return datasets
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
-def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=None):
+def main(trc, tec, vac, testset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -203,15 +203,15 @@ def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=
     elif to_reload:  # restore for further training and testing
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Restart training.", flush=True)
-        HE = tfreloader('train', ep, bs, clss, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, clss, trc, tec, vac)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc * ep / bs)
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -219,15 +219,15 @@ def main(trc, tec, vac, clss=2, testset=None, valset=None, to_reload=None, test=
     else:  # train and test
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
         print("Start a new training!")
-        HE = tfreloader('train', ep, bs, clss, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, clss, trc, tec, vac)
+        HE = tfreloader('train', ep, bs, trc, tec, vac)
+        VHE = tfreloader('validation', ep*10, bs, trc, tec, vac)
         itt = int(trc*ep/bs)+1
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, clss, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
@@ -258,9 +258,9 @@ if __name__ == "__main__":
         # test or not
         try:
             testmode = sys.argv[8]
-            main(trc, tec, vac, clss=classes, testset=tes, to_reload=modeltoload, test=True)
+            main(trc, tec, vac, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
-            main(trc, tec, vac, clss=classes, testset=tes, valset=vas, to_reload=modeltoload)
+            main(trc, tec, vac, testset=tes, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
@@ -268,5 +268,5 @@ if __name__ == "__main__":
             loader(data_dir)
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir)
-        main(trc, tec, vac, clss=classes, testset=tes, valset=vas)
+        main(trc, tec, vac, testset=tes)
 

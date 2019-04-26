@@ -29,41 +29,63 @@ class DataSet(object):
         features = tf.parse_example(
             serialized_example,
             # Defaults are not specified since both keys are required.
-            features={self._mode + '/image': tf.FixedLenFeature([], tf.string),
+            features={self._mode + '/imageL0': tf.FixedLenFeature([], tf.string),
+                      self._mode + '/imageL1': tf.FixedLenFeature([], tf.string),
+                      self._mode + '/imageL2': tf.FixedLenFeature([], tf.string),
                       self._mode + '/label': tf.FixedLenFeature([], tf.int64), })
 
-        image = tf.decode_raw(features[self._mode + '/image'], tf.float32)
-        image = tf.reshape(image, [-1, 299, 299, 3])
+        imagea = tf.decode_raw(features[self._mode + '/imageL0'], tf.float32)
+        imagea = tf.reshape(imagea, [-1, 299, 299, 3])
+        imageb = tf.decode_raw(features[self._mode + '/imageL1'], tf.float32)
+        imageb = tf.reshape(imageb, [-1, 299, 299, 3])
+        imagec = tf.decode_raw(features[self._mode + '/imageL2'], tf.float32)
+        imagec = tf.reshape(imagec, [-1, 299, 299, 3])
 
         # Convert label from a scalar uint8 tensor to an int32 scalar.
         label = tf.cast(features[self._mode + '/label'], tf.int32)
-        return image, label
+        return imagea, imageb, imagec, label
 
     # augmentation including onehot encoding
-    def augment(self, images, labels):
+    def augment(self, imagea, imageb, imagec, labels):
 
         angles = tf.cast(tf.random_uniform([], 0, 4), tf.int32)
-        images = tf.image.rot90(images, k=angles)
-        images = tf.image.random_flip_left_right(images)
-        images = tf.image.random_flip_up_down(images)
-        images = tf.image.random_hue(images, 0.02)
-        images = tf.image.random_brightness(images, 0.02)
-        images = tf.image.random_contrast(images, 0.9, 1.1)
-        images = tf.image.random_saturation(images, 0.9, 1.1)
+        imagea = tf.image.rot90(imagea, k=angles)
+        imagea = tf.image.random_flip_left_right(imagea)
+        imagea = tf.image.random_flip_up_down(imagea)
+        imagea = tf.image.random_hue(imagea, 0.02)
+        imagea = tf.image.random_brightness(imagea, 0.02)
+        imagea = tf.image.random_contrast(imagea, 0.9, 1.1)
+        imagea = tf.image.random_saturation(imagea, 0.9, 1.1)
+
+        imageb = tf.image.rot90(imageb, k=angles)
+        imageb = tf.image.random_flip_left_right(imageb)
+        imageb = tf.image.random_flip_up_down(imageb)
+        imageb = tf.image.random_hue(imageb, 0.02)
+        imageb = tf.image.random_brightness(imageb, 0.02)
+        imageb = tf.image.random_contrast(imageb, 0.9, 1.1)
+        imageb = tf.image.random_saturation(imageb, 0.9, 1.1)
+
+        imagec = tf.image.rot90(imagec, k=angles)
+        imagec = tf.image.random_flip_left_right(imagec)
+        imagec = tf.image.random_flip_up_down(imagec)
+        imagec = tf.image.random_hue(imagec, 0.02)
+        imagec = tf.image.random_brightness(imagec, 0.02)
+        imagec = tf.image.random_contrast(imagec, 0.9, 1.1)
+        imagec = tf.image.random_saturation(imagec, 0.9, 1.1)
 
         labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=self._classes)
 
-        return images, labels
+        return imagea, imageb, imagec, labels
 
     # onehot encoding only; for test set
-    def onehot_only(self, images, labels):
+    def onehot_only(self, imagea, imageb, imagec, labels):
         with tf.name_scope('onehot_only'):
             labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=self._classes)
             labels = tf.cast(labels, tf.float32)
-        return images, labels
+        return imagea, imageb, imagec, labels
 
     # dataset preparation; batching; Real test or not; train or test
-    def data(self, Not_Realtest=True, train=True, clss=2):
+    def data(self, Not_Realtest=True, train=True):
         batch_size = self._batchsize
         ep = self._epochs
         if Not_Realtest:
