@@ -315,17 +315,15 @@ class INCEPTION():
                                     svs = i
 
                                 if i > 79999:
-                                    mean_cost = np.mean(train_cost[-10000:-1])
                                     valid_mean_cost = np.mean(validation_cost[-10:-1])
                                     print('Mean validation loss: {}'.format(valid_mean_cost))
-                                    if valid_cost > valid_mean_cost and cost > mean_cost:
+                                    if valid_cost > valid_mean_cost:
                                         print("Early stopped! No improvement for at least 10000 iterations")
                                         break
                                     else:
                                         print("Passed early stopping evaluation. Continue training!")
 
                         if i >= max_iter-2 and verbose:
-
                             if cross_validate:
                                 print("final avg loss (@ step {} = epoch {}): {}".format(
                                     i + 1, np.around(i / ct * bs), err_train / i), flush=True)
