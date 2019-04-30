@@ -283,4 +283,3 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir)
         main(trc, tec, vac, testset=tes)
-
