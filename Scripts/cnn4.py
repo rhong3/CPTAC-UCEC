@@ -143,7 +143,7 @@ class INCEPTION():
                                                    scope='GoogleNet')
             print('Using Default: Inception-V1')
 
-        pred = tf.nn.sigmoid(logits, name="prediction")
+        pred = tf.nn.softmax(logits, name="prediction")
 
         global_step = tf.Variable(0, trainable=False)
 

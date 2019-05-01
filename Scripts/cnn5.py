@@ -107,7 +107,7 @@ class INCEPTION():
                                                    scope='XecptionV1')
             print('Using Default: Xeption-V1')
 
-        pred = tf.nn.sigmoid(logits, name="prediction")
+        pred = tf.nn.softmax(logits, name="prediction")
 
         global_step = tf.Variable(0, trainable=False)
 
