@@ -58,7 +58,7 @@ def loader(totlist_dir):
             RGB.append([imlist[i], RR, np.percentile(R, 25), np.percentile(R, 75), np.std(R),
                         GG, np.percentile(G, 25), np.percentile(G, 75), np.std(G),
                         BB, np.percentile(B, 25), np.percentile(B, 75), np.std(B)])
-        except AttributeError:
+        except (AttributeError, IndexError) as e:
             print('Error image:'+imlist[i])
             pass
 
