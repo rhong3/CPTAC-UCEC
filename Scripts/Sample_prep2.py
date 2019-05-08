@@ -37,13 +37,12 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            level = str(level)
-            dirr = root_dir + 'level{}'.format(level)
+            dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
                     print('Skipping ID:', id)
                 else:
-                    ids.append([slide, label, level, root_dir+'/'+id])
+                    ids.append([slide, label, level, dirr+'/'+id])
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path'])
         idsa = ids.loc[ids['level'] == 0]
         idsb = ids.loc[ids['level'] == 1]
@@ -52,6 +51,9 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
         idss['slide'] = idsa['slide']
         idss['label'] = idsa['label']
         idss['L0path'] = idsa['path']
+        idss = idss.reset_index(drop=True)
+        idsb = idsb.reset_index(drop=True)
+        idsc = idsc.reset_index(drop=True)
         idss['L1path'] = idsb['path']
         idss['L2path'] = idsc['path']
         idss = sku.shuffle(idss)
