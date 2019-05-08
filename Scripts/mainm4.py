@@ -26,6 +26,7 @@ ep = sys.argv[3]    # epochs to train
 md = sys.argv[4]    # structure to use
 pdmd = sys.argv[5]  # feature to predict
 
+
 if pdmd == 'subtype':
     classes = 4
 elif pdmd == 'histology':
