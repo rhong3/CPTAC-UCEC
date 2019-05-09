@@ -163,10 +163,6 @@ def set_sep(alll, path, cls, cut=0.2):
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
-    # Use 30% of all tiles as we have tooooo many tiles
-    train_tiles = train_tiles.sample(frac=0.10, replace=False)
-    validation_tiles = validation_tiles.sample(frac=0.10, replace=False)
-    test_tiles = test_tiles.sample(frac=0.10, replace=False)
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
     validation_tiles.to_csv(path+'/va_sample.csv', header=True, index=False)
