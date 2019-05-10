@@ -378,17 +378,16 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         catdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
         dirdict = {0: DIRA, 1: DIRB, 2: DIRC, 3: DIRD}
     elif pmd == 'histology':
-        if pmd == 'subtype':
-            DIRA = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
-            DIRB = "../Results/{}/out/{}_Serous_img".format(path, name)
-            DIRC = "../Results/{}/out/{}_Mixed_img".format(path, name)
-            for DIR in (DIRA, DIRB, DIRC):
-                try:
-                    os.mkdir(DIR)
-                except FileExistsError:
-                    pass
-            catdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
-            dirdict = {0: DIRA, 1: DIRB, 2: DIRC}
+        DIRA = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
+        DIRB = "../Results/{}/out/{}_Serous_img".format(path, name)
+        DIRC = "../Results/{}/out/{}_Mixed_img".format(path, name)
+        for DIR in (DIRA, DIRB, DIRC):
+            try:
+                os.mkdir(DIR)
+            except FileExistsError:
+                pass
+        catdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
+        dirdict = {0: DIRA, 1: DIRB, 2: DIRC}
     else:
         DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
         DIRB = "../Results/{}/out/{}_POS_img".format(path, name)
