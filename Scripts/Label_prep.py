@@ -234,7 +234,7 @@ jjx = pd.get_dummies(jj, columns=['subtype'])
 jjx.to_csv('../dummy_MUT_joined.csv', header=True, index=False)
 
 
-#Label prep
+#Histology Label prep
 import pandas as pd
 
 dummy = pd.read_csv('../dummy_MUT_joined.csv', header=0)
