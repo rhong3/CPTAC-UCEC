@@ -105,7 +105,7 @@ class INCEPTION():
                                                    is_train=is_train,
                                                    dropout=dropout,
                                                    scope='XecptionV2')
-            print('Using Xeption-V1')
+            print('Using Xeption-V2')
         elif model == 'X3':
             import XeptionV3
             logits, nett, ww = XeptionV3.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape,
@@ -113,7 +113,7 @@ class INCEPTION():
                                                    is_train=is_train,
                                                    dropout=dropout,
                                                    scope='XecptionV3')
-            print('Using Xeption-V1')
+            print('Using Xeption-V3')
         else:
             import XeptionV1
             logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape,

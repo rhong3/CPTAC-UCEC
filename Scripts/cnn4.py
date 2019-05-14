@@ -143,12 +143,12 @@ class INCEPTION():
                                                    scope='GoogleNet')
             print('Using Default: Inception-V1')
 
-        pred = tf.nn.softmax(logits, name="prediction")
+        pred = tf.sigmoid(logits, name="prediction")
 
         global_step = tf.Variable(0, trainable=False)
 
-        pred_cost = tf.losses.softmax_cross_entropy(
-            onehot_labels=y_in, logits=logits)
+        pred_cost = tf.losses.sigmoid_cross_entropy(
+            multi_class_labels=y_in, logits=logits)
 
         tf.summary.scalar("{}_cost".format(model), pred_cost)
 
