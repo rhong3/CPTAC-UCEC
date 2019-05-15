@@ -108,7 +108,7 @@ class INCEPTION():
             print('Using Xeption-V2')
         elif model == 'X3':
             import XeptionV3
-            logits, nett, ww = XeptionV3.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape,
+            logits, nett, ww = XeptionV3.XecptionV3(xa_in_reshape, xb_in_reshape, xc_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
