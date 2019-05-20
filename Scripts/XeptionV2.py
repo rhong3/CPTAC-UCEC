@@ -260,6 +260,8 @@ def XecptionV2(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True,
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
 
+        x = Conv2D(2688, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)
+
         net = x
 
         loss2_classifier = tf.add(auxa, tf.add(auxb, auxc))
