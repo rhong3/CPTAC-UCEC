@@ -210,7 +210,7 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, trc, tec, vac)
+            HE = tfreloader('test', 1, bs, cls, trc, tec, vac)
             m.inference(HE, dirr, testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
