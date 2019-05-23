@@ -5,7 +5,6 @@ Created on 11/01/2018
 
 @author: RH
 """
-
 import get_tilev3
 import time
 import matplotlib
