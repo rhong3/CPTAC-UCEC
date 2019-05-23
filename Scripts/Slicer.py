@@ -94,7 +94,7 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
     y = 0
     half_width_region = 49*ft
     full_width_region = 299*ft
-    stepsize = full_width_region - half_width_region
+    stepsize = (full_width_region - half_width_region)*ft
 
     n_x = int((bounds_width - 1) / stepsize)
     n_y = int((bounds_height - 1) / stepsize)
