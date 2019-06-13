@@ -119,15 +119,27 @@ def set_sep(alll, path, cls, level=None, cut=0.2):
     if level:
         alll = alll[alll.level == level]
     for i in range(cls):
-        subset = alll.loc[alll['label'] == i]
-        unq = list(subset.slide.unique())
-        np.random.shuffle(unq)
-        validation = unq[:int(len(unq)*cut/4)]
-        valist.append(subset[subset['slide'].isin(validation)])
-        test = unq[int(len(unq)*cut/4):int(len(unq)*cut)]
-        telist.append(subset[subset['slide'].isin(test)])
-        train = unq[int(len(unq)*cut):]
-        trlist.append(subset[subset['slide'].isin(train)])
+        # Added 6.13
+        if i == 0:
+            subset = alll.loc[alll['label'] == i]
+            unq = list(subset.slide.unique())
+            np.random.shuffle(unq)
+            validation = unq[:int(len(unq)*cut/16)]
+            valist.append(subset[subset['slide'].isin(validation)])
+            test = unq[int(len(unq)*cut/16):int(len(unq)*cut/4)]
+            telist.append(subset[subset['slide'].isin(test)])
+            train = unq[int(len(unq)*cut/4):int(len(unq)*cut)]
+            trlist.append(subset[subset['slide'].isin(train)])
+        else:
+            subset = alll.loc[alll['label'] == i]
+            unq = list(subset.slide.unique())
+            np.random.shuffle(unq)
+            validation = unq[:int(len(unq)*cut/4)]
+            valist.append(subset[subset['slide'].isin(validation)])
+            test = unq[int(len(unq)*cut/4):int(len(unq)*cut)]
+            telist.append(subset[subset['slide'].isin(test)])
+            train = unq[int(len(unq)*cut):]
+            trlist.append(subset[subset['slide'].isin(train)])
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
