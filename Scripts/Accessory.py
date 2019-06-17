@@ -419,10 +419,6 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         activation_lastconv = activation_lastconv.T
 
         topNum = 1  # generate heatmap for top X prediction results
-        scores = pred[ij]
-        scoresMean = np.mean(scores, axis=0)
-        ascending_order = np.argsort(scoresMean)
-        IDX_category = ascending_order[::-1]  # [::-1] to sort in descending order
         prdd = prl[ij, 0]
         curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[prdd], :])
         DIRR = dirdict[prdd]
@@ -478,10 +474,6 @@ def CAM_R(net, w, pred, x, path, name, bs, rd=0):
         activation_lastconv = activation_lastconv.T
 
         topNum = 1  # generate heatmap for top X prediction results
-        scores = pred[ij]
-        scoresMean = np.mean(scores, axis=0)
-        ascending_order = np.argsort(scoresMean)
-        IDX_category = ascending_order[::-1]  # [::-1] to sort in descending order
         curCAMmapAll = py_returnCAMmap(activation_lastconv, weights_LR[[1], :])
         for kk in range(topNum):
             curCAMmap_crops = curCAMmapAll[:, :, kk]

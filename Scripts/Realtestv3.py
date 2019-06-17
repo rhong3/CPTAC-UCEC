@@ -19,6 +19,7 @@ import cv2
 import skimage.morphology as mph
 import tensorflow as tf
 
+start_time = time.time()
 
 dirr = sys.argv[1]  # name of output directory
 imgfile = sys.argv[2]  # input scn/svs name
@@ -120,7 +121,6 @@ if __name__ == "__main__":
             os.mkdir(DIR)
         except FileExistsError:
             pass
-    start_time = time.time()
     # cut tiles with coordinates in the name (exclude white)
     n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file=imgfile, outdir=data_dir, level=0)
     print("--- %s seconds ---" % (time.time() - start_time))
@@ -194,5 +194,4 @@ if __name__ == "__main__":
     # # Time measure tool
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))
-
-
+print("--- %s seconds ---" % (time.time() - start_time))
