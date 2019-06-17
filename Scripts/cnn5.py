@@ -145,7 +145,7 @@ class INCEPTION():
                 global_step, train_op, merged_summary)
 
     # inference using trained models
-    def inference(self, X, dirr, testset, pmd, train_status=False, Not_Realtest=True):
+    def inference(self, X, dirr, testset=None, pmd=None, train_status=False, Not_Realtest=True, bs=None):
         now = datetime.now().isoformat()[11:]
         print("------- Testing begin: {} -------\n".format(now), flush=True)
         rd = 0
@@ -184,7 +184,7 @@ class INCEPTION():
                         feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        # ac.CAM_R(net, w, pred, xc, dirr, 'Test', bs, rd)
+                        ac.CAM_R(net, w, pred, xc, dirr, 'Test', bs, rd)
                         if rd == 0:
                             pdx = pred
                         else:
