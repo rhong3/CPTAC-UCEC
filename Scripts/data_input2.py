@@ -39,6 +39,18 @@ class DataSet(object):
         label = tf.cast(features[self._mode + '/label'], tf.int32)
         return image, label
 
+    # decoding tfrecords for real test
+    def Real_decode(self, serialized_example):
+        features = tf.parse_example(
+            serialized_example,
+            # Defaults are not specified since both keys are required.
+            features={self._mode + '/image': tf.FixedLenFeature([], tf.string)})
+
+        image = tf.decode_raw(features[self._mode + '/image'], tf.float32)
+        image = tf.reshape(image, [-1, 299, 299, 3])
+
+        return image
+
     # augmentation including onehot encoding
     def augment(self, images, labels):
 
@@ -66,10 +78,10 @@ class DataSet(object):
     def data(self, Not_Realtest=True, train=True):
         batch_size = self._batchsize
         ep = self._epochs
+        filenames = tf.placeholder(tf.string, shape=None)
+        dataset = tf.data.TFRecordDataset(filenames)
+        dataset = dataset.repeat(ep)
         if Not_Realtest:
-            filenames = tf.placeholder(tf.string, shape=None)
-            dataset = tf.data.TFRecordDataset(filenames)
-            dataset = dataset.repeat(ep)
             if train:
                 batched_dataset = dataset.batch(batch_size, drop_remainder=True)
                 batched_dataset = batched_dataset.map(self.decode)
@@ -81,12 +93,10 @@ class DataSet(object):
             iterator = batched_dataset.make_initializable_iterator()
             return iterator, self._filename, filenames
         else:
-            features_placeholder = tf.placeholder(self._images.dtype, self._images.shape)
-            dataset = tf.data.Dataset.from_tensor_slices(features_placeholder)
-            dataset = dataset.repeat(ep)
             batched_dataset = dataset.batch(batch_size, drop_remainder=False)
-            iterator = batched_dataset.make_initializable_iterator()
-            return iterator, self._images, features_placeholder
+            batched_dataset = batched_dataset.map(self.Real_decode)
+        iterator = batched_dataset.make_initializable_iterator()
+        return iterator, self._filename, filenames
 
     @property
     def images(self):
