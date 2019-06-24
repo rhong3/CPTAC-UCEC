@@ -102,6 +102,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         for i, color in zip(range(rdd), colors):
             plt.plot(fpr[i], tpr[i], color=color, lw=2,
                      label='ROC curve of {0} (area = {1:0.5f})'.format(fdict[i], roc_auc[i]))
+            print('{0} AUC of {1} = {2:0.5f}'.format(dm, fdict[i], roc_auc[i]))
 
         plt.plot([0, 1], [0, 1], 'k--', lw=2)
         plt.xlim([0.0, 1.0])
@@ -136,6 +137,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
             l, = plt.plot(recall[i], precision[i], color=color, lw=2)
             lines.append(l)
             labels.append('Precision-recall for {0} (area = {1:0.5f})'.format(fdict[i], average_precision[i]))
+            print('{0} Average Precision of {1} = {2:0.5f})'.format(dm, fdict[i], average_precision[i]))
 
         fig = plt.gcf()
         fig.subplots_adjust(bottom=0.25)
