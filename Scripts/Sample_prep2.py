@@ -92,13 +92,10 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
         ref = ref.loc[ref['histology_0NA'] == 0]
         EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
         Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
-        Mixedimg = intersection(ref.loc[ref['histology_Mixed'] == 1]['name'].tolist(), allimg)
         for i in EMimg:
             big_images.append([i, 0, path + "{}/".format(i)])
         for i in Serousimg:
             big_images.append([i, 1, path + "{}/".format(i)])
-        for i in Mixedimg:
-            big_images.append([i, 2, path + "{}/".format(i)])
     elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
         ref = ref.loc[ref['subtype_0NA'] == 0]
         negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
@@ -107,7 +104,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
             big_images.append([i, 0, path + "{}/".format(i)])
         for i in posimg:
             big_images.append([i, 1, path + "{}/".format(i)])
-    elif pmd in ['histology_Endometrioid', 'histology_Serous', 'histology_Mixed']:
+    elif pmd in ['histology_Endometrioid', 'histology_Serous']:
         ref = ref.loc[ref['histology_0NA'] == 0]
         negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
         posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)

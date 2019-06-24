@@ -267,5 +267,9 @@ dummy = pd.get_dummies(dummy, columns=['histology'])
 
 dummy = dummy.drop(['histology_Clear cell'], axis=1)
 
+dummy['histology_Endometrioid'] = dummy['histology_Endometrioid'] + dummy['histology_Mixed']
+
+dummy['histology_Serous'] = dummy['histology_Serous'] + dummy['histology_Mixed']
+
 dummy.to_csv('../dummy_His_MUT_joined.csv', header=True, index=False)
 

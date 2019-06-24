@@ -19,11 +19,8 @@ from itertools import cycle
 
 # Plot ROC and PRC plots
 def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
-    if pmd == 'subtype' or pmd == 'histology':
-        if pmd == 'subtype':
-            rdd = 4
-        else:
-            rdd = 3
+    if pmd == 'subtype':
+        rdd = 4
         # Compute ROC and PRC curve and ROC and PRC area for each class
         fpr = dict()
         tpr = dict()
@@ -201,8 +198,8 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         redict = {'MSI_score': int(0), 'Endometrioid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
     elif pmd == 'histology':
         inter_pd['Prediction'] = inter_pd[
-            ['Endometrioid_score', 'Serous_score', 'Mixed_score']].idxmax(axis=1)
-        redict = {'Endometrioid_score': int(0), 'Serous_score': int(1), 'Mixed_score': int(2)}
+            ['Endometrioid_score', 'Serous_score']].idxmax(axis=1)
+        redict = {'Endometrioid_score': int(0), 'Serous_score': int(1)}
     else:
         inter_pd['Prediction'] = inter_pd[['NEG_score', 'POS_score']].idxmax(axis=1)
         redict = {'NEG_score': int(0), 'POS_score': int(1)}
@@ -224,7 +221,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
             except ZeroDivisionError:
                 print("No data for {}.".format(fordict[i]))
     if pmd == 'histology':
-        for i in range(3):
+        for i in range(2):
             accua = accout[accout.True_label == i].shape[0]
             tota = inter_pd[inter_pd.True_label == i].shape[0]
             try:
@@ -237,7 +234,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         if pmd == 'subtype':
             pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
         elif pmd == 'histology':
-            pdx_slide = inter_pd[['Endometrioid_score', 'Serous_score', 'Mixed_score']].values
+            pdx_slide = inter_pd[['Endometrioid_score', 'Serous_score']].values
         else:
             pdx_slide = inter_pd[['NEG_score', 'POS_score']].values
         ROC_PRC(outtl_slide, pdx_slide, path, name, fordict, 'slide', accurr, pmd)
@@ -253,7 +250,7 @@ def realout(pdx, path, name, pmd):
     if pmd == 'subtype':
         lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
     elif pmd == 'histology':
-        lbdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
+        lbdict = {0: 'Endometrioid', 1: 'Serous'}
     else:
         lbdict = {0: 'negative', 1: pmd}
     pdx = np.asmatrix(pdx)
@@ -263,7 +260,7 @@ def realout(pdx, path, name, pmd):
     if pmd == 'subtype':
         out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     elif pmd == 'histology':
-        out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score', 'Mixed_score'])
+        out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score'])
     else:
         out = pd.DataFrame(pdx, columns=['NEG_score', 'POS_score'])
     out = pd.concat([out, prl], axis=1)
@@ -283,8 +280,8 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
         lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
         outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     elif pmd == 'histology':
-        lbdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
-        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score', 'Mixed_score'])
+        lbdict = {0: 'Endometrioid', 1: 'Serous'}
+        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     else:
         lbdict = {0: 'negative', 1: pmd}
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
@@ -319,7 +316,7 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
             except ZeroDivisionError:
                 print("No data for {}.".format(lbdict[i]))
     elif pmd == 'histology':
-        for i in range(3):
+        for i in range(2):
             accua = accout[accout.True_label == i].shape[0]
             tota = out[out.True_label == i].shape[0]
             try:
@@ -382,14 +379,13 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
     elif pmd == 'histology':
         DIRA = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
         DIRB = "../Results/{}/out/{}_Serous_img".format(path, name)
-        DIRC = "../Results/{}/out/{}_Mixed_img".format(path, name)
-        for DIR in (DIRA, DIRB, DIRC):
+        for DIR in (DIRA, DIRB):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
                 pass
-        catdict = {0: 'Endometrioid', 1: 'Serous', 2: 'Mixed'}
-        dirdict = {0: DIRA, 1: DIRB, 2: DIRC}
+        catdict = {0: 'Endometrioid', 1: 'Serous'}
+        dirdict = {0: DIRA, 1: DIRB}
     else:
         DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
         DIRB = "../Results/{}/out/{}_POS_img".format(path, name)
