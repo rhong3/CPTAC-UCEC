@@ -151,6 +151,7 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         y_score = np.asarray(pdx[:, 1]).ravel()
         auc = sklearn.metrics.roc_auc_score(tl, y_score)
         auc = round(auc, 5)
+        print('{0} AUC = {1:0.5f}'.format(dm, auc))
         fpr, tpr, _ = sklearn.metrics.roc_curve(tl, y_score)
         plt.figure()
         lw = 2
