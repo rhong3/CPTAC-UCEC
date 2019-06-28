@@ -189,8 +189,8 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
     return x, loss2_classifier
 
 
-def XecptionV2(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV2'):
-    with tf.variable_scope(scope, 'XecptionV2', [inputa, inputb, inputc]):
+def XecptionV4(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV4'):
+    with tf.variable_scope(scope, 'XecptionV4', [inputa, inputb, inputc]):
         xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
         xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
         xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
