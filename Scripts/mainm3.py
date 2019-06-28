@@ -193,8 +193,8 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
         print("Loaded! Ready for test!", flush=True)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(HE, dirr, testset=testset, pmd=pdmd)
+            THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
 
@@ -209,8 +209,8 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(HE, dirr, testset=testset, pmd=pdmd)
+            THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
 
@@ -225,8 +225,8 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
         else:
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
-            HE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(HE, dirr, testset=testset, pmd=pdmd)
+            THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd)
         else:
             print("Not enough testing images!")
 
