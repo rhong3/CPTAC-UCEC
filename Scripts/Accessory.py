@@ -282,7 +282,7 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
         outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
     elif pmd == 'histology':
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
-        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score', 'Mixed_score'])
+        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     else:
         lbdict = {0: 'negative', 1: pmd}
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
