@@ -121,7 +121,7 @@ class INCEPTION():
                                                    is_train=is_train,
                                                    dropout=dropout,
                                                    scope='XecptionV4')
-            print('Using Xeption-V3')
+            print('Using Xeption-V4')
         else:
             import XeptionV1
             logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape,
