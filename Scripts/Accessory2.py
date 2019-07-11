@@ -417,7 +417,7 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         # Output Weights (7.10 added)
         with open("../Results/{}/out/weight.txt".format(path), 'w') as f:
             for item in weights_LR:
-                f.write("%s\n" % item)
+                f.write("%s\t" % item)
         # Output Weights (7.10 added)
 
         activation_lastconv = np.array([net[ij]])
