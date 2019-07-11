@@ -433,7 +433,7 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         for kk in range(topNum):
             curCAMmap_crops = curCAMmapAll[:, :, kk]
             curCAMmapLarge_crops = cv2.resize(curCAMmap_crops, (299, 299))
-            curHeatMap = cv2.resize(im2double(curCAMmapLarge_crops), (299, 299))  # this line is not doing much
+            curHeatMap = cv2.resize(im2double(curCAMmapLarge_crops), (299, 299))
             curHeatMap = im2double(curHeatMap)
             curHeatMap = py_map2jpg(curHeatMap, None, 'jet')
             xim = x[ij].reshape(-1, 3)
