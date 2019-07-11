@@ -1,159 +1,159 @@
-"""
-Integrated Label Preparation Code
-
-Created on 4/25/2019
-
-@author: RH
-"""
-#CPTAC initial prep
-import pandas as pd
-
-imlist = pd.read_excel('../S043_CPTAC_UCEC_Discovery_Cohort_Study_Specimens_r1_Sept2018.xlsx', header=4)
-imlist = imlist[imlist['Group'] == 'Tumor ']
-cllist = pd.read_csv('../UCEC_V2.1/waffles_updated.txt', sep='\t', header = 0)
-cllist = cllist[cllist['Proteomics_Tumor_Normal'] == 'Tumor']
-
-joined = pd.merge(imlist, cllist, how='inner', on=['Participant_ID'])
-
-joined.to_csv('../joined_PID.csv', index = False)
-
-
-#CPTAC prep
-import pandas as pd
-import shutil
-import os
-import csv
-
-
-def flatten(l, a):
-    for i in l:
-        if isinstance(i, list):
-            flatten(i, a)
-        else:
-            a.append(i)
-    return a
-
-
-# Get all images in the root directory
-def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
-    ids = []
-    for id in os.listdir(root_dir):
-        if id in ignore:
-            print('Skipping ID:', id)
-        else:
-            dirname = id.split('_')[-2]
-            ids.append((id, dirname))
-    return ids
-
-
-PID = pd.read_csv("../joined_PID.csv", header = 0)
-temp = []
-ls = []
-for idx, row in PID.iterrows():
-    if "," in row["Parent Sample ID(s)"]:
-        m = row["Parent Sample ID(s)"].split(',')
-        for x in m:
-            w = row
-            ls.append(x)
-            temp.append(w)
-        PID = PID.drop(idx)
-temp = pd.DataFrame(temp)
-temp["Parent Sample ID(s)"] = ls
-PID = PID.append(temp, ignore_index=True)
-PID = PID.sort_values(["Parent Sample ID(s)"], ascending=1)
-
-PID.to_csv("../new_joined_PID.csv", header = True, index = False)
-
-PID = pd.read_csv("../new_joined_PID.csv", header = 0)
-
-ref_list = PID["Parent Sample ID(s)"].tolist()
-
-imids = image_ids_in('../CPTAC_img')
-inlist = []
-outlist = []
-reverse_inlist = []
-try:
-    os.mkdir('../CPTAC_img/inlist')
-except FileExistsError:
-    pass
-
-try:
-    os.mkdir('../CPTAC_img/outlist')
-except FileExistsError:
-    pass
-
-for im in imids:
-    if im[1] in ref_list:
-        inlist.append(im[0])
-        reverse_inlist.append(im[1])
-        shutil.move('../CPTAC_img/'+str(im[0]), '../CPTAC_img/inlist/'+str(im[0]))
-    else:
-        outlist.append(im[0])
-        shutil.move('../CPTAC_img/' + str(im[0]), '../CPTAC_img/outlist/' + str(im[0]))
-
-csvfile = "../CPTAC_inlist.csv"
-with open(csvfile, "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for val in inlist:
-        writer.writerow([val])
-
-csvfile = "../CPTAC_outlist.csv"
-with open(csvfile, "w") as output:
-    writer = csv.writer(output, lineterminator='\n')
-    for val in outlist:
-        writer.writerow([val])
-
-filtered_PID = PID[PID["Parent Sample ID(s)"].isin(reverse_inlist)]
-
-tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometrioid', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
-a = filtered_PID['TCGA_subtype']
-filtered_PID['Subtype'] = a
-filtered_PID.Subtype = filtered_PID.Subtype.replace(tpdict)
-filtered_PID = filtered_PID[filtered_PID.Subtype != 'Other']
-
-filtered_PID.to_csv("../filtered_joined_PID.csv", header=True, index=False)
-
-#TCGA prep
-import pandas as pd
-
-
-def flatten(l, a):
-    for i in l:
-        if isinstance(i, list):
-            flatten(i, a)
-        else:
-            a.append(i)
-    return a
-
-
-image_meta = pd.read_csv('../TCGA_Image_meta.tsv', sep='\t', header=0)
-TCGA_list = pd.read_excel('../datafile.S1.1.KeyClinicalData.xls', header=0)
-
-namelist = []
-for idx, row in image_meta.iterrows():
-    namelist.append(row['File Name'].split('-01Z')[0])
-
-image_meta['bcr_patient_barcode'] = namelist
-
-TCGA_list = TCGA_list.join(image_meta.set_index('bcr_patient_barcode'), on='bcr_patient_barcode')
-
-TCGA_list = TCGA_list.dropna()
-
-labellist = []
-for idx, row in TCGA_list.iterrows():
-    if row['IntegrativeCluster'] != "Notassigned":
-        labellist.append(row['IntegrativeCluster'])
-    else:
-        labellist.append(row['histology'])
-
-TCGA_list['label'] = labellist
-
-TCGA_list = TCGA_list[TCGA_list.label != 'Mixed']
-TCGA_list = TCGA_list[TCGA_list.label != 'Serous']
-lbdict = {'CN low': 'Endometrioid', 'CN high': 'Serous-like'}
-TCGA_list['label'] = TCGA_list['label'].replace(lbdict)
-
-TCGA_list.to_csv('../new_TCGA_list.csv', header=True, index=False)
+# """
+# Integrated Label Preparation Code
+#
+# Created on 4/25/2019
+#
+# @author: RH
+# """
+# #CPTAC initial prep
+# import pandas as pd
+#
+# imlist = pd.read_excel('../S043_CPTAC_UCEC_Discovery_Cohort_Study_Specimens_r1_Sept2018.xlsx', header=4)
+# imlist = imlist[imlist['Group'] == 'Tumor ']
+# cllist = pd.read_csv('../UCEC_V2.1/waffles_updated.txt', sep='\t', header = 0)
+# cllist = cllist[cllist['Proteomics_Tumor_Normal'] == 'Tumor']
+#
+# joined = pd.merge(imlist, cllist, how='inner', on=['Participant_ID'])
+#
+# joined.to_csv('../joined_PID.csv', index = False)
+#
+#
+# #CPTAC prep
+# import pandas as pd
+# import shutil
+# import os
+# import csv
+#
+#
+# def flatten(l, a):
+#     for i in l:
+#         if isinstance(i, list):
+#             flatten(i, a)
+#         else:
+#             a.append(i)
+#     return a
+#
+#
+# # Get all images in the root directory
+# def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
+#     ids = []
+#     for id in os.listdir(root_dir):
+#         if id in ignore:
+#             print('Skipping ID:', id)
+#         else:
+#             dirname = id.split('_')[-2]
+#             ids.append((id, dirname))
+#     return ids
+#
+#
+# PID = pd.read_csv("../joined_PID.csv", header = 0)
+# temp = []
+# ls = []
+# for idx, row in PID.iterrows():
+#     if "," in row["Parent Sample ID(s)"]:
+#         m = row["Parent Sample ID(s)"].split(',')
+#         for x in m:
+#             w = row
+#             ls.append(x)
+#             temp.append(w)
+#         PID = PID.drop(idx)
+# temp = pd.DataFrame(temp)
+# temp["Parent Sample ID(s)"] = ls
+# PID = PID.append(temp, ignore_index=True)
+# PID = PID.sort_values(["Parent Sample ID(s)"], ascending=1)
+#
+# PID.to_csv("../new_joined_PID.csv", header = True, index = False)
+#
+# PID = pd.read_csv("../new_joined_PID.csv", header = 0)
+#
+# ref_list = PID["Parent Sample ID(s)"].tolist()
+#
+# imids = image_ids_in('../CPTAC_img')
+# inlist = []
+# outlist = []
+# reverse_inlist = []
+# try:
+#     os.mkdir('../CPTAC_img/inlist')
+# except FileExistsError:
+#     pass
+#
+# try:
+#     os.mkdir('../CPTAC_img/outlist')
+# except FileExistsError:
+#     pass
+#
+# for im in imids:
+#     if im[1] in ref_list:
+#         inlist.append(im[0])
+#         reverse_inlist.append(im[1])
+#         shutil.move('../CPTAC_img/'+str(im[0]), '../CPTAC_img/inlist/'+str(im[0]))
+#     else:
+#         outlist.append(im[0])
+#         shutil.move('../CPTAC_img/' + str(im[0]), '../CPTAC_img/outlist/' + str(im[0]))
+#
+# csvfile = "../CPTAC_inlist.csv"
+# with open(csvfile, "w") as output:
+#     writer = csv.writer(output, lineterminator='\n')
+#     for val in inlist:
+#         writer.writerow([val])
+#
+# csvfile = "../CPTAC_outlist.csv"
+# with open(csvfile, "w") as output:
+#     writer = csv.writer(output, lineterminator='\n')
+#     for val in outlist:
+#         writer.writerow([val])
+#
+# filtered_PID = PID[PID["Parent Sample ID(s)"].isin(reverse_inlist)]
+#
+# tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometrioid', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
+# a = filtered_PID['TCGA_subtype']
+# filtered_PID['Subtype'] = a
+# filtered_PID.Subtype = filtered_PID.Subtype.replace(tpdict)
+# filtered_PID = filtered_PID[filtered_PID.Subtype != 'Other']
+#
+# filtered_PID.to_csv("../filtered_joined_PID.csv", header=True, index=False)
+#
+# #TCGA prep
+# import pandas as pd
+#
+#
+# def flatten(l, a):
+#     for i in l:
+#         if isinstance(i, list):
+#             flatten(i, a)
+#         else:
+#             a.append(i)
+#     return a
+#
+#
+# image_meta = pd.read_csv('../TCGA_Image_meta.tsv', sep='\t', header=0)
+# TCGA_list = pd.read_excel('../datafile.S1.1.KeyClinicalData.xls', header=0)
+#
+# namelist = []
+# for idx, row in image_meta.iterrows():
+#     namelist.append(row['File Name'].split('-01Z')[0])
+#
+# image_meta['bcr_patient_barcode'] = namelist
+#
+# TCGA_list = TCGA_list.join(image_meta.set_index('bcr_patient_barcode'), on='bcr_patient_barcode')
+#
+# TCGA_list = TCGA_list.dropna()
+#
+# labellist = []
+# for idx, row in TCGA_list.iterrows():
+#     if row['IntegrativeCluster'] != "Notassigned":
+#         labellist.append(row['IntegrativeCluster'])
+#     else:
+#         labellist.append(row['histology'])
+#
+# TCGA_list['label'] = labellist
+#
+# TCGA_list = TCGA_list[TCGA_list.label != 'Mixed']
+# TCGA_list = TCGA_list[TCGA_list.label != 'Serous']
+# lbdict = {'CN low': 'Endometrioid', 'CN high': 'Serous-like'}
+# TCGA_list['label'] = TCGA_list['label'].replace(lbdict)
+#
+# TCGA_list.to_csv('../new_TCGA_list.csv', header=True, index=False)
 
 
 #Mutation prep
@@ -281,5 +281,7 @@ dummy = dummy.drop(['histology_Clear cell'], axis=1)
 dummy['histology_Endometrioid'] = dummy['histology_Endometrioid'] + dummy['histology_Mixed']
 
 dummy['histology_Serous'] = dummy['histology_Serous'] + dummy['histology_Mixed']
+
+dummy = dummy.replace({'0NA': np.nan})
 
 dummy.to_csv('../dummy_His_MUT_joined.csv', header=True, index=False)
