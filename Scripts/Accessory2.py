@@ -415,10 +415,12 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         weights_LR = w
 
         # Output Weights (7.10 added)
-        with open("../Results/{}/out/weight.txt".format(path), 'w') as f:
-            print(weights_LR)
+        with open("../Results/{}/out/weight0.csv".format(path), 'w') as f:
             for item in weights_LR:
-                f.write("%s\t" % item)
+                f.write("%s," % item[0])
+        with open("../Results/{}/out/weight1.csv".format(path), 'w') as f:
+            for item in weights_LR:
+                f.write("%s," % item[1])
         # Output Weights (7.10 added)
 
         activation_lastconv = np.array([net[ij]])
