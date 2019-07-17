@@ -131,8 +131,10 @@ def set_sep(alll, path, cls, cut=0.2):
     trlist = []
     telist = []
     valist = []
+    TCGA = alll[alll['slide'].str.contains("TCGA")]
+    CPTAC = alll[~alll['slide'].str.contains("TCGA")]
     for i in range(cls):
-        subset = alll.loc[alll['label'] == i]
+        subset = TCGA.loc[TCGA['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
         validation = unq[:int(len(unq)*cut/4)]
@@ -141,6 +143,18 @@ def set_sep(alll, path, cls, cut=0.2):
         telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq)*cut):]
         trlist.append(subset[subset['slide'].isin(train)])
+
+        subset = CPTAC.loc[CPTAC['label'] == i]
+        unq = list(subset.slide.unique())
+        np.random.shuffle(unq)
+        validation = unq[:int(len(unq) * cut / 4)]
+        valist.append(subset[subset['slide'].isin(validation)])
+        test = unq[int(len(unq) * cut / 4):int(len(unq) * cut)]
+        telist.append(subset[subset['slide'].isin(test)])
+        train = unq[int(len(unq) * cut):]
+        trlist.append(subset[subset['slide'].isin(train)])
+
+
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
