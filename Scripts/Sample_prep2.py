@@ -154,7 +154,6 @@ def set_sep(alll, path, cls, cut=0.2):
         train = unq[int(len(unq) * cut):]
         trlist.append(subset[subset['slide'].isin(train)])
 
-
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
