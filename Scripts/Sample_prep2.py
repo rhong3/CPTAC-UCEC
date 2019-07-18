@@ -91,8 +91,8 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         idsc = ids.loc[ids['level'] == 2]
         idsc = idsc.drop(columns=['slide', 'label', 'level'])
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
-        idsa = pd.merge(idsa, idsb, on=['x', 'y'], how='left', validate="many_to_many")
-        idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_one")
+        idsa = pd.merge(idsa, idsb, on=['x', 'y'], how='inner', validate="many_to_many")
+        idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='inner', validate="many_to_one")
         idsa = idsa.drop(columns=['x', 'y'])
         idsa = idsa.fillna(method='ffill')
         idsa = idsa.fillna(method='bfill')
