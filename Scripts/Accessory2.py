@@ -523,3 +523,26 @@ def CAM_R(net, w, pred, x, path, name, bs, rd=0):
             # cv2.imwrite(imname1, a)
             # cv2.imwrite(imname2, b)
             cv2.imwrite(imname3, full)
+
+
+# Output activation for tSNE
+def tSNE_prep(flatnet, ori_test, y, pred, path):
+    # format clean up
+    tl = np.asmatrix(y)
+    tl = tl.argmax(axis=1).astype('uint8')
+    pdxt = np.asmatrix(pred)
+    prl = pdxt.argmax(axis=1).astype('uint8')
+    prl = pd.DataFrame(prl, columns=['Prediction'])
+    print(np.shape(flatnet))
+    act = pd.DataFrame(np.asmatrix(flatnet))
+    outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
+    outtlt = pd.DataFrame(tl, columns=['True_label'])
+    outt.reset_index(drop=True, inplace=True)
+    prl.reset_index(drop=True, inplace=True)
+    outtlt.reset_index(drop=True, inplace=True)
+    out = pd.concat([outt, prl, outtlt], axis=1)
+    ori_test.reset_index(drop=True, inplace=True)
+    out.reset_index(drop=True, inplace=True)
+    act.reset_index(drop=True, inplace=True)
+    out = pd.concat([ori_test, out, act], axis=1)
+    out.to_csv("../Results/{}/out/For_tSNE.csv".format(path), index=False)

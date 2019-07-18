@@ -171,15 +171,19 @@ class INCEPTION():
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         # ac.CAM(net, w, pred, xc, y, dirr, 'Test', bs, pmd, rd)
+                        net = np.mean(net, axis=(1, 2))
                         if rd == 0:
                             pdx = pred
                             yl = y
+                            netl = net
                         else:
                             pdx = np.concatenate((pdx, pred), axis=0)
                             yl = np.concatenate((yl, y), axis=0)
+                            netl = np.concatenate((netl, net), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
                         ac.metrics(pdx, yl, dirr, 'Test', pmd, testset)
+                        ac.tSNE_prep(flatnet=netl, ori_test=testset, y=yl, pred=pdx, path=dirr)
                         break
         else:
             itr, file, ph = X.data(Not_Realtest=False, train=False)
