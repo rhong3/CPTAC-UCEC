@@ -377,12 +377,13 @@ def py_map2jpg(imgmap, rang, colorMap):
 # generating CAM plots of each tile; net is activation; w is weight; pred is prediction scores; x are input images;
 # y are labels; path is output folder, name is test/validation; rd is current batch number
 def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
+    DIRT = "../Results/{}/out/{}_img".format(path, name)
     if pmd == 'subtype':
-        DIRA = "../Results/{}/out/{}_MSI_img".format(path, name)
-        DIRB = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
-        DIRC = "../Results/{}/out/{}_Serous-like_img".format(path, name)
-        DIRD = "../Results/{}/out/{}_POLE_img".format(path, name)
-        for DIR in (DIRA, DIRB, DIRC, DIRD):
+        DIRA = "../Results/{}/out/{}_img/MSI".format(path, name)
+        DIRB = "../Results/{}/out/{}_img/Endometrioid".format(path, name)
+        DIRC = "../Results/{}/out/{}_img/Serous-like".format(path, name)
+        DIRD = "../Results/{}/out/{}_img/POLE".format(path, name)
+        for DIR in (DIRT, DIRA, DIRB, DIRC, DIRD):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
@@ -390,9 +391,9 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         catdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
         dirdict = {0: DIRA, 1: DIRB, 2: DIRC, 3: DIRD}
     elif pmd == 'histology':
-        DIRA = "../Results/{}/out/{}_Endometrioid_img".format(path, name)
-        DIRB = "../Results/{}/out/{}_Serous_img".format(path, name)
-        for DIR in (DIRA, DIRB):
+        DIRA = "../Results/{}/out/{}_img/Endometrioid".format(path, name)
+        DIRB = "../Results/{}/out/{}_img/Serous".format(path, name)
+        for DIR in (DIRT, DIRA, DIRB):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
@@ -400,9 +401,9 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         catdict = {0: 'Endometrioid', 1: 'Serous'}
         dirdict = {0: DIRA, 1: DIRB}
     else:
-        DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
-        DIRB = "../Results/{}/out/{}_POS_img".format(path, name)
-        for DIR in (DIRA, DIRB):
+        DIRA = "../Results/{}/out/{}_img/NEG".format(path, name)
+        DIRB = "../Results/{}/out/{}_img/POS".format(path, name)
+        for DIR in (DIRT, DIRA, DIRB):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
@@ -425,15 +426,6 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
             ddt = 'Wrong'
 
         weights_LR = w
-
-        # Output Weights (7.10 added)
-        with open("../Results/{}/out/weight0.csv".format(path), 'w') as f:
-            for item in weights_LR:
-                f.write(str(ij)+", %s\n" % item[0])
-        with open("../Results/{}/out/weight1.csv".format(path), 'w') as f:
-            for item in weights_LR:
-                f.write(str(ij)+", %s\n" % item[1])
-        # Output Weights (7.10 added)
 
         activation_lastconv = np.array([net[ij]])
         weights_LR = weights_LR.T
