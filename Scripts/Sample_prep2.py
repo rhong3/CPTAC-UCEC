@@ -65,6 +65,44 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
     return idss
 
 
+def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
+    dira = os.path.isdir(root_dir + 'level0')
+    dirb = os.path.isdir(root_dir + 'level1')
+    dirc = os.path.isdir(root_dir + 'level2')
+    if dira and dirb and dirc:
+        ids = []
+        for level in range(3):
+            fac = {0: 4001, 1:1001, 2:251}
+            dirr = root_dir + 'level{}'.format(str(level))
+            for id in os.listdir(dirr):
+                if id in ignore:
+                    print('Skipping ID:', id)
+                else:
+                    x = int(int(id.split('x-', 1)[1].split('-', 1)[0])/fac[level])
+                    y = int(int(id.split('y-', 1)[1].split('.p', 1)[0])/fac[level])
+                    ids.append([slide, label, level, dirr+'/'+id, x, y])
+        ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y'])
+        idsa = ids.loc[ids['level'] == 0]
+        idsa = idsa.drop(columns=['level'])
+        idsa = idsa.rename(index=str, columns={"path": "L0path"})
+        idsb = ids.loc[ids['level'] == 1]
+        idsb = idsb.drop(columns=['slide', 'label', 'level'])
+        idsb = idsb.rename(index=str, columns={"path": "L1path"})
+        idsc = ids.loc[ids['level'] == 2]
+        idsc = idsc.drop(columns=['slide', 'label', 'level'])
+        idsc = idsc.rename(index=str, columns={"path": "L2path"})
+        idsa = pd.merge(idsa, idsb, on=['x', 'y'], how='left', validate="many_to_many")
+        idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_one")
+        idsa = idsa.drop(columns=['x', 'y'])
+        idsa = idsa.fillna(method='ffill')
+        idsa = idsa.fillna(method='bfill')
+        idsa = sku.shuffle(idsa)
+    else:
+        idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+
+    return idsa
+
+
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv'):
     if not os.path.isdir(path):
@@ -161,13 +199,13 @@ def set_sep(alll, path, cls, cut=0.2):
     train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     for idx, row in test.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         test_tiles = pd.concat([test_tiles, tile_ids])
     for idx, row in train.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         train_tiles = pd.concat([train_tiles, tile_ids])
     for idx, row in validation.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
