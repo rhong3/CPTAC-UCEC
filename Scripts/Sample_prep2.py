@@ -100,9 +100,10 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = idsa.drop(columns=['x', 'y', 'dup'])
-        idsa = idsa.fillna(method='ffill')
-        idsa = idsa.fillna(method='bfill')
+        idsa = idsa.fillna(method='ffill', axis=0)
+        idsa = idsa.fillna(method='bfill', axis=0)
         idsa = sku.shuffle(idsa)
+        idsa = idsa.dropna()
     else:
         idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
 
@@ -205,13 +206,13 @@ def set_sep(alll, path, cls, cut=0.2):
     train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     for idx, row in test.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
         test_tiles = pd.concat([test_tiles, tile_ids])
     for idx, row in train.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
         train_tiles = pd.concat([train_tiles, tile_ids])
     for idx, row in validation.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
