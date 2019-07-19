@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import sklearn.utils as sku
 import numpy as np
+import re
 
 tile_path = "../tiles/"
 
@@ -72,16 +73,21 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            fac = {0: 4001, 1:1001, 2:251}
+            fac = {0: 4001, 1: 1001, 2: 251}
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
                     print('Skipping ID:', id)
                 else:
-                    x = int(int(id.split('x-', 1)[1].split('-', 1)[0])/fac[level])
-                    y = int(int(id.split('y-', 1)[1].split('.p', 1)[0])/fac[level])
-                    ids.append([slide, label, level, dirr+'/'+id, x, y])
-        ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y'])
+                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0])/fac[level])
+                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0])/fac[level])
+                    dup = re.split('_| |copy', id.split('y-', 1)[1])[-1]
+                    if not dup:
+                        ck = 0
+                    else:
+                        ck = 1
+                    ids.append([slide, label, level, dirr+'/'+id, x, y, ck])
+        ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
         idsa = ids.loc[ids['level'] == 0]
         idsa = idsa.drop(columns=['level'])
         idsa = idsa.rename(index=str, columns={"path": "L0path"})
@@ -91,9 +97,9 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         idsc = ids.loc[ids['level'] == 2]
         idsc = idsc.drop(columns=['slide', 'label', 'level'])
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
-        idsa = pd.merge(idsa, idsb, on=['x', 'y'], how='inner', validate="many_to_many")
-        idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='inner', validate="many_to_one")
-        idsa = idsa.drop(columns=['x', 'y'])
+        idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa = idsa.drop(columns=['x', 'y', 'dup'])
         idsa = idsa.fillna(method='ffill')
         idsa = idsa.fillna(method='bfill')
         idsa = sku.shuffle(idsa)
