@@ -468,9 +468,9 @@ class INCEPTION():
                             neta = net[:,:,:,:len(net[0,0,0,:]/3)]
                             netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
                             netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
-                            wa = w[:,:,:len[0,0,:]/3]
-                            wb = w[:,:,len[0,0,:]/3:2*len[0,0,:]/3]
-                            wc = w[:,:,2*len[0,0,:]/3:]
+                            wa = w[:,:,:len(w[0,0,:]/3)]
+                            wb = w[:,:,len(w[0,0,:]/3):2*len(w[0,0,:]/3)]
+                            wc = w[:,:,2*len(w[0,0,:]/3):]
 
                             ##########
                             print(np.shape(w))
