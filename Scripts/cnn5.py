@@ -471,7 +471,6 @@ class INCEPTION():
                             wa = w[:,:,:len(w[0,0,:]/3)]
                             wb = w[:,:,len(w[0,0,:]/3):2*len(w[0,0,:]/3)]
                             wc = w[:,:,2*len(w[0,0,:]/3):]
-
                             ##########
                             print(np.shape(w))
                             print(np.shape(wa))
