@@ -56,6 +56,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
     for level in range(3):
         level = str(level)
         if pmd == 'subtype':
+            ref = ref.loc[ref['subtype_0NA'] == 0]
             MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
             EMimg = intersection(ref.loc[ref['subtype_Endometrioid'] == 1]['name'].tolist(), allimg)
             SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
@@ -69,7 +70,6 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
             for i in POLEimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 3])
         elif pmd == 'histology':
-            ref = ref.loc[ref['histology_0NA'] == 0]
             EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
             Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
             for i in EMimg:
@@ -84,10 +84,21 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
             for i in posimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-        elif pmd in ['histology_Endometrioid', 'histology_Serous']:
-            ref = ref.loc[ref['histology_0NA'] == 0]
-            negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
-            posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
+        elif pmd == 'MSIst':
+            ref = ref.loc[ref['MSIst_0NA'] == 0]
+            Himg = intersection(ref.loc[ref['MSIst_MSI-H'] == 1]['name'].tolist(), allimg)
+            Limg = intersection(ref.loc[ref['MSIst_MSI-L'] == 1]['name'].tolist(), allimg)
+            Simg = intersection(ref.loc[ref['MSIst_MSS'] == 1]['name'].tolist(), allimg)
+            for i in Himg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
+            for i in Limg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
+            for i in Simg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 2])
+        elif pmd in ['MSIst_MSI-H', 'MSIst_MSI-L', 'MSIst_MSS']:
+            ref = ref.loc[ref['MSIst_0NA'] == 0]
+            negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
+            posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
             for i in negimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
             for i in posimg:
