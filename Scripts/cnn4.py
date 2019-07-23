@@ -195,7 +195,7 @@ class INCEPTION():
                         rd += 1
                     except tf.errors.OutOfRangeError:
                         ac.metrics(pdx, yl, dirr, 'Test', pmd, testset)
-                        ac.tSNE_prep(flatnet=netl, ori_test=testset, y=yl, pred=pdx, path=dirr)
+                        ac.tSNE_prep(flatnet=netl, ori_test=testset, y=yl, pred=pdx, path=dirr, pmd=pmd)
                         break
         else:
             itr, file, ph = X.data(Not_Realtest=False, train=False)

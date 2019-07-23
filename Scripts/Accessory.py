@@ -515,7 +515,7 @@ def CAM_R(net, w, pred, x, path, name, bs, rd=0):
             cv2.imwrite(imname3, full)
 
 # Output activation for tSNE
-def tSNE_prep(flatnet, ori_test, y, pred, path):
+def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     # format clean up
     tl = np.asmatrix(y)
     tl = tl.argmax(axis=1).astype('uint8')
@@ -524,7 +524,12 @@ def tSNE_prep(flatnet, ori_test, y, pred, path):
     prl = pd.DataFrame(prl, columns=['Prediction'])
     print(np.shape(flatnet))
     act = pd.DataFrame(np.asmatrix(flatnet))
-    outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
+    if pmd == 'subtype':
+        outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+    elif pmd == 'histology':
+        outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
+    else:
+        outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
     outtlt = pd.DataFrame(tl, columns=['True_label'])
     outt.reset_index(drop=True, inplace=True)
     prl.reset_index(drop=True, inplace=True)
