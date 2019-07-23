@@ -6,9 +6,7 @@ Created on 7/23/2019
 @author: RH
 """
 import pandas as pd
-import shutil
 import os
-import csv
 import numpy as np
 
 # CPTAC
@@ -69,13 +67,13 @@ for im in imids:
         outlist.append(im[0])
 
 filtered_PID = PID[PID["Parent Sample ID(s)"].isin(reverse_inlist)]
-filtered_PID = filtered_PID.rename(columns={'TCGA_subtype': 'subtype'})
+filtered_PID = filtered_PID.rename(columns={'TCGA_subtype': 'subtype', 'CTNNB1_Mut': 'CTNNB1'})
 tpdict = {'CN-High': 'Serous-like', 'CN-Low': 'Endometrioid', 'MSI-H': 'MSI', 'POLE': 'POLE', 'Other': 'Other'}
-filtered_PID.subtype = filtered_PID.Subtype.replace(tpdict)
+filtered_PID.subtype = filtered_PID.subtype.replace(tpdict)
 filtered_PID = filtered_PID[filtered_PID.subtype != 'Other']  # filtered_joined_PID.csv
 
 CPTAC = filtered_PID
-CPTAC_MUT = pd.read_csv('../UCEC_V2.1/UCEC_CPTAC3_meta_table_V2.1.txt', sep='\t', header=0)
+CPTAC_MUT = pd.read_csv('../UCEC_V2.1/UCEC_CPTAC3_meta_table_V2.1.csv', sep=',', header=0, error_bad_lines=False)
 CPTAC_MUTt = CPTAC_MUT[['Participant_ID', 'TP53_TP53', 'TP53_ATM', 'PI3K_PIK3R1', 'PI3K_PIK3CA',
                         'PI3K_PTEN', 'PI3K_MTOR', 'PI3K_PIK3R2', 'PI3K_PPP2R1A', 'HRD_BRCA2', 'JAK1_Mutation']]
 
@@ -89,7 +87,7 @@ CPTAC = CPTAC.rename(index=str, columns={"TP53_TP53": "TP53", "TP53_ATM": "ATM",
                                          "PI3K_PIK3R2": "PIK3R2", "PI3K_PPP2R1A": "PPP2R1A", "HRD_BRCA2": "BRCA2",
                                          "JAK1_Mutation": "JAK1"})  # MUT_CPTAC_list.csv
 
-CPTAC_lite = CPTAC[['Participant_ID', 'Subtype', 'MSI_status', 'Histologic_type', 'ATM', 'MTOR', 'PIK3R2',
+CPTAC_lite = CPTAC[['Participant_ID', 'subtype', 'MSI_status', 'Histologic_type', 'ATM', 'MTOR', 'PIK3R2',
                     'PPP2R1A', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN', 'BRCA2', 'JAK1']]
 
 CPTAC_lite = CPTAC_lite.rename(index=str, columns={'Participant_ID': 'name',
@@ -167,20 +165,20 @@ TCGA_mlist = TCGA_mlist[['bcr_patient_barcode', 'ATM', 'MTOR', 'PIK3R2',
 TCGA_mlist = TCGA_mlist.rename(index=str, columns={'bcr_patient_barcode': 'name'})
 
 ### Histology
-TCGA_hlist = TCGA
+TCGA_hlist = TCGA[TCGA['histology'] != 'Clear cell']
 TCGA_hlist = TCGA_hlist.rename(columns={'bcr_patient_barcode': 'name'})
-TCGA_hlist = TCGA_hlist[[['name', 'histology']]]
+TCGA_hlist = TCGA_hlist[['name', 'histology']]
 
 ### MSI
 TCGA_slist = TCGA[TCGA['msi_status_7_marker_call'] != 'Indeterminant']
 TCGA_slist = TCGA_slist.rename(columns={'bcr_patient_barcode': 'name','msi_status_7_marker_call': 'MSIst'})
-TCGA_slist = TCGA_slist[[['name', 'MSIst']]]
+TCGA_slist = TCGA_slist[['name', 'MSIst']]
 
 TCGA_mg = pd.merge(TCGA_list, TCGA_mlist, how='outer', on='name')
 TCGA_mg = pd.merge(TCGA_mg, TCGA_hlist, how='outer', on='name')
 TCGA_mg = pd.merge(TCGA_mg, TCGA_slist, how='outer', on='name')
 
-mg = pd.concat([TCGA_mg, CPTAC_lite])
+mg = pd.concat([TCGA_mg, CPTAC_lite], sort=True)
 ddd = {np.nan: '0NA'}
 
 mg['subtype'] = mg['subtype'].replace(ddd)
@@ -192,5 +190,6 @@ mg = mg.drop_duplicates()
 mgx = pd.get_dummies(mg, columns=['subtype', 'histology', 'MSIst'])
 mgx['histology_Endometrioid'] = mgx['histology_Endometrioid'] + mgx['histology_Mixed']
 mgx['histology_Serous'] = mgx['histology_Serous'] + mgx['histology_Mixed']
-
-mgx.to_csv('../dummy_His_MUT_joined.csv', header=True, index=False)
+mgx = mgx.drop(['histology_Clear cell'], axis=1)
+mgx = mgx.set_index('name')
+mgx.to_csv('../dummy_His_MUT_joined.csv', header=True, index=True)
