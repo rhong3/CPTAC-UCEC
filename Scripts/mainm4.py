@@ -23,7 +23,7 @@ matplotlib.use('Agg')
 dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
 ep = sys.argv[3]    # epochs to train
-md = sys.argv[4]    # structure to use
+md = sys.argv[4]    # architecture to use
 pdmd = sys.argv[5]  # feature to predict
 
 
