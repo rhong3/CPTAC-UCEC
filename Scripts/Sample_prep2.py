@@ -119,70 +119,67 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
     allimg = image_ids_in(path)
     ref = pd.read_csv(ref_file, header=0)
     big_images = []
-    for level in range(3):
-        level = str(level)
-        if pmd == 'subtype':
-            MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
-            EMimg = intersection(ref.loc[ref['subtype_Endometrioid'] == 1]['name'].tolist(), allimg)
-            SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
-            POLEimg = intersection(ref.loc[ref['subtype_POLE'] == 1]['name'].tolist(), allimg)
-            for i in MSIimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in EMimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-            for i in SLimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 2])
-            for i in POLEimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 3])
-        elif pmd == 'histology':
-            EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
-            Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
-            for i in EMimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in Serousimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-        elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
-            ref = ref.loc[ref['subtype_0NA'] == 0]
-            negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
-            posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
-            for i in negimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in posimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-        elif pmd == 'MSIst':
-            Himg = intersection(ref.loc[ref['MSIst_MSI-H'] == 1]['name'].tolist(), allimg)
-            Limg = intersection(ref.loc[ref['MSIst_MSI-L'] == 1]['name'].tolist(), allimg)
-            Simg = intersection(ref.loc[ref['MSIst_MSS'] == 1]['name'].tolist(), allimg)
-            for i in Himg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in Limg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-            for i in Simg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 2])
-        elif pmd in ['MSIst_MSI-H', 'MSIst_MSI-L', 'MSIst_MSS']:
-            ref = ref.loc[ref['MSIst_0NA'] == 0]
-            negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
-            posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
-            for i in negimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in posimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-        else:
-            # 7.24 special version
-            ref = ref.loc[ref['subtype_0NA'] == 0]
-            ref = ref.loc[ref['subtype_Serous-like'] == 0]
-            ref = ref.loc[ref['subtype_Endometrioid'] == 0]
-            ##########################
+    if pmd == 'subtype':
+        MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
+        EMimg = intersection(ref.loc[ref['subtype_Endometrioid'] == 1]['name'].tolist(), allimg)
+        SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
+        POLEimg = intersection(ref.loc[ref['subtype_POLE'] == 1]['name'].tolist(), allimg)
+        for i in MSIimg:
+            big_images.append([i, 0,  path + "{}/".format(i)])
+        for i in EMimg:
+            big_images.append([i, 1, path + "{}/".format(i)])
+        for i in SLimg:
+            big_images.append([i, 2, path + "{}/".format(i)])
+        for i in POLEimg:
+            big_images.append([i, 3, path + "{}/".format(i)])
+    elif pmd == 'histology':
+        EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
+        Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
+        for i in EMimg:
+            big_images.append([i, 0, path + "{}/".format(i)])
+        for i in Serousimg:
+            big_images.append([i, 1, path + "{}/".format(i)])
+    elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
+        ref = ref.loc[ref['subtype_0NA'] == 0]
+        negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
+        posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
+        for i in negimg:
+            big_images.append([i, 0, path + "{}/".format(i)])
+        for i in posimg:
+            big_images.append([i, 1, path + "{}/".format(i)])
+    elif pmd == 'MSIst':
+        Himg = intersection(ref.loc[ref['MSIst_MSI-H'] == 1]['name'].tolist(), allimg)
+        Limg = intersection(ref.loc[ref['MSIst_MSI-L'] == 1]['name'].tolist(), allimg)
+        Simg = intersection(ref.loc[ref['MSIst_MSS'] == 1]['name'].tolist(), allimg)
+        for i in Himg:
+            big_images.append([i, 0, path + "{}/".format(i)])
+        for i in Limg:
+            big_images.append([i, 1, path + "{}/".format(i)])
+        for i in Simg:
+            big_images.append([i, 2, path + "{}/".format(i)])
+    elif pmd in ['MSIst_MSI-H', 'MSIst_MSI-L', 'MSIst_MSS']:
+        ref = ref.loc[ref['MSIst_0NA'] == 0]
+        negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
+        posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
+        for i in negimg:
+            big_images.append([i, 0, path + "{}/".format(i)])
+        for i in posimg:
+            big_images.append([i, 1, path + "{}/".format(i)])
+    else:
+        # 7.24 special version
+        ref = ref.loc[ref['subtype_0NA'] == 0]
+        ref = ref.loc[ref['subtype_Serous-like'] == 0]
+        ref = ref.loc[ref['subtype_Endometrioid'] == 0]
+        ##########################
 
-            negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
-            posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
-            for i in negimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in posimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
+        negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
+        posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
+        for i in negimg:
+            big_images.append([i, 0, path + "{}/".format(i)])
+        for i in posimg:
+            big_images.append([i, 1, path + "{}/".format(i)])
 
-    datapd = pd.DataFrame(big_images, columns=['slide', 'level', 'path', 'label'])
-    datapd.to_csv(path + "All_images.csv", header=True, index=False)
+    datapd = pd.DataFrame(big_images, columns=['slide', 'label', 'path'])
 
     return datapd
 
@@ -199,9 +196,9 @@ def set_sep(alll, path, cls, cut=0.2):
         subset = TCGA.loc[TCGA['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
-        validation = unq[:int(len(unq)*cut/4)]
+        validation = unq[:int(len(unq)*cut/2)]
         valist.append(subset[subset['slide'].isin(validation)])
-        test = unq[int(len(unq)*cut/4):int(len(unq)*cut)]
+        test = unq[int(len(unq)*cut/2):int(len(unq)*cut)]
         telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq)*cut):]
         trlist.append(subset[subset['slide'].isin(train)])
@@ -209,13 +206,12 @@ def set_sep(alll, path, cls, cut=0.2):
         subset = CPTAC.loc[CPTAC['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
-        validation = unq[:int(len(unq) * cut / 4)]
+        validation = unq[:int(len(unq) * cut / 2)]
         valist.append(subset[subset['slide'].isin(validation)])
-        test = unq[int(len(unq) * cut / 4):int(len(unq) * cut)]
+        test = unq[int(len(unq) * cut / 2):int(len(unq) * cut)]
         telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq) * cut):]
         trlist.append(subset[subset['slide'].isin(train)])
-
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
