@@ -168,6 +168,12 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
             for i in posimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
         else:
+            # 7.24 special version
+            ref = ref.loc[ref['subtype_0NA'] == 0]
+            ref = ref.loc[ref['subtype_Serous-like'] == 0]
+            ref = ref.loc[ref['subtype_Endometrioid'] == 0]
+            ##########################
+
             negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
             posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
             for i in negimg:
