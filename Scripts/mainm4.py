@@ -7,7 +7,7 @@ Created on 04/26/2019
 
 @author: RH
 """
-from sklearn import metrics
+import sklearn.metrics
 import os
 import sys
 import numpy as np
