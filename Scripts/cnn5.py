@@ -418,6 +418,8 @@ class INCEPTION():
                             self.valid_logger.add_summary(valid_summary, i)
                             print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
                             for i in range(3):
+                                print(np.shape(net))
+                                print(np.shape(w))
                                 neta = net[:, :, :, :len(net[0, 0, 0, :] / 3)]
                                 netb = net[:, :, :, len(net[0, 0, 0, :] / 3):2 * len(net[0, 0, 0, :] / 3)]
                                 netc = net[:, :, :, 2 * len(net[0, 0, 0, :] / 3):]
