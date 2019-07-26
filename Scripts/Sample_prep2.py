@@ -110,6 +110,24 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     return idsa
 
 
+# Balance CPTAC and TCGA tiles in each class
+def balance(pdls, cls):
+    balanced = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+    for i in range(cls):
+        ref = pdls.loc[pdls['label'] == i]
+        CPTAC = ref[~ref['slide'].str.contains("TCGA")]
+        TCGA = ref[ref['slide'].str.contains("TCGA")]
+        ratio = (CPTAC.shape[0])/(TCGA.shape[0])
+        if ratio < 0.2:
+            TCGA = TCGA.sample(int(5*CPTAC.shape[0]), replace=False)
+            ref = pd.concat([TCGA, CPTAC], sort=False)
+        elif ratio > 5:
+            CPTAC = CPTAC.sample(int(5*TCGA.shape[0]), replace=False)
+            ref = pd.concat([TCGA, CPTAC], sort=False)
+        balanced = pd.concat([balanced, ref], sort=False)
+    return balanced
+
+
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv'):
     if not os.path.isdir(path):
@@ -219,20 +237,23 @@ def set_sep(alll, path, cls, cut=0.2):
     train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     for idx, row in test.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         test_tiles = pd.concat([test_tiles, tile_ids])
     for idx, row in train.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         train_tiles = pd.concat([train_tiles, tile_ids])
     for idx, row in validation.iterrows():
-        tile_ids = tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
-    # No shuffle on test set
-    train_tiles = sku.shuffle(train_tiles)
-    validation_tiles = sku.shuffle(validation_tiles)
+
     # train_tiles = train_tiles.sample(frac=0.50, replace=False)
     # validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
     # test_tiles = test_tiles.sample(frac=0.50, replace=False)
+    train_tiles = balance(train_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
+    # No shuffle on test set
+    train_tiles = sku.shuffle(train_tiles)
+    validation_tiles = sku.shuffle(validation_tiles)
 
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
