@@ -44,6 +44,25 @@ def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', '
     return ids
 
 
+# Balance CPTAC and TCGA tiles in each class
+def balance(pdls, cls):
+    balanced = pd.DataFrame(columns=['slide', 'level', 'path', 'label'])
+    for i in range(cls):
+        ref = pdls.loc[pdls['label'] == i]
+        CPTAC = ref[~ref['slide'].str.contains("TCGA")]
+        TCGA = ref[ref['slide'].str.contains("TCGA")]
+        if CPTAC.shape[0] != 0 and TCGA.shape[0] != 0:
+            ratio = (CPTAC.shape[0])/(TCGA.shape[0])
+            if ratio < 0.2:
+                TCGA = TCGA.sample(int(5*CPTAC.shape[0]), replace=False)
+                ref = pd.concat([TCGA, CPTAC], sort=False)
+            elif ratio > 5:
+                CPTAC = CPTAC.sample(int(5*TCGA.shape[0]), replace=False)
+                ref = pd.concat([TCGA, CPTAC], sort=False)
+        balanced = pd.concat([balanced, ref], sort=False)
+    return balanced
+
+
 # Get all svs images with its label as one file; level is the tile resolution level
 def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv'):
     if not os.path.isdir(path):
@@ -186,12 +205,14 @@ def set_sep(alll, path, cls, level=None, cut=0.2):
     test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'level', 'path', 'label'])
     train_tiles = pd.DataFrame(train_tiles_list, columns=['slide', 'level', 'path', 'label'])
     validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'level', 'path', 'label'])
+
+    train_tiles = balance(train_tiles, cls=cls)
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
-    train_tiles = train_tiles.sample(frac=0.50, replace=False)
-    validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
-    test_tiles = test_tiles.sample(frac=0.50, replace=False)
+    # train_tiles = train_tiles.sample(frac=0.50, replace=False)
+    # validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
+    # test_tiles = test_tiles.sample(frac=0.50, replace=False)
 
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
