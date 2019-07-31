@@ -13,7 +13,7 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 import cv2
-import Sample_prep2
+import Sample_prep
 import time
 import matplotlib
 matplotlib.use('Agg')
@@ -250,7 +250,7 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir)
-        trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes)
-        loader2(data_dir)
+        alll = Sample_prep.big_image_sum(pmd=pdmd, path=img_dir)
+        trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, cls=classes)
+        loader(data_dir)
 
