@@ -251,7 +251,7 @@ def set_sep(alll, path, cls, cut=0.2):
     # validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
     # test_tiles = test_tiles.sample(frac=0.50, replace=False)
     train_tiles = balance(train_tiles, cls=cls)
-    # validation_tiles = balance(validation_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
