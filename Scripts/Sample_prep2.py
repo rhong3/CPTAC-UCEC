@@ -247,8 +247,8 @@ def set_sep(alll, path, cls, cut=0.2):
         tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
 
-    # train_tiles = train_tiles.sample(frac=0.50, replace=False)
-    # validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
+    train_tiles = train_tiles.sample(frac=0.50, replace=False)
+    validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
     # test_tiles = test_tiles.sample(frac=0.50, replace=False)
     train_tiles = balance(train_tiles, cls=cls)
     validation_tiles = balance(validation_tiles, cls=cls)
