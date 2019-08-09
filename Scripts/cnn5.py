@@ -422,8 +422,8 @@ class INCEPTION():
                                 netb = net[:, :, :, len(net[0, 0, 0, :] / 3):2 * len(net[0, 0, 0, :] / 3)]
                                 netc = net[:, :, :, 2 * len(net[0, 0, 0, :] / 3):]
                                 wa = w[:len(w[:, 0] / 3), :]
-                                wb = w[len(w[0, 0, :] / 3):2 * len(w[0, 0, :] / 3), :]
-                                wc = w[2 * len(w[0, 0, :] / 3):, :]
+                                wb = w[len(w[:, 0] / 3):2 * len(w[:, 0] / 3), :]
+                                wc = w[2 * len(w[:, 0] / 3):, :]
                                 ac.CAM(neta, wa, pred, xc, y, dirr, 'Validation_level0', bs, pmd)
                                 ac.CAM(netb, wb, pred, xc, y, dirr, 'Validation_level1', bs, pmd)
                                 ac.CAM(netc, wc, pred, xc, y, dirr, 'Validation_level2', bs, pmd)
@@ -469,8 +469,8 @@ class INCEPTION():
                             netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
                             netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
                             wa = w[:len(w[:,0]/3), :]
-                            wb = w[len(w[0,0,:]/3):2*len(w[0,0,:]/3), :]
-                            wc = w[2*len(w[0,0,:]/3):, :]
+                            wb = w[len(w[:,0]/3):2*len(w[:,0]/3), :]
+                            wc = w[2*len(w[:,0]/3):, :]
                             ##########
                             print(np.shape(w))
                             print(np.shape(wa))
