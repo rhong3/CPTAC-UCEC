@@ -552,6 +552,7 @@ def CAM_R(net, w, pred, x, path, name, bs, rd=0):
             # cv2.imwrite(imname2, b)
             cv2.imwrite(imname3, full)
 
+
 # Output activation for tSNE
 def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     # format clean up
@@ -579,4 +580,5 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     out.reset_index(drop=True, inplace=True)
     act.reset_index(drop=True, inplace=True)
     out = pd.concat([ori_test, out, act], axis=1)
+    out = out.sample(100000, replace=False)
     out.to_csv("../Results/{}/out/For_tSNE.csv".format(path), index=False)

@@ -1,0 +1,32 @@
+---
+title: "Post-metrics"
+output: html_document
+---
+
+# Load data and pkgs
+```{r, echo=FALSE}
+  Test_slide <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/X1MSS/out/Test_slide.csv")
+Test_tile <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/X1MSS/out/Test_tile.csv")
+library(caret)
+library(pROC)
+library(dplyr)
+```
+
+```{r, echo=FALSE}
+print("Slide Level:")
+answers <- factor(Test_slide$True_label)
+results <- factor(Test_slide$Prediction)
+confusionMatrix(data=results, reference=answers)
+# score = select(Test_slide, MSI_score, Endometrioid_score, Serous.like_score, POLE_score)
+# colnames(score) = c("MSI", "Endometrioid", "Serous-like", "POLE")
+# roc =  multiclass.roc(answers, score)
+# auc(roc)
+# ci.auc(multiclass.roc=roc)
+print("Tile Level:")
+answers <- factor(Test_tile$True_label)
+results <- factor(Test_tile$Prediction)
+confusionMatrix(data=results, reference=answers)
+# roc =  roc(answers, factor(select(Test_tile, MSI_score, Endometrioid_score, Serous.like_score, POLE_score)))
+# auc(roc)
+# ci.auc(roc)
+```
