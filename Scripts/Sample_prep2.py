@@ -73,10 +73,7 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            if 'TCGA' in root_dir:
-                fac = {0: 4001, 1: 1001, 2: 251}
-            else:
-                fac = {0: 4001, 1: 1001, 2: 251}
+            fac = {0: 16.001, 1: 4.001, 2: 1.001}
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
@@ -84,12 +81,8 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
                 else:
                     x = int(float(id.split('x-', 1)[1].split('-', 1)[0])/fac[level])
                     y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0])/fac[level])
-                    dup = re.split('_| |copy', id.split('y-', 1)[1])[-1]
-                    if not dup:
-                        ck = 0
-                    else:
-                        ck = 1
-                    ids.append([slide, label, level, dirr+'/'+id, x, y, ck])
+                    dup = int(re.split('.p', re.split('_', id.split('y-', 1)[1])[-1])[0])
+                    ids.append([slide, label, level, dirr+'/'+id, x, y, dup])
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
         idsa = ids.loc[ids['level'] == 0]
         idsa = idsa.drop(columns=['level'])
