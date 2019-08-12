@@ -38,7 +38,7 @@ def cut():
     std = staintools.LuminosityStandardizer.standardize(std)
     CPTACpath = '../images/CPTAC/'
     TCGApath = '../images/TCGA/'
-    ref = pd.read_csv('../dummy_MUT_joined.csv', header=0)
+    ref = pd.read_csv('../dummy_His_MUT_joined.csv', header=0)
 
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
