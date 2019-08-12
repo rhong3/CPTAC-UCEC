@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 matplotlib.use('Agg')
 import Slicer
+import staintools
 
 
 # Get all images in the root directory
@@ -33,6 +34,8 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
 
 
 def cut():
+    std = staintools.read_image("../colorstandard.png")
+    std = staintools.LuminosityStandardizer.standardize(std)
     CPTACpath = '../images/CPTAC/'
     TCGApath = '../images/TCGA/'
     ref = pd.read_csv('../dummy_MUT_joined.csv', header=0)
@@ -43,14 +46,14 @@ def cut():
     TCGAlist = image_ids_in(TCGApath, 'TCGA')
 
     for i in CPTAClist:
+        dup = None
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
         try:
             os.mkdir("../tiles/{}".format(i[1]))
-            dup = False
         except(FileExistsError):
-            dup = True
+            dup = np.random.randint(1000)
             pass
         for m in range(3):
             if m == 0:
@@ -69,21 +72,21 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
-                                                                level=level, dp=dup, ft=tff)
+                                                                level=level, std_img=std, dp=dup, ft=tff)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
 
     for i in TCGAlist:
+        dup = None
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
         try:
             os.mkdir("../tiles/{}".format(i[1]))
-            dup = False
         except(FileExistsError):
-            dup = True
+            dup = np.random.randint(1000)
             pass
         for m in range(3):
             if m == 0:
@@ -102,12 +105,11 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
-                                                                level=level, dp=dup, ft=tff)
+                                                                level=level, std_img=std, dp=dup, ft=tff)
             except(IndexError):
                 pass
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
-
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

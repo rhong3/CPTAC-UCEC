@@ -59,17 +59,16 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if 0.1 < wscore < 0.33:
+        if 0.01 < wscore < 0.4:
             img = img.resize((299, 299))
-            # img = normalization(img, std)
+            img = normalization(img, std)
             if dp:
-                ran = np.random.randint(10000)
-                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran)))
-                strr = outdir + "/region_x-{}-y-{}_{}.png".format(target_x, target_y, str(ran))
+                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(x0, y0, str(dp)))
+                strr = outdir + "/region_x-{}-y-{}_{}.png".format(x0, y0, str(dp))
             else:
-                img.save(outdir + "/region_x-{}-y-{}.png".format(target_x, target_y))
-                strr = outdir + "/region_x-{}-y-{}.png".format(target_x, target_y)
-            imloc.append([x0, y0, target_x, target_y, strr])
+                img.save(outdir + "/region_x-{}-y-{}.png".format(x0, y0))
+                strr = outdir + "/region_x-{}-y-{}.png".format(x0, y0)
+            imloc.append([x0, y0, image_x, image_y, strr])
         y0 += 1
     slide.close()
     return imloc
@@ -79,14 +78,11 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
 # First open the slide, determine how many tiles can be cut, record the residue edges width,
 # and calculate the final output prediction heat map size should be. Then, using multithread to cut tiles, and stack up
 # tiles and their position dictionaries.
-def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
+def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None, ft=1):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
     print(slp)
     print(slide.level_dimensions)
-
-    std_img = staintools.read_image("../colorstandard.png")
-    std_img = staintools.LuminosityStandardizer.standardize(std_img)
 
     bounds_width = slide.level_dimensions[level][0]
     bounds_height = slide.level_dimensions[level][1]
@@ -129,7 +125,7 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=False, ft=1):
     imlocpd = imlocpd.reset_index(drop=False)
     imlocpd.columns = ["Num", "X_pos", "Y_pos", "X", "Y", "Loc"]
     if dp:
-        imlocpd.to_csv(outdir + "/dict.csv", index=False, mode='a', header=False)
+        imlocpd.to_csv(outdir + "/{}_dict.csv".format(dp), index=False)
     else:
         imlocpd.to_csv(outdir + "/dict.csv", index=False)
     tempdict = None

@@ -73,7 +73,10 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            fac = {0: 4001, 1: 1001, 2: 251}
+            if 'TCGA' in root_dir:
+                fac = {0: 4001, 1: 1001, 2: 251}
+            else:
+                fac = {0: 4001, 1: 1001, 2: 251}
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
@@ -99,11 +102,11 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
         idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
-        idsa = idsa.drop(columns=['x', 'y', 'dup'])
+        # idsa = idsa.drop(columns=['x', 'y', 'dup'])
         idsa = idsa.fillna(method='ffill', axis=0)
         idsa = idsa.fillna(method='bfill', axis=0)
-        idsa = sku.shuffle(idsa)
-        idsa = idsa.dropna()
+        # idsa = sku.shuffle(idsa)
+        # idsa = idsa.dropna()
     else:
         idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
 
@@ -234,6 +237,7 @@ def set_sep(alll, path, cls, cut=0.2):
     test = pd.concat(telist)
     train = pd.concat(trlist)
     validation = pd.concat(valist)
+
     test_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
     validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
@@ -253,8 +257,8 @@ def set_sep(alll, path, cls, cut=0.2):
     train_tiles = balance(train_tiles, cls=cls)
     validation_tiles = balance(validation_tiles, cls=cls)
     # No shuffle on test set
-    train_tiles = sku.shuffle(train_tiles)
-    validation_tiles = sku.shuffle(validation_tiles)
+    # train_tiles = sku.shuffle(train_tiles)
+    # validation_tiles = sku.shuffle(validation_tiles)
 
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
