@@ -73,14 +73,14 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            fac = {0: 4.001, 1: 2.001, 2: 1.001}
+            fac = 1000.1
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
                     print('Skipping ID:', id)
                 else:
-                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0])/fac[level])
-                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0])/fac[level])
+                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0])/fac)
+                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0])/fac)
                     dup = int(re.split('.p', re.split('_', id.split('y-', 1)[1])[-1])[0])
                     ids.append([slide, label, level, dirr+'/'+id, x, y, dup])
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])

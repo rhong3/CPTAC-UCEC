@@ -63,11 +63,11 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
             img = img.resize((299, 299))
             img = normalization(img, std)
             if dp:
-                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(x0, y0, str(dp)))
-                strr = outdir + "/region_x-{}-y-{}_{}.png".format(x0, y0, str(dp))
+                img.save(outdir + "/region_x-{}-y-{}_{}.png".format(image_x, image_y, str(dp)))
+                strr = outdir + "/region_x-{}-y-{}_{}.png".format(image_x, image_y, str(dp))
             else:
-                img.save(outdir + "/region_x-{}-y-{}.png".format(x0, y0))
-                strr = outdir + "/region_x-{}-y-{}.png".format(x0, y0)
+                img.save(outdir + "/region_x-{}-y-{}.png".format(image_x, image_y))
+                strr = outdir + "/region_x-{}-y-{}.png".format(image_x, image_y)
             imloc.append([x0, y0, image_x, image_y, strr])
         y0 += 1
     slide.close()
@@ -90,7 +90,7 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     y = 0
     half_width_region = 49*ft
     full_width_region = 299*ft
-    stepsize = (full_width_region - half_width_region)*ft
+    stepsize = (full_width_region - half_width_region)
 
     n_x = int((bounds_width - 1) / stepsize)
     n_y = int((bounds_height - 1) / stepsize)
