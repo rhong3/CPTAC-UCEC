@@ -73,7 +73,7 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     if dira and dirb and dirc:
         ids = []
         for level in range(3):
-            fac = {0: 16.001, 1: 4.001, 2: 1.001}
+            fac = {0: 4.001, 1: 2.001, 2: 1.001}
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
