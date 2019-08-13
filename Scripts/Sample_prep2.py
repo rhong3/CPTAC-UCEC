@@ -71,9 +71,12 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
     dirb = os.path.isdir(root_dir + 'level1')
     dirc = os.path.isdir(root_dir + 'level2')
     if dira and dirb and dirc:
+        if "TCGA" in root_dir:
+            fac = 2000.1
+        else:
+            fac = 1000.1
         ids = []
         for level in range(3):
-            fac = 1000.1
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if id in ignore:
