@@ -1,5 +1,6 @@
 """
-Calculation of metrics including accuracy, AUROC, and PRC and outputing CAM of tiles
+Calculation of metrics including accuracy, AUROC, and PRC, outputing CAM of tiles, and output
+last layer activation for tSNE
 
 Created on 11/01/2018
 
@@ -193,7 +194,8 @@ def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
         plt.savefig("../Results/{}/out/{}_{}_PRC.png".format(path, name, dm))
 
 
-# slide level; need prediction scores, true labels, output path, and name of the files for metrics; accuracy, AUROC; PRC.
+# slide level; need prediction scores, true labels, output path, and name of the files for metrics;
+# accuracy, AUROC; AUPRC.
 def slide_metrics(inter_pd, path, name, fordict, pmd):
     inter_pd = inter_pd.drop(['path', 'label', 'Prediction', 'level'], axis=1)
     inter_pd = inter_pd.groupby(['slide']).mean()

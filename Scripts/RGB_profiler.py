@@ -1,3 +1,11 @@
+"""
+Check RGB info for tiles
+
+Created on 03/26/2019
+
+@author: RH
+"""
+
 import cv2
 import pandas as pd
 import numpy as np

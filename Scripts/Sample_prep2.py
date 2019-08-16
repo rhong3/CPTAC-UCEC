@@ -66,6 +66,7 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
     return idss
 
 
+# pair tiles of 20x, 10x, 5x of the same area
 def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
     dira = os.path.isdir(root_dir + 'level0')
     dirb = os.path.isdir(root_dir + 'level1')

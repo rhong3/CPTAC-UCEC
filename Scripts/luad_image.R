@@ -1,5 +1,6 @@
 ## reduce dimensionality of the acitvation layer of model
 ## visualize the manifold
+## TO BE MODIFIED
 
 filename='tSNE_results.csv'
 bins = 50

@@ -32,8 +32,9 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
                 ids.append((id, dirname))
     return ids
 
-
+# cut; each level is 2 times difference (20x, 10x, 5x)
 def cut():
+    # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
     CPTACpath = '../images/CPTAC/'
@@ -45,6 +46,7 @@ def cut():
     CPTAClist = image_ids_in(CPTACpath, 'CPTAC')
     TCGAlist = image_ids_in(TCGApath, 'TCGA')
 
+    # CPTAC
     for i in CPTAClist:
         dup = None
         matchrow = ref.loc[ref['name'] == i[1]]
@@ -77,7 +79,7 @@ def cut():
                 pass
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
-
+    # TCGA
     for i in TCGAlist:
         dup = None
         matchrow = ref.loc[ref['name'] == i[1]]
@@ -118,6 +120,7 @@ def cut():
     # print("--- %s seconds ---" % (time.time() - start_time))
 
 
+# Run as main
 if __name__ == "__main__":
     if not os.path.isdir('../tiles'):
         os.mkdir('../tiles')

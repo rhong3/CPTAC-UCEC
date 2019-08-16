@@ -26,7 +26,7 @@ ep = sys.argv[3]    # epochs to train
 md = sys.argv[4]    # architecture to use
 pdmd = sys.argv[5]  # feature to predict
 try:
-    level = sys.argv[6]  # level of tiles to use
+    level = sys.argv[6]  # magnification of tiles to use
 except IndexError:
     level = None
 

@@ -171,12 +171,12 @@ class INCEPTION():
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         # for i in range(3):
-                        #     neta = net[:,:,:,:len(net[0,0,0,:]/3)]
-                        #     netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
-                        #     netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
-                        #     wa = w[:,:,:len[0,0,:]/3]
-                        #     wb = w[:,:,len[0,0,:]/3:2*len[0,0,:]/3]
-                        #     wc = w[:,:,2*len[0,0,:]/3:]
+                        #     neta = net[:, :, :, :len(net[0, 0, 0, :] / 3)]
+                        #     netb = net[:, :, :, len(net[0, 0, 0, :] / 3):2 * len(net[0, 0, 0, :] / 3)]
+                        #     netc = net[:, :, :, 2 * len(net[0, 0, 0, :] / 3):]
+                        #     wa = w[:len(w[:, 0] / 3), :]
+                        #     wb = w[len(w[:, 0] / 3):2 * len(w[:, 0] / 3), :]
+                        #     wc = w[2 * len(w[:, 0] / 3):, :]
                         #     ac.CAM(neta, wa, pred, xc, y, dirr, 'Test_level0', bs, pmd, rd)
                         #     ac.CAM(netb, wb, pred, xc, y, dirr, 'Test_level1', bs, pmd, rd)
                         #     ac.CAM(netc, wc, pred, xc, y, dirr, 'Test_level2', bs, pmd, rd)
@@ -209,9 +209,9 @@ class INCEPTION():
                             neta = net[:,:,:,:len(net[0,0,0,:]/3)]
                             netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
                             netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
-                            wa = w[:,:,:len[0,0,:]/3]
-                            wb = w[:,:,len[0,0,:]/3:2*len[0,0,:]/3]
-                            wc = w[:,:,2*len[0,0,:]/3:]
+                            wa = w[:len(w[:,0]/3), :]
+                            wb = w[len(w[:,0]/3):2*len(w[:,0]/3), :]
+                            wc = w[2*len(w[:,0]/3):, :]
                             ac.CAM_R(neta, wa, pred, xc, dirr, 'Test_level0', bs, rd)
                             ac.CAM_R(netb, wb, pred, xc, dirr, 'Test_level1', bs, rd)
                             ac.CAM_R(netc, wc, pred, xc, dirr, 'Test_level2', bs, rd)

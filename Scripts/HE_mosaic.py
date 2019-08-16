@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Make tSNE mosaic (TO BE MODIFIED)
+
 Created on Wed Jul 17 10:16:21 2019
 
 @author: lwk

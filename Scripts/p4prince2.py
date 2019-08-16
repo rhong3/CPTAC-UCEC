@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main method
+Main method for preparing tfrecords for prince on tensorflow 2 code and Xception architectures
 
 Created on 11/26/2018
 
