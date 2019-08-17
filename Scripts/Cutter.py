@@ -32,6 +32,7 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
                 ids.append((id, dirname))
     return ids
 
+
 # cut; each level is 2 times difference (20x, 10x, 5x)
 def cut():
     # load standard image for normalization
@@ -71,7 +72,7 @@ def cut():
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
-                pass
+                continue
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
                                                                 level=level, std_img=std, dp=dup, ft=tff)
@@ -104,12 +105,14 @@ def cut():
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
-                pass
+                continue
             try:
                 n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
                                                                 level=level, std_img=std, dp=dup, ft=tff)
-            except(IndexError):
+            except Exception as e:
+                print('Error!')
                 pass
+
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
 
