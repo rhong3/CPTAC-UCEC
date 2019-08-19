@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Make tSNE mosaic (TO BE MODIFIED)
+Make tSNE mosaic
 
 Created on Wed Jul 17 10:16:21 2019
 
-@author: lwk
+@author: lwk, RH
 """
 
 
@@ -14,6 +14,11 @@ from PIL import Image
 
 bins=50
 size=100
+
+
+## random select representative images and output the file paths
+
+
 
 filename='selected_tiles_neg.csv'
 imdat=pd.read_csv(filename,header=0)

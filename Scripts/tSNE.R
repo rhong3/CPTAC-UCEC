@@ -1,22 +1,31 @@
 ## reduce dimensionality of the acitvation layer of model
 ## visualize the manifold
-## TO BE MODIFIED
 
-filename='tSNE_results.csv'
-bins = 50
+args = commandArgs(trailingOnly=TRUE)
+input_file=args[1]
+output_file=args[2]
+start=args[3]
+bins=args[4]
 
-dat = read.table(filename, header = T, sep=',')
+library(Rtsne)
+dat = read.table(file=input_file,header=T,sep=',')
+X = as.matrix(dat[,start:dim(dat)[2]])
+res = Rtsne(X, initial_dims=100)
+Y=res$Y
+out_dat = cbind(dat[,1:(start-1)],Y)
 
-dat = cbind(dat,x_bin=cut(dat[,9],bins),
-                y_bin=cut(dat[,10],bins))
+dat = cbind(dat,x_bin=cut(dat[,start],bins),
+                y_bin=cut(dat[,(start+1)],bins))
 
 dat = cbind(dat, x_int = as.numeric(dat$x_bin),
                  y_int = as.numeric(dat$y_bin))
 
-colnames(dat)[9:10]=c('tsne1','tsne2')
+colnames(dat)[start:(start+1)]=c('tsne1','tsne2')
 
 dat$True_label=as.factor(dat$True_label)
 dat$slide=as.factor(dat$slide)
+
+write.table(dat, file=output_file, row.names = F, sep=',')
 
 ## plot the manifold with probability
 library(ggplot2)
