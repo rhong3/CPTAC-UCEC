@@ -64,27 +64,3 @@ grid.arrange(p1,p2,nrow=1)
 grid.arrange(p3,p4,nrow=1)
 
 dev.off()
-
-## random select representative images and output the file paths
-
-select=data.frame()
-
-for (i in 1:bins){
-  for (j in 1:bins){
-    sub = droplevels(subset(dat,x_int==i&y_int==j&True_label==0&POS_score<0.1))
-    if(dim(sub)[1]>0){
-      #print(dim(sub)[1])
-      rownames(sub)=1:dim(sub)[1]
-      ind=sample(1:dim(sub)[1],size=1)
-      print(ind)
-      impath=as.character(sub$path[ind])
-      nl=data.frame(impath=impath,x_int=i,y_int=j)
-      select=rbind(select,nl) 
-    }
-    rm(sub)
-  }
-}
-
-select$impath=gsub('\\.\\.','/media/data01/Runyu/LUAD',select$impath)
-
-write.table(select, file='selected_tiles_neg.csv',sep=',',quote=F,row.names=F)
