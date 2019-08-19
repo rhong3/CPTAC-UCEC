@@ -6,6 +6,7 @@ Created on 04/26/2019
 
 @author: RH
 """
+
 import matplotlib
 matplotlib.use('Agg')
 import os
@@ -587,5 +588,5 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     out.reset_index(drop=True, inplace=True)
     act.reset_index(drop=True, inplace=True)
     out = pd.concat([ori_test, out, act], axis=1)
-    out = out.sample(100000, replace=False)
+    out = out.sample(10000, replace=False)
     out.to_csv("../Results/{}/out/For_tSNE.csv".format(path), index=False)
