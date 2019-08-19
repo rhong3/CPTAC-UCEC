@@ -23,8 +23,6 @@ from itertools import cycle
 def ROC_PRC(outtl, pdx, path, name, fdict, dm, accur, pmd):
     if pmd == 'subtype':
         rdd = 4
-    elif pmd == 'MSIst':
-        rdd = 3
     else:
         rdd = 2
     if rdd > 2:
@@ -211,8 +209,8 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         redict = {'Endometrioid_score': int(0), 'Serous_score': int(1)}
     elif pmd == 'MSIst':
         inter_pd['Prediction'] = inter_pd[
-            ['MSI-H_score', 'MSI-L_score', 'MSS_score']].idxmax(axis=1)
-        redict = {'MSI-H_score': int(0), 'MSI-L_score': int(1),'MSS_score': int(2)}
+            ['MSI-H_score', 'MSS_score']].idxmax(axis=1)
+        redict = {'MSI-H_score': int(0), 'MSS_score': int(1)}
     else:
         inter_pd['Prediction'] = inter_pd[['NEG_score', 'POS_score']].idxmax(axis=1)
         redict = {'NEG_score': int(0), 'POS_score': int(1)}
@@ -234,7 +232,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
             except ZeroDivisionError:
                 print("No data for {}.".format(fordict[i]))
     elif pmd == 'MSIst':
-        for i in range(3):
+        for i in range(2):
             accua = accout[accout.True_label == i].shape[0]
             tota = inter_pd[inter_pd.True_label == i].shape[0]
             try:
@@ -247,7 +245,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         if pmd == 'subtype':
             pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
         elif pmd == 'MSIst':
-            pdx_slide = inter_pd[['MSI-H_score', 'MSI-L_score', 'MSS_score']].values
+            pdx_slide = inter_pd[['MSI-H_score', 'MSS_score']].values
         elif pmd == 'histology':
             pdx_slide = inter_pd[['Endometrioid_score', 'Serous_score']].values
         else:
@@ -267,7 +265,7 @@ def realout(pdx, path, name, pmd):
     elif pmd == 'histology':
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
     elif pmd == 'MSIst':
-        lbdict = {0: 'MSI-H', 1: 'MSI-L', 2: 'MSS'}
+        lbdict = {0: 'MSI-H', 1: 'MSS'}
     else:
         lbdict = {0: 'negative', 1: pmd}
     pdx = np.asmatrix(pdx)
@@ -279,7 +277,7 @@ def realout(pdx, path, name, pmd):
     elif pmd == 'histology':
         out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        out = pd.DataFrame(pdx, columns=['MSI-H_score', 'MSI-L_score', 'MSS_score'])
+        out = pd.DataFrame(pdx, columns=['MSI-H_score', 'MSS_score'])
     else:
         out = pd.DataFrame(pdx, columns=['NEG_score', 'POS_score'])
     out.reset_index(drop=True, inplace=True)
@@ -304,8 +302,8 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        lbdict = {0: 'MSI-H', 1: 'MSI-L', 2: 'MSS'}
-        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSI-L_score', 'MSS_score'])
+        lbdict = {0: 'MSI-H', 1: 'MSS'}
+        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSS_score'])
     else:
         lbdict = {0: 'negative', 1: pmd}
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
@@ -350,7 +348,7 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
             except ZeroDivisionError:
                 print("No data for {}.".format(lbdict[i]))
     elif pmd == 'MSIst':
-        for i in range(3):
+        for i in range(2):
             accua = accout[accout.True_label == i].shape[0]
             tota = out[out.True_label == i].shape[0]
             try:
@@ -435,15 +433,14 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         dirdict = {0: DIRA, 1: DIRB}
     elif pmd == 'MSIst':
         DIRA = "../Results/{}/out/{}_MSI-H_img".format(path, name)
-        DIRB = "../Results/{}/out/{}_MSI-L_img".format(path, name)
-        DIRC = "../Results/{}/out/{}_MSS_img".format(path, name)
-        for DIR in (DIRA, DIRB, DIRC):
+        DIRB = "../Results/{}/out/{}_MSS_img".format(path, name)
+        for DIR in (DIRA, DIRB):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
                 pass
-        catdict = {0: 'MSI-H', 1: 'MSI-L', 2: 'MSS'}
-        dirdict = {0: DIRA, 1: DIRB, 2: DIRC}
+        catdict = {0: 'MSI-H', 1: 'MSS'}
+        dirdict = {0: DIRA, 1: DIRB}
     else:
         DIRA = "../Results/{}/out/{}_img/NEG".format(path, name)
         DIRB = "../Results/{}/out/{}_img/POS".format(path, name)
@@ -576,7 +573,7 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     elif pmd == 'histology':
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSI-L_score', 'MSS_score'])
+        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSS_score'])
     else:
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
     outtlt = pd.DataFrame(tl, columns=['True_label'])

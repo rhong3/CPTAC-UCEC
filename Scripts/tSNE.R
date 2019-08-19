@@ -6,6 +6,7 @@ input_file=args[1]
 output_file=args[2]
 start=args[3]
 bins=args[4]
+POS_score=args[5]
 
 library(Rtsne)
 dat = read.table(file=input_file,header=T,sep=',')

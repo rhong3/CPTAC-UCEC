@@ -32,8 +32,6 @@ except IndexError:
 
 if pdmd == 'subtype':
     classes = 4
-elif pdmd =='MSIst':
-    classes = 3
 else:
     classes = 2
 

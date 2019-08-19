@@ -190,6 +190,7 @@ mg = mg.drop_duplicates()
 mgx = pd.get_dummies(mg, columns=['subtype', 'histology', 'MSIst'])
 mgx['histology_Endometrioid'] = mgx['histology_Endometrioid'] + mgx['histology_Mixed']
 mgx['histology_Serous'] = mgx['histology_Serous'] + mgx['histology_Mixed']
-mgx = mgx.drop(['histology_Clear cell'], axis=1)
+mgx['MSIst_MSS'] = mgx['MSIst_MSS'] + mgx['MSIst_MSI-L']
+# mgx = mgx.drop(['histology_Clear cell', 'MSIst_MSI-L'], axis=1)
 mgx = mgx.set_index('name')
 mgx.to_csv('../dummy_His_MUT_joined.csv', header=True, index=True)
