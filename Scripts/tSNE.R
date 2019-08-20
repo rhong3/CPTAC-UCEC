@@ -11,7 +11,7 @@ POS_score=args[5]
 library(Rtsne)
 dat = read.table(file=input_file,header=T,sep=',')
 X = as.matrix(dat[,start:dim(dat)[2]])
-res = Rtsne(X, initial_dims=100)
+res = Rtsne(X, initial_dims=100, check_duplicates = FALSE)
 Y=res$Y
 out_dat = cbind(dat[,1:(start-1)],Y)
 
