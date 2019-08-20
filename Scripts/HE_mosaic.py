@@ -52,10 +52,10 @@ imdat = sample(ipdat, pdmd, bin)
 imdat.to_csv('../Results/{}/out/tsne_selected.csv'.format(dirr), index=False)
 new_im = Image.new(mode='RGB', size=(size*bin,size*bin), color='white')
 
-for row in imdat.itertuples():
-    impath = row.impath
-    x = row.x_int
-    y = row.y_int
+for rows in imdat.itertuples():
+    impath = rows.impath
+    x = rows.x_int
+    y = rows.y_int
     im = Image.open(impath)
     im.thumbnail((size, size))
     new_im.paste(im, ((x-1)*size, (bin-y)*size))

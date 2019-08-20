@@ -5,8 +5,8 @@ output: html_document
 
 # Load data and pkgs
 ```{r, echo=FALSE}
-  Test_slide <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/X1MSS/out/Test_slide.csv")
-Test_tile <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/X1MSS/out/Test_tile.csv")
+  Test_slide <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/I3CTNNB1/out/Test_slide.csv")
+Test_tile <- read.csv("~/Documents/CPTAC-UCEC/Results/NL3/I3CTNNB1/out/Test_tile.csv")
 library(caret)
 library(pROC)
 library(dplyr)
