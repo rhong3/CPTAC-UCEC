@@ -587,3 +587,4 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     out = pd.concat([ori_test, out, act], axis=1)
     out = out.sample(30000, replace=False)
     out.to_csv("../Results/{}/out/For_tSNE.csv".format(path), index=False)
+

@@ -16,10 +16,10 @@ Y=res$Y
 out_dat = cbind(dat[,1:(start-1)],Y)
 
 dat = cbind(dat,x_bin=cut(dat[,start],bins),
-                y_bin=cut(dat[,(start+1)],bins))
+            y_bin=cut(dat[,(start+1)],bins))
 
 dat = cbind(dat, x_int = as.numeric(dat$x_bin),
-                 y_int = as.numeric(dat$y_bin))
+            y_int = as.numeric(dat$y_bin))
 
 colnames(dat)[start:(start+1)]=c('tsne1','tsne2')
 

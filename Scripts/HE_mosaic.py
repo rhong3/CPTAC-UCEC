@@ -8,7 +8,6 @@ Created on Wed Jul 17 10:16:21 2019
 @author: lwk, RH
 """
 
-
 import pandas as pd
 from PIL import Image
 import sys
@@ -18,10 +17,10 @@ bin=sys.argv[2]
 size=sys.argv[3]
 pdmd = sys.argv[4]
 dirr = sys.argv[5]
-ipdat=pd.read_csv(filename, header=0)
+ipdat = pd.read_csv(filename, header=0)
 
 
-## random select representative images and output the file paths
+# random select representative images and output the file paths
 def sample(dat, md, bins):
 
     if md == 'subtype':
