@@ -10,9 +10,9 @@ Created on 03/19/2019
 import tensorflow as tf
 from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D
-from keras.layers.core import Dense, Dropout, Flatten, Activation, Lambda
+from keras.layers.core import Dense, Dropout, Flatten, Activation
 from keras.layers.normalization import BatchNormalization
-from keras.layers.merge import concatenate, add
+from keras.layers.merge import concatenate
 from keras.regularizers import l2
 
 def resnet_v2_stem(input):
@@ -50,7 +50,7 @@ def resnet_v2_stem(input):
     return x
 
 
-def inception_A(input, scale_residual=True):
+def inception_A(input):
     '''Architecture of Inception_ResNet_A block which is a 35 * 35 grid module.'''
 
     ar1 = Conv2D(32, (1, 1), data_format="channels_last", kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
@@ -72,7 +72,7 @@ def inception_A(input, scale_residual=True):
     return output
 
 
-def inception_B(input, scale_residual=True):
+def inception_B(input):
     '''Architecture of Inception_ResNet_B block which is a 17 * 17 grid module.'''
 
     br1 = Conv2D(192, (1, 1), data_format="channels_last", kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
@@ -91,7 +91,7 @@ def inception_B(input, scale_residual=True):
     return output
 
 
-def inception_C(input, scale_residual=True):
+def inception_C(input):
     '''Architecture of Inception_ResNet_C block which is a 8 * 8 grid module.'''
 
     cr1 = Conv2D(192, (1, 1), data_format="channels_last", kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
