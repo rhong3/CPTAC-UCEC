@@ -17,6 +17,7 @@ bin = int(sys.argv[2])
 size = int(sys.argv[3])
 pdmd = sys.argv[4]
 dirr = sys.argv[5]
+outim = sys.argv[6]
 
 
 # random select representative images and output the file paths
@@ -65,5 +66,5 @@ if __name__ == "__main__":
         im.thumbnail((size, size))
         new_im.paste(im, ((x-1)*size, (bin-y)*size))
 
-    new_im.save('../Results/{}/out/model_manifold_neg.jpeg'.format(dirr))
+    new_im.save('../Results/{}/out/{}.jpeg'.format(dirr, outim))
 
