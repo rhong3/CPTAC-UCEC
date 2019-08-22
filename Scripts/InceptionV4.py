@@ -150,7 +150,7 @@ def reduction_B(input):
     return rbr
 
 
-def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionResnetV2'):
+def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionV4'):
     '''Creates the Inception_v4 network.'''
     with tf.variable_scope(scope, 'InceptionV4', [input]):
         # Input shape is 299 * 299 * 3
