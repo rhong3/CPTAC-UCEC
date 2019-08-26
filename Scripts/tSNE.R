@@ -18,12 +18,12 @@ POS_score='POS_score'
 
 library(Rtsne)
 ori_dat = read.table(file=input_file,header=T,sep=',')
-# P = ori_dat[which(ori_dat$Prediction==1),]
-# N = ori_dat[which(ori_dat$Prediction==0),]
-# N = ori_dat[sample(nrow(N), 20000), ]
-# sp_ori_dat = rbind(P, N)
-# sp_ori_dat=ori_dat[sample(nrow(ori_dat), 10000), ]
-sp_ori_dat=ori_dat
+P = ori_dat[which(ori_dat$Prediction==1),]
+N = ori_dat[which(ori_dat$Prediction==0),]
+N = ori_dat[sample(nrow(N), 20000), ]
+sp_ori_dat = rbind(P, N)
+sp_ori_dat=ori_dat[sample(nrow(ori_dat), 10000), ]
+# sp_ori_dat=ori_dat
 X = as.matrix(sp_ori_dat[,start:dim(sp_ori_dat)[2]])
 res = Rtsne(X, initial_dims=100, check_duplicates = FALSE)
 Y=res$Y
