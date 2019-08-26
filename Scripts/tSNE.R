@@ -9,20 +9,20 @@
 # bins=args[5]
 # POS_score=args[6]
 
-input_file='/Users/rh2740/documents/LUAD/Results/I6STK11/out/For_tSNE.csv'
-output_file='/Users/rh2740/documents/LUAD/Results/I6STK11/out/tSNE_P_N.csv'
-out_fig='/Users/rh2740/documents/LUAD/Results/I6STK11/out/P_N.pdf'
+input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I3TP53/out/For_tSNE.csv'
+output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I3TP53/out/tSNE_P_N.csv'
+out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I3TP53/out/P_N.pdf'
 start=9
 bins=50
 POS_score='POS_score'
 
 library(Rtsne)
 ori_dat = read.table(file=input_file,header=T,sep=',')
-P = ori_dat[which(ori_dat$Prediction==1),]
-N = ori_dat[which(ori_dat$Prediction==0),]
-N = ori_dat[sample(nrow(N), 20000), ]
-sp_ori_dat = rbind(P, N)
-# sp_ori_dat=ori_dat[sample(nrow(ori_dat), 10000), ]
+# P = ori_dat[which(ori_dat$Prediction==1),]
+# N = ori_dat[which(ori_dat$Prediction==0),]
+# N = ori_dat[sample(nrow(N), 20000), ]
+# sp_ori_dat = rbind(P, N)
+sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
 # sp_ori_dat=ori_dat
 X = as.matrix(sp_ori_dat[,start:dim(sp_ori_dat)[2]])
 res = Rtsne(X, initial_dims=100, check_duplicates = FALSE)
