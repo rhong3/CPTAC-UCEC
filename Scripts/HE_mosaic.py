@@ -47,7 +47,6 @@ def sample(dat, md, bins):
                         sampledls.append([row['path'], row['x_int'], row['y_int']])
                 except ValueError:
                     pass
-    print(sampledls)
     samples = pd.DataFrame(sampledls, columns=['impath', 'x_int', 'y_int'])
     return samples
 
