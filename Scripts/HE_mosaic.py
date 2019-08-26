@@ -7,7 +7,6 @@ Created on Wed Jul 17 10:16:21 2019
 
 @author: lwk, RH
 """
-
 import pandas as pd
 from PIL import Image
 import sys
