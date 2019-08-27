@@ -47,7 +47,7 @@ library(ggplot2)
 library(gridExtra)
 
 p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=POS_score))+
-  scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.4)+
+  scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
   geom_point(alpha=0.2)+
   #theme(legend.position='bottom')+
   xlim(-50,50)+
