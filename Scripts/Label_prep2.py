@@ -30,6 +30,7 @@ def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
             ids.append((id, dirname))
     return ids
 
+
 imlist = pd.read_excel('../S043_CPTAC_UCEC_Discovery_Cohort_Study_Specimens_r1_Sept2018.xlsx', header=4)
 imlist = imlist[imlist['Group'] == 'Tumor ']
 cllist = pd.read_csv('../UCEC_V2.1/waffles_updated.txt', sep='\t', header = 0)
@@ -73,7 +74,7 @@ filtered_PID.subtype = filtered_PID.subtype.replace(tpdict)
 filtered_PID = filtered_PID[filtered_PID.subtype != 'Other']  # filtered_joined_PID.csv
 
 CPTAC = filtered_PID
-CPTAC_MUT = pd.read_csv('../UCEC_V2.1/UCEC_CPTAC3_meta_table_V2.1.csv', sep=',', header=0, error_bad_lines=False)
+CPTAC_MUT = pd.read_csv('../UCEC_V2.1/UCEC_CPTAC3_meta_table_V2.1_MUT.csv', sep=',', header=0, error_bad_lines=False)
 CPTAC_MUTt = CPTAC_MUT[['Participant_ID', 'TP53_TP53', 'TP53_ATM', 'PI3K_PIK3R1', 'PI3K_PIK3CA',
                         'PI3K_PTEN', 'PI3K_MTOR', 'PI3K_PIK3R2', 'PI3K_PPP2R1A', 'HRD_BRCA2', 'JAK1_Mutation']]
 
