@@ -74,27 +74,27 @@ filtered_PID.subtype = filtered_PID.subtype.replace(tpdict)
 filtered_PID = filtered_PID[filtered_PID.subtype != 'Other']  # filtered_joined_PID.csv
 
 CPTAC = filtered_PID
+CPTAC = CPTAC.drop(columns=['MLH1', 'CTNNB1'])
 CPTAC_MUT = pd.read_csv('../UCEC_V2.1/UCEC_CPTAC3_meta_table_V2.1_MUT.csv', sep=',', header=0, error_bad_lines=False)
-CPTAC_MUTt = CPTAC_MUT[['Participant_ID', 'TP53_TP53', 'TP53_ATM', 'PI3K_PIK3R1', 'PI3K_PIK3CA',
-                        'PI3K_PTEN', 'PI3K_MTOR', 'PI3K_PIK3R2', 'PI3K_PPP2R1A', 'HRD_BRCA2', 'JAK1_Mutation']]
+CPTAC_MUTt = CPTAC_MUT[['Participant_ID', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+                        'PTEN', 'RPL22', 'TP53']]
 
 CPTAC = CPTAC.join(CPTAC_MUTt.set_index('Participant_ID'), how='inner', on='Participant_ID')
 
 
-CPTAC = CPTAC.dropna(subset=['TP53_TP53', 'TP53_ATM', 'PI3K_PIK3R1', 'PI3K_PIK3CA', 'PI3K_PTEN',
-                             'PI3K_MTOR', 'PI3K_PIK3R2', 'PI3K_PPP2R1A', 'HRD_BRCA2', 'JAK1_Mutation'])
+CPTAC = CPTAC.dropna(subset=['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+                        'PTEN', 'RPL22', 'TP53'])
 
-CPTAC = CPTAC.rename(index=str, columns={"TP53_TP53": "TP53", "TP53_ATM": "ATM", 'PI3K_PIK3R1': "PIK3R1",
-                                         "PI3K_PIK3CA": "PIK3CA", "PI3K_PTEN": "PTEN", "PI3K_MTOR": "MTOR",
-                                         "PI3K_PIK3R2": "PIK3R2", "PI3K_PPP2R1A": "PPP2R1A", "HRD_BRCA2": "BRCA2",
-                                         "JAK1_Mutation": "JAK1"})  # MUT_CPTAC_list.csv
+# MUT_CPTAC_list.csv
 
-CPTAC_lite = CPTAC[['Participant_ID', 'subtype', 'MSI_status', 'Histologic_type', 'ATM', 'MTOR', 'PIK3R2',
-                    'PPP2R1A', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN', 'BRCA2', 'JAK1']]
+CPTAC_lite = CPTAC[['Participant_ID', 'subtype', 'MSI_status', 'Histologic_type', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2',
+                    'CTCF', 'CTNNB1', 'EGFR', 'ERBB2', 'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA',
+                    'PIK3R1', 'PIK3R2', 'PPP2R1A', 'PTEN', 'RPL22', 'TP53']]
 
 CPTAC_lite = CPTAC_lite.rename(index=str, columns={'Participant_ID': 'name',
                                                    'Histologic_type': 'histology', 'MSI_status': 'MSIst'})
-
 
 # TCGA
 image_meta = pd.read_csv('../TCGA_Image_meta.tsv', sep='\t', header=0)
@@ -126,7 +126,8 @@ TCGA_MUT = pd.read_csv('../TCGA_MUT/TCGA_clinical/MUT_clinical.tsv', sep='\t', h
 mut_list = TCGA_MUT['submitter_id']
 TCGA_mlist = TCGA[TCGA['bcr_patient_barcode'].isin(mut_list)]
 
-for a in ['ATM', 'MTOR', 'PIK3R2', 'PPP2R1A', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN', 'BRCA2', 'JAK1']:
+for a in ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2', 'FBXW7', 'FGFR2', 'JAK1', 'KRAS',
+          'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A', 'PTEN', 'RPL22', 'TP53']:
     cl = pd.read_csv("../TCGA_MUT/TCGA_clinical/{}_MUT_clinical.tsv".format(str(a)), sep='\t', header=0)
 
     cl[a] = 1
@@ -161,8 +162,9 @@ TCGA_mlist = TCGA_mlist.groupby('bcr_patient_barcode').max()
 
 TCGA_mlist.insert(0, 'bcr_patient_barcode', TCGA_mlist.index, allow_duplicates=False) # MUT_TCGA_list.csv
 
-TCGA_mlist = TCGA_mlist[['bcr_patient_barcode', 'ATM', 'MTOR', 'PIK3R2',
-                  'PPP2R1A', 'TP53', 'CTNNB1', 'PIK3CA', 'PIK3R1', 'PTEN', 'BRCA2', 'JAK1']]
+TCGA_mlist = TCGA_mlist[['bcr_patient_barcode', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+                        'PTEN', 'RPL22', 'TP53']]
 
 TCGA_mlist = TCGA_mlist.rename(index=str, columns={'bcr_patient_barcode': 'name'})
 
