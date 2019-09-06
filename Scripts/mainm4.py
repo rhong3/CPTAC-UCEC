@@ -58,15 +58,21 @@ out_dir = "../Results/{}/out".format(dirr)
 
 
 # count numbers of training and testing images
-def counters(totlist_dir):
+def counters(totlist_dir, cls):
     trlist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
     telist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
     valist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
     trcc = len(trlist['label']) - 1
     tecc = len(telist['label']) - 1
     vacc = len(valist['label']) - 1
-
-    return trcc, tecc, vacc
+    weigh = []
+    for i in range(cls):
+        ccct = len(trlist.loc[trlist['label']==i])+len(valist.loc[valist['label']==i])\
+               +len(telist.loc[telist['label']==i])
+        wt = (trcc+tecc+vacc)/cls/ccct
+        weigh.append(wt)
+    weigh = tf.constant(weigh)
+    return trcc, tecc, vacc, weigh
 
 
 # read images
@@ -203,10 +209,11 @@ def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
-def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
+def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
 
     if test:  # restore for testing only
-        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
+        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR,
+                           meta_dir=LOG_DIR, model=md, weights=weight)
         print("Loaded! Ready for test!", flush=True)
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
@@ -215,7 +222,8 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
             print("Not enough testing images!")
 
     elif to_reload:  # restore for further training and testing
-        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=LOG_DIR, model=md)
+        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR,
+                           meta_dir=LOG_DIR, model=md, weights=weight)
         print("Loaded! Restart training.", flush=True)
         HE = tfreloader('train', ep, bs, cls, trc, tec, vac)
         VHE = tfreloader('validation', ep*10, bs, cls, trc, tec, vac)
@@ -231,7 +239,7 @@ def main(trc, tec, vac, cls, testset=None, to_reload=None, test=None):
             print("Not enough testing images!")
 
     else:  # train and test
-        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md)
+        m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md, weights=weight)
         print("Start a new training!")
         HE = tfreloader('train', ep, bs, cls, trc, tec, vac)
         VHE = tfreloader('validation', ep*10, bs, cls, trc, tec, vac)
@@ -258,13 +266,14 @@ if __name__ == "__main__":
     # get counts of testing, validation, and training datasets;
     # if not exist, prepare testing and training datasets from sampling
     try:
-        trc, tec, vac = counters(data_dir)
+        trc, tec, vac, weights = counters(data_dir, classes)
+        trs = pd.read_csv(data_dir + '/tr_sample.csv', header=0)
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
         alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir)
         trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes)
-        trc, tec, vac = counters(data_dir)
+        trc, tec, vac, weights = counters(data_dir, classes)
         loader(data_dir)
     # have trained model or not; train from scratch if not
     try:
@@ -272,9 +281,9 @@ if __name__ == "__main__":
         # test or not
         try:
             testmode = sys.argv[7]
-            main(trc, tec, vac, classes, testset=tes, to_reload=modeltoload, test=True)
+            main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
-            main(trc, tec, vac, classes, testset=tes, to_reload=modeltoload)
+            main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             loader(data_dir)
@@ -282,4 +291,4 @@ if __name__ == "__main__":
             loader(data_dir)
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir)
-        main(trc, tec, vac, classes, testset=tes)
+        main(trc, tec, vac, classes, weights, testset=tes)

@@ -29,12 +29,13 @@ class INCEPTION():
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta", model='IG'):
+                 log_dir="./log", meta_dir="./meta", model='I1', weights = tf.constant([1., 1., 1., 1.])):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
         self.sesh = tf.Session()
         self.model = model
+        self.weights = weights
 
         if meta_graph:  # load saved graph
             model_name = os.path.basename(meta_graph)
@@ -147,8 +148,9 @@ class INCEPTION():
 
         global_step = tf.Variable(0, trainable=False)
 
-        pred_cost = tf.losses.sigmoid_cross_entropy(
-            multi_class_labels=y_in, logits=logits)
+        sample_weights = tf.gather(self.weights, y_in)
+        pred_cost = tf.losses.softmax_cross_entropy(
+            onehot_labels=y_in, logits=logits, weights=sample_weights)
 
         tf.summary.scalar("{}_cost".format(model), pred_cost)
 
