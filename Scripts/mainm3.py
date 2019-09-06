@@ -64,9 +64,9 @@ def counters(totlist_dir, cls):
     trlist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
     telist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
     valist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
-    trcc = len(trlist['label']) - 1
-    tecc = len(telist['label']) - 1
-    vacc = len(valist['label']) - 1
+    trcc = len(trlist['label'])
+    tecc = len(telist['label'])
+    vacc = len(valist['label'])
     weigh = []
     for i in range(cls):
         ccct = len(trlist.loc[trlist['label']==i])+len(valist.loc[valist['label']==i])\
@@ -95,84 +95,39 @@ def _bytes_feature(value):
 
 
 # loading images for dictionaries and generate tfrecords
-def loader(totlist_dir):
-    trlist = pd.read_csv(totlist_dir+'/tr_sample.csv', header=0)
-    telist = pd.read_csv(totlist_dir+'/te_sample.csv', header=0)
-    valist = pd.read_csv(totlist_dir+'/va_sample.csv', header=0)
-    trimlist = trlist['path'].values.tolist()
-    trlblist = trlist['label'].values.tolist()
-    teimlist = telist['path'].values.tolist()
-    telblist = telist['label'].values.tolist()
-    vaimlist = valist['path'].values.tolist()
-    valblist = valist['label'].values.tolist()
+def loader(totlist_dir, ds):
+    if ds == 'train':
+        slist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
+    elif ds == 'validation':
+        slist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
+    elif ds == 'test':
+        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    else:
+        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    imlist = slist['path'].values.tolist()
+    lblist = slist['label'].values.tolist()
 
-    train_filename = data_dir+'/train.tfrecords'
-    writer = tf.python_io.TFRecordWriter(train_filename)
-    for i in range(len(trimlist)):
+    filename = data_dir + '/' + ds + '.tfrecords'
+    writer = tf.python_io.TFRecordWriter(filename)
+    for i in range(len(imlist)):
         if not i % 1000:
             sys.stdout.flush()
         try:
             # Load the image
-            img = load_image(trimlist[i])
-            label = trlblist[i]
+            img = load_image(imlist[i])
+            label = lblist[i]
             # Create a feature
-            feature = {'train/label': _int64_feature(label),
-                       'train/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
+            feature = {ds + '/label': _int64_feature(label),
+                       ds + '/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
             # Create an example protocol buffer
             example = tf.train.Example(features=tf.train.Features(feature=feature))
 
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
         except AttributeError:
-            print('Error image:'+trimlist[i])
+            print('Error image:' + imlist[i])
             pass
 
-    writer.close()
-    sys.stdout.flush()
-
-    test_filename = data_dir+'/test.tfrecords'
-    writer = tf.python_io.TFRecordWriter(test_filename)
-    for i in range(len(teimlist)):
-        if not i % 1000:
-            sys.stdout.flush()
-        try:
-            # Load the image
-            img = load_image(teimlist[i])
-            label = telblist[i]
-            # Create a feature
-            feature = {'test/label': _int64_feature(label),
-                       'test/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
-            # Create an example protocol buffer
-            example = tf.train.Example(features=tf.train.Features(feature=feature))
-
-            # Serialize to string and write on the file
-            writer.write(example.SerializeToString())
-        except AttributeError:
-            print('Error image:'+teimlist[i])
-            pass
-    writer.close()
-    sys.stdout.flush()
-
-    val_filename = data_dir+'/validation.tfrecords'
-    writer = tf.python_io.TFRecordWriter(val_filename)
-    for i in range(len(vaimlist)):
-        if not i % 1000:
-            sys.stdout.flush()
-        try:
-            # Load the image
-            img = load_image(vaimlist[i])
-            label = valblist[i]
-            # Create a feature
-            feature = {'validation/label': _int64_feature(label),
-                       'validation/image': _bytes_feature(tf.compat.as_bytes(img.tostring()))}
-            # Create an example protocol buffer
-            example = tf.train.Example(features=tf.train.Features(feature=feature))
-
-            # Serialize to string and write on the file
-            writer.write(example.SerializeToString())
-        except AttributeError:
-            print('Error image:'+vaimlist[i])
-            pass
     writer.close()
     sys.stdout.flush()
 
@@ -258,7 +213,9 @@ if __name__ == "__main__":
         alll = Sample_prep.big_image_sum(pmd=pdmd, path=img_dir)
         trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, cls=classes, level=level)
         trc, tec, vac, weights = counters(data_dir, classes)
-        loader(data_dir)
+        loader(data_dir, 'train')
+        loader(data_dir, 'validation')
+        loader(data_dir, 'test')
     # have trained model or not; train from scratch if not
     try:
         modeltoload = sys.argv[7]
@@ -270,10 +227,10 @@ if __name__ == "__main__":
             main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload)
     except IndexError:
         if not os.path.isfile(data_dir + '/test.tfrecords'):
-            loader(data_dir)
+            loader(data_dir, 'test')
         if not os.path.isfile(data_dir + '/train.tfrecords'):
-            loader(data_dir)
+            loader(data_dir, 'train')
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
-            loader(data_dir)
+            loader(data_dir, 'validation')
         main(trc, tec, vac, classes, weights, testset=tes)
 
