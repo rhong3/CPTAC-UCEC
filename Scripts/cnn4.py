@@ -81,7 +81,7 @@ class INCEPTION():
         dropout = self.dropout
         # dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
         # label input
-        y_in = tf.placeholder(dtype=tf.float32, name="y")
+        y_in = tf.placeholder(dtype=tf.int32, name="y")
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
         # classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
@@ -149,6 +149,7 @@ class INCEPTION():
         global_step = tf.Variable(0, trainable=False)
 
         sample_weights = tf.gather(self.weights, y_in)
+
         pred_cost = tf.losses.softmax_cross_entropy(
             onehot_labels=y_in, logits=logits, weights=sample_weights)
 
@@ -264,6 +265,7 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
+                        print(tf.shape(y))
 
                         feed_dict = {self.x_in: x, self.y_in: y}
 

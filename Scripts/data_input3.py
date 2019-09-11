@@ -93,7 +93,7 @@ class DataSet(object):
     def onehot_only(self, imagea, imageb, imagec, labels):
         with tf.name_scope('onehot_only'):
             labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=self._classes)
-            labels = tf.cast(labels, tf.float32)
+            # labels = tf.cast(labels, tf.float32)
         return imagea, imageb, imagec, labels
 
     # dataset preparation; batching; Real test or not; train or test

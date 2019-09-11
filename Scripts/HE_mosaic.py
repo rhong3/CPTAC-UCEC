@@ -58,7 +58,7 @@ if __name__ == "__main__":
     dirls = []
     for n in range(6):
         num = str(n+1)
-        genes = ['Participant_ID', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+        genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
                         'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
                         'PTEN', 'RPL22', 'TP53']
         for g in genes:
@@ -67,9 +67,9 @@ if __name__ == "__main__":
 
     for i in dirls:
         try:
-            ipdat = pd.read_csv('../Results/{}/out/{}.csv'.format(i, filename))
+            ipdat = pd.read_csv('../Results/NL3/{}/out/{}.csv'.format(i, filename))
             imdat = sample(ipdat, pdmd, bin)
-            imdat.to_csv('../Results/{}/out/tsne_selected.csv'.format(i), index=False)
+            imdat.to_csv('../Results/NL3/{}/out/tsne_selected.csv'.format(i), index=False)
             new_im = Image.new(mode='RGB', size=(size*bin, size*bin), color='white')
 
             for rows in imdat.itertuples():
@@ -81,7 +81,9 @@ if __name__ == "__main__":
                 new_im.paste(im, ((x-1)*size, (bin-y)*size))
 
             new_im.save('../Results/{}/out/{}.jpeg'.format(i, outim))
+            print('{} done'.format(i))
         except FileNotFoundError:
+            print('{} passed'.format(i))
             pass
 
 
