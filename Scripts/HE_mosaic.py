@@ -12,9 +12,9 @@ import pandas as pd
 from PIL import Image
 import sys
 
-filename = sys.argv[1]
-bin = int(sys.argv[2])
-size = int(sys.argv[3])
+filename = sys.argv[1]   # DEFAULT='tSNE_P_N'
+bin = int(sys.argv[2])   # DEFAULT=50
+size = int(sys.argv[3])  # DEFAULT=299
 pdmd = sys.argv[4]
 dirr = sys.argv[5]
 outim = sys.argv[6]
@@ -52,18 +52,36 @@ def sample(dat, md, bins):
 
 
 if __name__ == "__main__":
-    ipdat = pd.read_csv('../Results/{}/out/{}.csv'.format(dirr, filename))
-    imdat = sample(ipdat, pdmd, bin)
-    imdat.to_csv('../Results/{}/out/tsne_selected.csv'.format(dirr), index=False)
-    new_im = Image.new(mode='RGB', size=(size*bin,size*bin), color='white')
+    # dirls = dirr.split(',')
 
-    for rows in imdat.itertuples():
-        impath = rows.impath
-        x = rows.x_int
-        y = rows.y_int
-        im = Image.open(impath)
-        im.thumbnail((size, size))
-        new_im.paste(im, ((x-1)*size, (bin-y)*size))
+    ### special ###
+    dirls = []
+    for n in range(6):
+        num = str(n+1)
+        genes = ['Participant_ID', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+                        'PTEN', 'RPL22', 'TP53']
+        for g in genes:
+            dirls.append('I{}{}'.format(num, g))
+    ### special ###
 
-    new_im.save('../Results/{}/out/{}.jpeg'.format(dirr, outim))
+    for i in dirls:
+        try:
+            ipdat = pd.read_csv('../Results/{}/out/{}.csv'.format(i, filename))
+            imdat = sample(ipdat, pdmd, bin)
+            imdat.to_csv('../Results/{}/out/tsne_selected.csv'.format(i), index=False)
+            new_im = Image.new(mode='RGB', size=(size*bin, size*bin), color='white')
+
+            for rows in imdat.itertuples():
+                impath = rows.impath
+                x = rows.x_int
+                y = rows.y_int
+                im = Image.open(impath)
+                im.thumbnail((size, size))
+                new_im.paste(im, ((x-1)*size, (bin-y)*size))
+
+            new_im.save('../Results/{}/out/{}.jpeg'.format(i, outim))
+        except FileNotFoundError:
+            pass
+
 
