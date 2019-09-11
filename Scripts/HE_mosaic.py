@@ -76,10 +76,13 @@ if __name__ == "__main__":
                 impath = rows.impath
                 x = rows.x_int
                 y = rows.y_int
-                im = Image.open(impath)
-                im.thumbnail((size, size))
-                new_im.paste(im, ((x-1)*size, (bin-y)*size))
-
+                try:
+                    im = Image.open(impath)
+                    im.thumbnail((size, size))
+                    new_im.paste(im, ((x-1)*size, (bin-y)*size))
+                except FileNotFoundError:
+                    print(impath)
+                    pass
             new_im.save('../Results/{}/out/{}.jpeg'.format(i, outim))
             print('{} done'.format(i))
         except FileNotFoundError:

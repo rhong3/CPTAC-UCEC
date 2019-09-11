@@ -265,7 +265,7 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-                        print(tf.shape(y))
+                        print(y)
 
                         feed_dict = {self.x_in: x, self.y_in: y}
 

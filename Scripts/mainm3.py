@@ -73,6 +73,8 @@ def counters(totlist_dir, cls):
                +len(telist.loc[telist['label']==i])
         wt = ((trcc+tecc+vacc)/cls)/ccct
         weigh.append(wt)
+    print(weigh)
+    print(len(weigh))
     weigh = tf.constant(weigh)
     return trcc, tecc, vacc, weigh
 
@@ -233,6 +235,6 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir, 'validation')
 
-        print(tf.shape(weights))
+        print(weights)
         main(trc, tec, vac, classes, weights, testset=tes)
 
