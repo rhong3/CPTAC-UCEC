@@ -144,11 +144,11 @@ class INCEPTION():
                                                    scope='GoogleNet')
             print('Using Default: Inception-V1')
 
-        pred = tf.sigmoid(logits, name="prediction")
+        pred = tf.nn.softmax(logits, name="prediction")
 
         global_step = tf.Variable(0, trainable=False)
 
-        sample_weights = tf.gather(self.weights, y_in)
+        sample_weights = tf.gather(self.weights, tf.argmax(y_in, axis=0))
 
         pred_cost = tf.losses.softmax_cross_entropy(
             onehot_labels=y_in, logits=logits, weights=sample_weights)
@@ -265,7 +265,6 @@ class INCEPTION():
                 while True:
                     try:
                         x, y = sessa.run(next_element)
-                        print(y)
 
                         feed_dict = {self.x_in: x, self.y_in: y}
 
