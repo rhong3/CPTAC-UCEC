@@ -11,6 +11,7 @@ Created on Wed Jul 17 10:16:21 2019
 import pandas as pd
 from PIL import Image
 import sys
+import os
 
 filename = sys.argv[1]   # DEFAULT='tSNE_P_N'
 bin = int(sys.argv[2])   # DEFAULT=50
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     dirls = []
     for n in range(6):
         num = str(n+1)
-        genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+        genes = ['ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
                         'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
                         'PTEN', 'RPL22', 'TP53']
         for g in genes:
@@ -70,6 +71,7 @@ if __name__ == "__main__":
             ipdat = pd.read_csv('../Results/NL3/{}/out/{}.csv'.format(i, filename))
             imdat = sample(ipdat, pdmd, bin)
             imdat.to_csv('../Results/NL3/{}/out/tsne_selected.csv'.format(i), index=False)
+
             new_im = Image.new(mode='RGB', size=(size*bin, size*bin), color='white')
 
             for rows in imdat.itertuples():
@@ -83,7 +85,7 @@ if __name__ == "__main__":
                 except FileNotFoundError:
                     print(impath)
                     pass
-            new_im.save('../Results/{}/out/{}.jpeg'.format(i, outim))
+            new_im.save(os.path.abspath('../Results/NL3/{}/out/{}.jpeg'.format(i, outim)), "JPEG")
             print('{} done'.format(i))
         except FileNotFoundError:
             print('{} passed'.format(i))
