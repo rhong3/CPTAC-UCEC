@@ -42,7 +42,7 @@ def sample(dat, md, bins):
             for j in range(bins):
                 try:
                     sub = dat.loc[(dat['x_int'] == i) & (dat['y_int'] == j)
-                                    & (dat[redict[m]] > 0.8) & (dat['True_label'] == m)]
+                                    & (dat[redict[m]] > 0.6) & (dat['True_label'] == m)]
                     picked = sub.sample(1, replace=False)
                     for idx, row in picked.iterrows():
                         sampledls.append([row['path'], row['x_int'], row['y_int']])
@@ -72,7 +72,7 @@ if __name__ == "__main__":
             imdat = sample(ipdat, pdmd, bin)
             imdat.to_csv('../Results/NL3/{}/out/tsne_selected.csv'.format(i), index=False)
 
-            new_im = Image.new(mode='RGB', size=(size*bin, size*bin), color='white')
+            new_im = Image.new(mode='RGB', size=(size*(bin+1), size*(bin+1)), color='white')
 
             for rows in imdat.itertuples():
                 impath = rows.impath
