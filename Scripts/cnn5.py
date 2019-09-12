@@ -83,12 +83,10 @@ class INCEPTION():
         xc_in_reshape = tf.reshape(xc_in, [-1, self.input_dim[1], self.input_dim[2], 3])
         # dropout
         dropout = self.dropout
-        # dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
         # label input
         y_in = tf.placeholder(dtype=tf.float32, name="y")
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
-        # classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
         classes = self.classes
 
         if model == 'X1':
@@ -136,7 +134,8 @@ class INCEPTION():
 
         global_step = tf.Variable(0, trainable=False)
 
-        sample_weights = tf.gather(self.weights, y_in)
+        sample_weights = tf.gather(self.weights, tf.argmax(y_in, axis=1))
+
         pred_cost = tf.losses.softmax_cross_entropy(
             onehot_labels=y_in, logits=logits, weights=sample_weights)
 

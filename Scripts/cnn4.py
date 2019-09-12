@@ -54,8 +54,7 @@ class INCEPTION():
 
         # unpack handles for tensor ops to feed or fetch for lower layers
         (self.x_in, self.is_train, self.y_in, self.logits,
-         self.net, self.w, self.pred, self.pred_cost,
-         self.global_step, self.train_op, self.merged_summary) = handles
+         self.net, self.w, self.pred, self.pred_cost, self.global_step, self.train_op, self.merged_summary) = handles
 
         if save_graph_def:  # tensorboard
             try:
@@ -79,12 +78,11 @@ class INCEPTION():
         x_in_reshape = tf.reshape(x_in, [-1, self.input_dim[1], self.input_dim[2], 3])
         # dropout
         dropout = self.dropout
-        # dropout = tf.placeholder_with_default(1., shape=[], name="dropout")
         # label input
         y_in = tf.placeholder(dtype=tf.int32, name="y")
+
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
-        # classes = tf.placeholder_with_default(4, shape=[], name="num_classes")
         classes = self.classes
 
         if model == 'I1':
@@ -148,7 +146,7 @@ class INCEPTION():
 
         global_step = tf.Variable(0, trainable=False)
 
-        sample_weights = tf.gather(self.weights, tf.argmax(y_in, axis=0))
+        sample_weights = tf.gather(self.weights, tf.argmax(y_in, axis=1))
 
         pred_cost = tf.losses.softmax_cross_entropy(
             onehot_labels=y_in, logits=logits, weights=sample_weights)
