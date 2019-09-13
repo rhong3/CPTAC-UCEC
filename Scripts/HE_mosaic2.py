@@ -85,7 +85,7 @@ if __name__ == "__main__":
                     except FileNotFoundError:
                         print(impath)
                         pass
-                new_im.save(os.path.abspath('../Results/NL3/{}/out/{}.jpeg'.format(i, outim)), "JPEG")
+                new_im.save(os.path.abspath('../Results/NL3/{}/out/{}_{}.jpeg'.format(i, outim, j)), "JPEG")
                 print('{} done'.format(i))
         except FileNotFoundError:
             print('{} passed'.format(i))
