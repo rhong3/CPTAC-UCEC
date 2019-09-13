@@ -233,5 +233,6 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir, 'validation')
 
+        print(tf.shape(weights))
         main(trc, tec, vac, classes, weights, testset=tes)
 
