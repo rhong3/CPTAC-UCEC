@@ -145,9 +145,9 @@ def set_sep(alll, path, cls, level=None, cut=0.2):
         subset = TCGA.loc[TCGA['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
-        validation = unq[:int(len(unq) * cut / 4)]
+        validation = unq[:int(len(unq) * cut / 2)]
         valist.append(subset[subset['slide'].isin(validation)])
-        test = unq[int(len(unq) * cut / 4):int(len(unq) * cut)]
+        test = unq[int(len(unq) * cut / 2):int(len(unq) * cut)]
         telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq) * cut):]
         trlist.append(subset[subset['slide'].isin(train)])
@@ -155,9 +155,9 @@ def set_sep(alll, path, cls, level=None, cut=0.2):
         subset = CPTAC.loc[CPTAC['label'] == i]
         unq = list(subset.slide.unique())
         np.random.shuffle(unq)
-        validation = unq[:int(len(unq) * cut / 4)]
+        validation = unq[:int(len(unq) * cut / 2)]
         valist.append(subset[subset['slide'].isin(validation)])
-        test = unq[int(len(unq) * cut / 4):int(len(unq) * cut)]
+        test = unq[int(len(unq) * cut / 2):int(len(unq) * cut)]
         telist.append(subset[subset['slide'].isin(test)])
         train = unq[int(len(unq) * cut):]
         trlist.append(subset[subset['slide'].isin(train)])
