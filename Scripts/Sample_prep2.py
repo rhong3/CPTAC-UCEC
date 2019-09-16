@@ -83,7 +83,10 @@ def paired_tile_ids_in(slide, label, root_dir):
                 if '.png' in id:
                     x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
                     y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0]) / fac)
-                    dup = int(re.split('.p', re.split('_', id.split('y-', 1)[1])[-1])[0])
+                    try:
+                        dup = int(re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0])
+                    except IndexError:
+                        dup = np.nan
                     ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
                 else:
                     print('Skipping ID:', id)
@@ -182,12 +185,6 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
         for i in posimg:
             big_images.append([i, 1, path + "{}/".format(i)])
     else:
-        # # 7.24 special version
-        # ref = ref.loc[ref['subtype_0NA'] == 0]
-        # ref = ref.loc[ref['subtype_Serous-like'] == 0]
-        # ref = ref.loc[ref['subtype_Endometrioid'] == 0]
-        # ##########################
-
         negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
         posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
         for i in negimg:
