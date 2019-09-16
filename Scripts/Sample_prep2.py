@@ -31,7 +31,7 @@ def intersection(lst1, lst2):
     return lst3
 
 
-def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
+def tile_ids_in(slide, label, root_dir):
     dira = os.path.isdir(root_dir + 'level0')
     dirb = os.path.isdir(root_dir + 'level1')
     dirc = os.path.isdir(root_dir + 'level2')
@@ -40,10 +40,10 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
         for level in range(3):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
-                if id in ignore:
-                    print('Skipping ID:', id)
+                if '.png' in id:
+                    ids.append([slide, label, level, dirr + '/' + id])
                 else:
-                    ids.append([slide, label, level, dirr+'/'+id])
+                    print('Skipping ID:', id)
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path'])
         idsa = ids.loc[ids['level'] == 0]
         idsb = ids.loc[ids['level'] == 1]
@@ -67,7 +67,7 @@ def tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv
 
 
 # pair tiles of 20x, 10x, 5x of the same area
-def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
+def paired_tile_ids_in(slide, label, root_dir):
     dira = os.path.isdir(root_dir + 'level0')
     dirb = os.path.isdir(root_dir + 'level1')
     dirc = os.path.isdir(root_dir + 'level2')
@@ -80,13 +80,13 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         for level in range(3):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
-                if id in ignore:
-                    print('Skipping ID:', id)
-                else:
-                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0])/fac)
-                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0])/fac)
+                if '.png' in id:
+                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
+                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0]) / fac)
                     dup = int(re.split('.p', re.split('_', id.split('y-', 1)[1])[-1])[0])
-                    ids.append([slide, label, level, dirr+'/'+id, x, y, dup])
+                    ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
+                else:
+                    print('Skipping ID:', id)
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
         idsa = ids.loc[ids['level'] == 0]
         idsa = idsa.drop(columns=['level'])
@@ -97,8 +97,8 @@ def paired_tile_ids_in(slide, label, root_dir, ignore=['.DS_Store','dict.csv', '
         idsc = ids.loc[ids['level'] == 2]
         idsc = idsc.drop(columns=['slide', 'label', 'level'])
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
-        idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="one_to_many")
-        idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="one_to_many")
+        idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         # idsa = idsa.drop(columns=['x', 'y', 'dup'])
         idsa = idsa.fillna(method='ffill', axis=0)
         idsa = idsa.fillna(method='bfill', axis=0)

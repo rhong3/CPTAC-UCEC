@@ -30,14 +30,14 @@ def intersection(lst1, lst2):
     return lst3
 
 
-def tile_ids_in(slide, level, root_dir, label, ignore=['.DS_Store','dict.csv', 'all.csv']):
+def tile_ids_in(slide, level, root_dir, label):
     ids = []
     try:
         for id in os.listdir(root_dir):
-            if id in ignore:
-                print('Skipping ID:', id)
-            else:
+            if '.png' in id:
                 ids.append([slide, level, root_dir+'/'+id, label])
+            else:
+                print('Skipping ID:', id)
     except FileNotFoundError:
         print('Ignore:', root_dir)
 
