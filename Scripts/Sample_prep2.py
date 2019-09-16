@@ -102,11 +102,11 @@ def paired_tile_ids_in(slide, label, root_dir):
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
         idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
-        # idsa = idsa.drop(columns=['x', 'y', 'dup'])
-        idsa = idsa.fillna(method='ffill', axis=0)
-        idsa = idsa.fillna(method='bfill', axis=0)
-        # idsa = sku.shuffle(idsa)
-        # idsa = idsa.dropna()
+        idsa = idsa.drop(columns=['x', 'y', 'dup'])
+        # idsa = idsa.fillna(method='ffill', axis=0)
+        # idsa = idsa.fillna(method='bfill', axis=0)
+        idsa = idsa.dropna()
+        idsa = sku.shuffle(idsa)
     else:
         idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
 
