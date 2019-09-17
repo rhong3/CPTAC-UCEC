@@ -53,18 +53,18 @@ def sample(dat, md, bins):
 
 
 if __name__ == "__main__":
-    # dirls = dirr.split(',')
+    dirls = dirr.split(',')
 
-    ### special ###
-    dirls = []
-    for n in range(6):
-        num = str(n+1)
-        genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
-                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
-                        'PTEN', 'RPL22', 'TP53']
-        for g in genes:
-            dirls.append('X{}{}'.format(num, g))
-    ### special ###
+    # ### special ###
+    # dirls = []
+    # for n in range(6):
+    #     num = str(n+1)
+    #     genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+    #                     'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+    #                     'PTEN', 'RPL22', 'TP53']
+    #     for g in genes:
+    #         dirls.append('X{}{}'.format(num, g))
+    # ### special ###
 
     for i in dirls:
         try:
