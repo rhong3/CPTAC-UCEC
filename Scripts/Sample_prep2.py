@@ -122,11 +122,11 @@ def balance(pdls, cls):
         TCGA = ref[ref['slide'].str.contains("TCGA")]
         if CPTAC.shape[0] != 0 and TCGA.shape[0] != 0:
             ratio = (CPTAC.shape[0])/(TCGA.shape[0])
-            if ratio < 0.2:
-                TCGA = TCGA.sample(int(5*CPTAC.shape[0]), replace=False)
+            if ratio < 0.25:
+                TCGA = TCGA.sample(int(4*CPTAC.shape[0]), replace=False)
                 ref = pd.concat([TCGA, CPTAC], sort=False)
-            elif ratio > 5:
-                CPTAC = CPTAC.sample(int(5*TCGA.shape[0]), replace=False)
+            elif ratio > 4:
+                CPTAC = CPTAC.sample(int(4*TCGA.shape[0]), replace=False)
                 ref = pd.concat([TCGA, CPTAC], sort=False)
         balanced = pd.concat([balanced, ref], sort=False)
     return balanced
