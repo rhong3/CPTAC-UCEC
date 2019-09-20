@@ -172,12 +172,12 @@ class INCEPTION():
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         # for i in range(3):
-                        #     neta = net[:, :, :, :len(net[0, 0, 0, :] / 3)]
-                        #     netb = net[:, :, :, len(net[0, 0, 0, :] / 3):2 * len(net[0, 0, 0, :] / 3)]
-                        #     netc = net[:, :, :, 2 * len(net[0, 0, 0, :] / 3):]
-                        #     wa = w[:len(w[:, 0] / 3), :]
-                        #     wb = w[len(w[:, 0] / 3):2 * len(w[:, 0] / 3), :]
-                        #     wc = w[2 * len(w[:, 0] / 3):, :]
+                        #     neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
+                        #     netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
+                        #     netc = net[:, :, :, 2 * int(np.shape(net)[3] / 3):]
+                        #     wa = w[:int(np.shape(w)[0] / 3), :]
+                        #     wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
+                        #     wc = w[2 * int(np.shape(w)[0] / 3):, :]
                         #     ac.CAM(neta, wa, pred, xc, y, dirr, 'Test_level0', bs, pmd, rd)
                         #     ac.CAM(netb, wb, pred, xc, y, dirr, 'Test_level1', bs, pmd, rd)
                         #     ac.CAM(netc, wc, pred, xc, y, dirr, 'Test_level2', bs, pmd, rd)
@@ -207,12 +207,12 @@ class INCEPTION():
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         for i in range(3):
-                            neta = net[:,:,:,:len(net[0,0,0,:]/3)]
-                            netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
-                            netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
-                            wa = w[:len(w[:,0]/3), :]
-                            wb = w[len(w[:,0]/3):2*len(w[:,0]/3), :]
-                            wc = w[2*len(w[:,0]/3):, :]
+                            neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
+                            netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
+                            netc = net[:, :, :, 2 * int(np.shape(net)[3] / 3):]
+                            wa = w[:int(np.shape(w)[0] / 3), :]
+                            wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
+                            wc = w[2 * int(np.shape(w)[0] / 3):, :]
                             ac.CAM_R(neta, wa, pred, xc, dirr, 'Test_level0', bs, rd)
                             ac.CAM_R(netb, wb, pred, xc, dirr, 'Test_level1', bs, rd)
                             ac.CAM_R(netc, wc, pred, xc, dirr, 'Test_level2', bs, rd)
@@ -419,12 +419,12 @@ class INCEPTION():
                             self.valid_logger.add_summary(valid_summary, i)
                             print("round {} --> Final Last validation loss: ".format(i), valid_cost, flush=True)
                             for i in range(3):
-                                neta = net[:, :, :, :len(net[0, 0, 0, :] / 3)]
-                                netb = net[:, :, :, len(net[0, 0, 0, :] / 3):2 * len(net[0, 0, 0, :] / 3)]
-                                netc = net[:, :, :, 2 * len(net[0, 0, 0, :] / 3):]
-                                wa = w[:len(w[:, 0] / 3), :]
-                                wb = w[len(w[:, 0] / 3):2 * len(w[:, 0] / 3), :]
-                                wc = w[2 * len(w[:, 0] / 3):, :]
+                                neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
+                                netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
+                                netc = net[:, :, :, 2 * int(np.shape(net)[3] / 3):]
+                                wa = w[:int(np.shape(w)[0] / 3), :]
+                                wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
+                                wc = w[2 * int(np.shape(w)[0] / 3):, :]
                                 ac.CAM(neta, wa, pred, xc, y, dirr, 'Validation_level0', bs, pmd)
                                 ac.CAM(netb, wb, pred, xc, y, dirr, 'Validation_level1', bs, pmd)
                                 ac.CAM(netc, wc, pred, xc, y, dirr, 'Validation_level2', bs, pmd)
@@ -466,14 +466,13 @@ class INCEPTION():
                         self.valid_logger.add_summary(valid_summary, i)
                         print("round {} --> Last validation loss: ".format(i), valid_cost, flush=True)
                         for i in range(3):
-                            neta = net[:,:,:,:len(net[0,0,0,:]/3)]
-                            netb = net[:,:,:,len(net[0,0,0,:]/3):2*len(net[0,0,0,:]/3)]
-                            netc = net[:,:,:,2*len(net[0,0,0,:]/3):]
-                            wa = w[:len(w[:,0]/3), :]
-                            wb = w[len(w[:,0]/3):2*len(w[:,0]/3), :]
-                            wc = w[2*len(w[:,0]/3):, :]
+                            neta = net[:,:,:,:int(np.shape(net)[3]/3)]
+                            netb = net[:,:,:,int(np.shape(net)[3]/3):2*int(np.shape(net)[3]/3)]
+                            netc = net[:,:,:,2*int(np.shape(net)[3]/3):]
+                            wa = w[:int(np.shape(w)[0]/3), :]
+                            wb = w[int(np.shape(w)[0]/3):2*int(np.shape(w)[0]/3), :]
+                            wc = w[2*int(np.shape(w)[0]/3):, :]
                             ##########
-                            print(np.shape(w))
                             print(np.shape(wa))
                             print(np.shape(wb))
                             print(np.shape(wc))
