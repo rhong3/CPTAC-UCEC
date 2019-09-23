@@ -5,6 +5,7 @@ library(pROC)
 library(dplyr)
 library(MLmetrics)
 library(boot)
+Sys.setenv('R_MAX_VSIZE'=10000000000000000000)
 
 # Mutations
 sum=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 2)
