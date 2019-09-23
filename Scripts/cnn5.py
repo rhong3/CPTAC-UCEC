@@ -472,14 +472,6 @@ class INCEPTION():
                             wa = w[:int(np.shape(w)[0]/3), :]
                             wb = w[int(np.shape(w)[0]/3):2*int(np.shape(w)[0]/3), :]
                             wc = w[2*int(np.shape(w)[0]/3):, :]
-                            ##########
-                            print(np.shape(wa))
-                            print(np.shape(wb))
-                            print(np.shape(wc))
-                            print(np.shape(neta))
-                            print(np.shape(netb))
-                            print(np.shape(netc))
-                            ###########
 
                             ac.CAM(neta, wa, pred, xc, y, dirr, 'Validation_level0', bs, pmd)
                             ac.CAM(netb, wb, pred, xc, y, dirr, 'Validation_level1', bs, pmd)
