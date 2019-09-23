@@ -22,25 +22,28 @@ matplotlib.use('Agg')
 
 dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
-ep = sys.argv[3]    # epochs to train
-md = sys.argv[4]    # architecture to use
-pdmd = sys.argv[5]  # feature to predict
+bs = int(bs)
+md = sys.argv[3]    # architecture to use
+pdmd = sys.argv[4]  # feature to predict
+
 try:
-    level = sys.argv[6]  # magnification of tiles to use
+    level = sys.argv[5]  # magnification of tiles to use
 except IndexError:
     level = None
+
+try:
+    ep = sys.argv[6]  # epochs to train
+    ep = int(ep)
+except IndexError:
+    ep = 100
 
 if pdmd == 'subtype':
     classes = 4
 else:
     classes = 2
 
-bs = int(bs)
-ep = int(ep)
-
-IMG_DIM = 299
 # input image dimension
-INPUT_DIM = [bs, IMG_DIM, IMG_DIM, 3]
+INPUT_DIM = [bs, 299, 299, 3]
 # hyper parameters
 HYPERPARAMS = {
     "batch_size": bs,
@@ -49,8 +52,6 @@ HYPERPARAMS = {
     "classes": classes
 }
 
-MAX_ITER = np.inf
-MAX_EPOCHS = ep
 # paths to directories
 img_dir = '../tiles/'
 LOG_DIR = "../Results/{}".format(dirr)
