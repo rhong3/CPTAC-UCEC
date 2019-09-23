@@ -66,7 +66,7 @@ for (i in targets){
       Trocdf = t(data.frame(ci.auc(Troc)))
       colnames(Trocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
       # PRC
-      Tprcci=boot.ci(boot(data = Test_tile, statistic=auprc, R=5), type="bca")
+      Tprcci=boot.ci(boot(data = Test_tile, statistic=auprc, R=4), type="bca")
       Tprcdf = data.frame('PRC.95%CI_lower' = Tprcci$bca[4], 'PRC' = Tprcci$t0, 'PRC.95%CI_upper' = Tprcci$bca[5])
       # Combine and add prefix
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
