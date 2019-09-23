@@ -277,17 +277,6 @@ class INCEPTION():
 
                         summary, logits, pred, cost, i, _ = self.sesh.run(fetches, feed_dict)
 
-                        #######
-                        pred = tf.nn.softmax(logits)
-                        print(pred.eval())
-                        sample_weights = tf.gather(self.weights, tf.argmax(y, axis=1))
-                        print(sample_weights.eval())
-                        pred_cost = tf.losses.softmax_cross_entropy(
-                            onehot_labels=y, logits=logits, weights=sample_weights)
-                        print(pred_cost.eval())
-                        ########
-
-
                         self.train_logger.add_summary(summary, i)
                         err_train += cost
 

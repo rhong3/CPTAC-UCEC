@@ -132,7 +132,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
 
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
-def set_sep(alll, path, cls, level=None, cut=0.2):
+def set_sep(alll, path, cls, level=None, cut=0.2, batchsize=64):
     trlist = []
     telist = []
     valist = []
@@ -185,9 +185,15 @@ def set_sep(alll, path, cls, level=None, cut=0.2):
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
-    # train_tiles = train_tiles.sample(frac=0.50, replace=False)
-    # validation_tiles = validation_tiles.sample(frac=0.50, replace=False)
-    # test_tiles = test_tiles.sample(frac=0.50, replace=False)
+    if train_tiles.shape[0] > int(batchsize*80000/3):
+        train_tiles = train_tiles.sample(int(batchsize*80000/3), replace=False)
+        print('Truncate training set!')
+    if validation_tiles.shape[0] > int(batchsize*80000/30):
+        validation_tiles = validation_tiles.sample(int(batchsize*80000/30), replace=False)
+        print('Truncate validation set!')
+    if test_tiles.shape[0] > int(batchsize*80000/3):
+        test_tiles = test_tiles.sample(int(batchsize*80000/3), replace=False)
+        print('Truncate test set!')
 
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
     train_tiles.to_csv(path+'/tr_sample.csv', header=True, index=False)
