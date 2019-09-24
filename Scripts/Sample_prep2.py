@@ -248,7 +248,7 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
     if train_tiles.shape[0] > int(batchsize*100000/3):
-        train_tiles = train_tiles.sample(int(batchsize*80000/3), replace=False)
+        train_tiles = train_tiles.sample(int(batchsize*100000/3), replace=False)
         print('Truncate training set!')
     if validation_tiles.shape[0] > int(batchsize*100000/30):
         validation_tiles = validation_tiles.sample(int(batchsize*100000/30), replace=False)

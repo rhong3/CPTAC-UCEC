@@ -5,7 +5,7 @@ library(pROC)
 library(dplyr)
 library(MLmetrics)
 library(boot)
-Sys.setenv('R_MAX_VSIZE'=10000000000000000000)
+library(gmodels)
 
 # Mutations
 sum=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 2)
@@ -22,6 +22,13 @@ OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Archit
                                                               "Tile_Recall",                  "Tile_F1",                      "Tile_Prevalence",              "Tile_Detection.Rate",          "Tile_Detection.Prevalence",   
                                                               "Tile_Balanced.Accuracy"))
 
+# PRC function for bootstrap
+auprc = function(data, indices){
+  sampleddf = data[indices,]
+  prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+  return(prc)
+}
+
 for (i in targets){
   tryCatch(
     {
@@ -33,13 +40,6 @@ for (i in targets){
       Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", i, "/out/Test_slide.csv", sep=''))
       Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", i, "/out/Test_tile.csv", sep=''))
       
-      # PRC function for bootstrap
-      auprc = function(data, indices){
-        sampleddf = data[indices,]
-        prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
-        return(prc)
-      }
-      
       # per patient level
       answers <- factor(Test_slide$True_label)
       results <- factor(Test_slide$Prediction)
@@ -50,7 +50,7 @@ for (i in targets){
       rocdf = t(data.frame(ci.auc(roc)))
       colnames(rocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
       # PRC
-      prcci=boot.ci(boot(data = Test_slide, statistic=auprc, R=1000), type="bca")
+      prcci=boot.ci(boot(data = Test_slide, statistic=auprc, R=100), type="bca")
       prcdf = data.frame('PRC.95%CI_lower' = prcci$bca[4], 'PRC' = prcci$t0, 'PRC.95%CI_upper' = prcci$bca[5])
       # Combine and add prefix
       soverall = cbind(rocdf, prcdf, data.frame(t(CMP$overall)), data.frame(t(CMP$byClass)))
@@ -66,8 +66,15 @@ for (i in targets){
       Trocdf = t(data.frame(ci.auc(Troc)))
       colnames(Trocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
       # PRC
-      Tprcci=boot.ci(boot(data = Test_tile, statistic=auprc, R=4), type="bca")
-      Tprcdf = data.frame('PRC.95%CI_lower' = Tprcci$bca[4], 'PRC' = Tprcci$t0, 'PRC.95%CI_upper' = Tprcci$bca[5])
+      prcR = PRAUC(Test_tile$POS_score, factor(Test_tile$True_label))
+      prls = list()
+      for (i in 1:10){
+        sampleddf = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
+        prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+        prls[i] = prc
+      }
+      Tprcci = ci(as.numeric(prls))
+      Tprcdf = data.frame('PRC.95%CI_lower' = Tprcci[2], 'PRC' = prcR, 'PRC.95%CI_upper' = Tprcci[3])
       # Combine and add prefix
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
       colnames(Toverall) = paste('Tile', colnames(Toverall), sep='_')
@@ -87,3 +94,4 @@ for (i in targets){
 }
 
 write.csv(OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_mutations.csv")
+
