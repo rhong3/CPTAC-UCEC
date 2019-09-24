@@ -8,15 +8,20 @@ library(boot)
 library(gmodels)
 
 # Mutations
+# Check previously calculated trials
+previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_mutations.csv")
+existed=paste(previous$Tiles, paste(previous$Architecture, previous$Mutation, sep=''), sep='/')
 sum=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 2)
-targets = paste(sum$Tiles, paste(sum$Architecture, sum$Mutation, sep=''), sep='/')
-OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Architecture", "Tiles", "Patient_ROC.95%CI_lower", "Patient_ROC",                 
-                                                             "Patient_ROC.95%CI_upper",      "Patient_PRC.95%CI_lower",      "Patient_PRC",                  "Patient_PRC.95%CI_upper",      "Patient_Accuracy",            
+inlist = paste(sum$Tiles, paste(sum$Architecture, sum$Mutation, sep=''), sep='/')
+# Find the new trials to be calculated
+targets = inlist[which(!inlist %in% existed)]
+OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Architecture", "Tiles", "Patient_ROC.95.CI_lower", "Patient_ROC",                 
+                                                             "Patient_ROC.95.CI_upper",      "Patient_PRC.95.CI_lower",      "Patient_PRC",                  "Patient_PRC.95%CI_upper",      "Patient_Accuracy",            
                                                               "Patient_Kappa",                "Patient_AccuracyLower",        "Patient_AccuracyUpper",        "Patient_AccuracyNull",         "Patient_AccuracyPValue",      
                                                               "Patient_McnemarPValue",        "Patient_Sensitivity",          "Patient_Specificity",          "Patient_Pos.Pred.Value",       "Patient_Neg.Pred.Value",      
                                                               "Patient_Precision",            "Patient_Recall",               "Patient_F1",                   "Patient_Prevalence",           "Patient_Detection.Rate",      
-                                                              "Patient_Detection.Prevalence", "Patient_Balanced.Accuracy",    "Tile_ROC.95%CI_lower",         "Tile_ROC",                     "Tile_ROC.95%CI_upper",        
-                                                              "Tile_PRC.95%CI_lower",         "Tile_PRC",                     "Tile_PRC.95%CI_upper",         "Tile_Accuracy",                "Tile_Kappa",                  
+                                                              "Patient_Detection.Prevalence", "Patient_Balanced.Accuracy",    "Tile_ROC.95.CI_lower",         "Tile_ROC",                     "Tile_ROC.95%CI_upper",        
+                                                              "Tile_PRC.95.CI_lower",         "Tile_PRC",                     "Tile_PRC.95.CI_upper",         "Tile_Accuracy",                "Tile_Kappa",                  
                                                               "Tile_AccuracyLower",           "Tile_AccuracyUpper",           "Tile_AccuracyNull",            "Tile_AccuracyPValue",          "Tile_McnemarPValue",          
                                                               "Tile_Sensitivity",             "Tile_Specificity",             "Tile_Pos.Pred.Value",          "Tile_Neg.Pred.Value",          "Tile_Precision",              
                                                               "Tile_Recall",                  "Tile_F1",                      "Tile_Prevalence",              "Tile_Detection.Rate",          "Tile_Detection.Prevalence",   
@@ -32,8 +37,9 @@ OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Archit
 for (i in targets){
   tryCatch(
     {
+      print(i)
+      keyname = substr(strsplit(i, '/')[[1]][2], 3, nchar(folder_name))
       folder = strsplit(i, '-')[[1]][1]  #split replicated trials
-      postfix = strsplit(i, '-')[[1]][2]
       tiles = strsplit(folder, '/')[[1]][1]  #get NL number
       folder_name = strsplit(folder, '/')[[1]][2]  #get folder name
       pos = substr(folder_name, 3, nchar(folder_name))  #get mutation
@@ -49,7 +55,7 @@ for (i in targets){
       # ROC
       roc =  roc(answers, Test_slide$POS_score, levels=c('negative', pos))
       rocdf = t(data.frame(ci.auc(roc)))
-      colnames(rocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
+      colnames(rocdf) = c('ROC.95.CI_lower', 'ROC', 'ROC.95.CI_upper')
       # PRC
       SprcR = PRAUC(Test_slide$POS_score, factor(Test_slide$True_label))
       Sprls = list()
@@ -59,7 +65,7 @@ for (i in targets){
         Sprls[i] = Sprc
       }
       Sprcci = ci(as.numeric(Sprls))
-      Sprcdf = data.frame('PRC.95%CI_lower' = Sprcci[2], 'PRC' = SprcR, 'PRC.95%CI_upper' = Sprcci[3])
+      Sprcdf = data.frame('PRC.95.CI_lower' = Sprcci[2], 'PRC' = SprcR, 'PRC.95.CI_upper' = Sprcci[3])
       # Combine and add prefix
       soverall = cbind(rocdf, Sprcdf, data.frame(t(CMP$overall)), data.frame(t(CMP$byClass)))
       colnames(soverall) = paste('Patient', colnames(soverall), sep='_')
@@ -72,7 +78,7 @@ for (i in targets){
       # ROC
       Troc =  roc(Tanswers, Test_tile$POS_score, levels=c('negative', pos))
       Trocdf = t(data.frame(ci.auc(Troc)))
-      colnames(Trocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
+      colnames(Trocdf) = c('ROC.95.CI_lower', 'ROC', 'ROC.95.CI_upper')
       # PRC
       prcR = PRAUC(Test_tile$POS_score, factor(Test_tile$True_label))
       prls = list()
@@ -82,12 +88,12 @@ for (i in targets){
         prls[i] = prc
       }
       Tprcci = ci(as.numeric(prls))
-      Tprcdf = data.frame('PRC.95%CI_lower' = Tprcci[2], 'PRC' = prcR, 'PRC.95%CI_upper' = Tprcci[3])
+      Tprcdf = data.frame('PRC.95.CI_lower' = Tprcci[2], 'PRC' = prcR, 'PRC.95.CI_upper' = Tprcci[3])
       # Combine and add prefix
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
       colnames(Toverall) = paste('Tile', colnames(Toverall), sep='_')
       # Key names
-      keydf = data.frame("Mutation" = paste(pos, postfix, sep=''), "Architecture" = arch, Tiles = tiles)
+      keydf = data.frame("Mutation" = keyname, "Architecture" = arch, Tiles = tiles)
       # combine all df and reset row name
       tempdf = cbind(keydf, soverall, Toverall)
       rownames(tempdf) <- NULL
@@ -101,4 +107,8 @@ for (i in targets){
   )  
 }
 
-write.csv(OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_mutations.csv")
+# Bind old with new; sort; save
+New_OUTPUT = rbind(previous, OUTPUT)
+New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Mutation, New_OUTPUT$Tiles, New_OUTPUT$Architecture),]
+write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_mutations.csv", row.names=FALSE)
+
