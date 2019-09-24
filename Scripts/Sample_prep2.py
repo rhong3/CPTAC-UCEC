@@ -247,14 +247,14 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
-    if train_tiles.shape[0] > int(batchsize*100000/3):
-        train_tiles = train_tiles.sample(int(batchsize*100000/3), replace=False)
+    if train_tiles.shape[0] > int(batchsize*80000/3):
+        train_tiles = train_tiles.sample(int(batchsize*80000/3), replace=False)
         print('Truncate training set!')
-    if validation_tiles.shape[0] > int(batchsize*100000/30):
-        validation_tiles = validation_tiles.sample(int(batchsize*100000/30), replace=False)
+    if validation_tiles.shape[0] > int(batchsize*80000/30):
+        validation_tiles = validation_tiles.sample(int(batchsize*80000/30), replace=False)
         print('Truncate validation set!')
-    if test_tiles.shape[0] > int(batchsize*100000/3):
-        test_tiles = test_tiles.sample(int(batchsize*100000/3), replace=False)
+    if test_tiles.shape[0] > int(batchsize*80000/3):
+        test_tiles = test_tiles.sample(int(batchsize*80000/3), replace=False)
         print('Truncate test set!')
 
     test_tiles.to_csv(path+'/te_sample.csv', header=True, index=False)
