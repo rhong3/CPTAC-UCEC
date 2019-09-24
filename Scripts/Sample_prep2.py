@@ -155,6 +155,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
         for i in POLEimg:
             big_images.append([i, 3, path + "{}/".format(i)])
     elif pmd == 'histology':
+        allimg = intersection(ref.loc[ref['histology_Mixed'] == 0]['name'].tolist(), allimg)
         EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
         Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
         for i in EMimg:
