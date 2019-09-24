@@ -22,12 +22,12 @@ OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Archit
                                                               "Tile_Recall",                  "Tile_F1",                      "Tile_Prevalence",              "Tile_Detection.Rate",          "Tile_Detection.Prevalence",   
                                                               "Tile_Balanced.Accuracy"))
 
-# PRC function for bootstrap
-auprc = function(data, indices){
-  sampleddf = data[indices,]
-  prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
-  return(prc)
-}
+# # PRC function for bootstrap
+# auprc = function(data, indices){
+#   sampleddf = data[indices,]
+#   prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+#   return(prc)
+# }
 
 for (i in targets){
   tryCatch(
@@ -46,14 +46,21 @@ for (i in targets){
       # statistical metrics
       CMP = confusionMatrix(data=results, reference=answers, positive = pos)
       # ROC
-      roc =  roc(answers, Test_slide$POS_score)
+      roc =  roc(answers, Test_slide$POS_score, levels=c('negative', pos))
       rocdf = t(data.frame(ci.auc(roc)))
       colnames(rocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
       # PRC
-      prcci=boot.ci(boot(data = Test_slide, statistic=auprc, R=100), type="bca")
-      prcdf = data.frame('PRC.95%CI_lower' = prcci$bca[4], 'PRC' = prcci$t0, 'PRC.95%CI_upper' = prcci$bca[5])
+      SprcR = PRAUC(Test_slide$POS_score, factor(Test_slide$True_label))
+      Sprls = list()
+      for (i in 1:100){
+        sampleddf = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
+        Sprc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+        Sprls[i] = Sprc
+      }
+      Sprcci = ci(as.numeric(Sprls))
+      Sprcdf = data.frame('PRC.95%CI_lower' = Sprcci[2], 'PRC' = SprcR, 'PRC.95%CI_upper' = Sprcci[3])
       # Combine and add prefix
-      soverall = cbind(rocdf, prcdf, data.frame(t(CMP$overall)), data.frame(t(CMP$byClass)))
+      soverall = cbind(rocdf, Sprcdf, data.frame(t(CMP$overall)), data.frame(t(CMP$byClass)))
       colnames(soverall) = paste('Patient', colnames(soverall), sep='_')
       
       # per tile level
@@ -62,7 +69,7 @@ for (i in targets){
       # statistical metrics
       CMT = confusionMatrix(data=Tresults, reference=Tanswers)
       # ROC
-      Troc =  roc(Tanswers, Test_tile$POS_score)
+      Troc =  roc(Tanswers, Test_tile$POS_score, levels=c('negative', pos))
       Trocdf = t(data.frame(ci.auc(Troc)))
       colnames(Trocdf) = c('ROC.95%CI_lower', 'ROC', 'ROC.95%CI_upper')
       # PRC
@@ -94,4 +101,3 @@ for (i in targets){
 }
 
 write.csv(OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_mutations.csv")
-
