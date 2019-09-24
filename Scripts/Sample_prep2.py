@@ -174,9 +174,9 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
         Himg = intersection(ref.loc[ref['MSIst_MSI-H'] == 1]['name'].tolist(), allimg)
         Simg = intersection(ref.loc[ref['MSIst_MSS'] == 1]['name'].tolist(), allimg)
         for i in Himg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-        for i in Simg:
             big_images.append([i, 1, path + "{}/".format(i)])
+        for i in Simg:
+            big_images.append([i, 0, path + "{}/".format(i)])
     elif pmd in ['MSIst_MSI-H', 'MSIst_MSI-L', 'MSIst_MSS']:
         ref = ref.loc[ref['MSIst_0NA'] == 0]
         negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)

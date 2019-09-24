@@ -1,4 +1,4 @@
-# Mutations
+# MSI status
 # Calculate bootstraped CI of accuracy, AUROC, AUPRC and other statistical metrics. Gather them into a single file.
 library(readxl)
 library(caret)
@@ -8,24 +8,25 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
+
 # Check previously calculated trials
-previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_mutations.csv")
-existed=paste(previous$Tiles, paste(previous$Architecture, previous$Mutation, sep=''), sep='/')
-sum=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 2)
-inlist = paste(sum$Tiles, paste(sum$Architecture, sum$Mutation, sep=''), sep='/')
+previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_MSI.csv")
+existed=paste(previous$Tiles, paste(previous$Architecture, 'MSIst', sep=''), sep='/')
+sum=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 4)
+inlist = paste(sum$Tiles, paste(sum$Architecture, 'MSIst', sep=''), sep='/')
 # Find the new trials to be calculated
 targets = inlist[which(!inlist %in% existed)]
-OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Mutation", "Architecture", "Tiles", "Patient_ROC.95.CI_lower", "Patient_ROC",                 
+OUTPUT = setNames(data.frame(matrix(ncol = 50, nrow = 0)), c("Architecture", "Tiles", "Patient_ROC.95.CI_lower", "Patient_ROC",                 
                                                              "Patient_ROC.95.CI_upper",      "Patient_PRC.95.CI_lower",      "Patient_PRC",                  "Patient_PRC.95%CI_upper",      "Patient_Accuracy",            
-                                                              "Patient_Kappa",                "Patient_AccuracyLower",        "Patient_AccuracyUpper",        "Patient_AccuracyNull",         "Patient_AccuracyPValue",      
-                                                              "Patient_McnemarPValue",        "Patient_Sensitivity",          "Patient_Specificity",          "Patient_Pos.Pred.Value",       "Patient_Neg.Pred.Value",      
-                                                              "Patient_Precision",            "Patient_Recall",               "Patient_F1",                   "Patient_Prevalence",           "Patient_Detection.Rate",      
-                                                              "Patient_Detection.Prevalence", "Patient_Balanced.Accuracy",    "Tile_ROC.95.CI_lower",         "Tile_ROC",                     "Tile_ROC.95%CI_upper",        
-                                                              "Tile_PRC.95.CI_lower",         "Tile_PRC",                     "Tile_PRC.95.CI_upper",         "Tile_Accuracy",                "Tile_Kappa",                  
-                                                              "Tile_AccuracyLower",           "Tile_AccuracyUpper",           "Tile_AccuracyNull",            "Tile_AccuracyPValue",          "Tile_McnemarPValue",          
-                                                              "Tile_Sensitivity",             "Tile_Specificity",             "Tile_Pos.Pred.Value",          "Tile_Neg.Pred.Value",          "Tile_Precision",              
-                                                              "Tile_Recall",                  "Tile_F1",                      "Tile_Prevalence",              "Tile_Detection.Rate",          "Tile_Detection.Prevalence",   
-                                                              "Tile_Balanced.Accuracy"))
+                                                             "Patient_Kappa",                "Patient_AccuracyLower",        "Patient_AccuracyUpper",        "Patient_AccuracyNull",         "Patient_AccuracyPValue",      
+                                                             "Patient_McnemarPValue",        "Patient_Sensitivity",          "Patient_Specificity",          "Patient_Pos.Pred.Value",       "Patient_Neg.Pred.Value",      
+                                                             "Patient_Precision",            "Patient_Recall",               "Patient_F1",                   "Patient_Prevalence",           "Patient_Detection.Rate",      
+                                                             "Patient_Detection.Prevalence", "Patient_Balanced.Accuracy",    "Tile_ROC.95.CI_lower",         "Tile_ROC",                     "Tile_ROC.95%CI_upper",        
+                                                             "Tile_PRC.95.CI_lower",         "Tile_PRC",                     "Tile_PRC.95.CI_upper",         "Tile_Accuracy",                "Tile_Kappa",                  
+                                                             "Tile_AccuracyLower",           "Tile_AccuracyUpper",           "Tile_AccuracyNull",            "Tile_AccuracyPValue",          "Tile_McnemarPValue",          
+                                                             "Tile_Sensitivity",             "Tile_Specificity",             "Tile_Pos.Pred.Value",          "Tile_Neg.Pred.Value",          "Tile_Precision",              
+                                                             "Tile_Recall",                  "Tile_F1",                      "Tile_Prevalence",              "Tile_Detection.Rate",          "Tile_Detection.Prevalence",   
+                                                             "Tile_Balanced.Accuracy"))
 
 # # PRC function for bootstrap
 # auprc = function(data, indices){
@@ -110,5 +111,6 @@ for (i in targets){
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
 New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Mutation, New_OUTPUT$Tiles, New_OUTPUT$Architecture),]
-write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_mutations.csv", row.names=FALSE)
+write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_MSI.csv", row.names=FALSE)
+
 

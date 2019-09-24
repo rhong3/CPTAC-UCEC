@@ -208,8 +208,8 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         redict = {'Endometrioid_score': int(0), 'Serous_score': int(1)}
     elif pmd == 'MSIst':
         inter_pd['Prediction'] = inter_pd[
-            ['MSI-H_score', 'MSS_score']].idxmax(axis=1)
-        redict = {'MSI-H_score': int(0), 'MSS_score': int(1)}
+            ['MSS_score', 'MSI-H_score']].idxmax(axis=1)
+        redict = {'MSI-H_score': int(1), 'MSS_score': int(0)}
     else:
         inter_pd['Prediction'] = inter_pd[['NEG_score', 'POS_score']].idxmax(axis=1)
         redict = {'NEG_score': int(0), 'POS_score': int(1)}
@@ -244,7 +244,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
         if pmd == 'subtype':
             pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
         elif pmd == 'MSIst':
-            pdx_slide = inter_pd[['MSI-H_score', 'MSS_score']].values
+            pdx_slide = inter_pd[['MSS_score', 'MSI-H_score']].values
         elif pmd == 'histology':
             pdx_slide = inter_pd[['Endometrioid_score', 'Serous_score']].values
         else:
@@ -264,7 +264,7 @@ def realout(pdx, path, name, pmd):
     elif pmd == 'histology':
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
     elif pmd == 'MSIst':
-        lbdict = {0: 'MSI-H', 1: 'MSS'}
+        lbdict = {1: 'MSI-H', 0: 'MSS'}
     else:
         lbdict = {0: 'negative', 1: pmd}
     pdx = np.asmatrix(pdx)
@@ -276,7 +276,7 @@ def realout(pdx, path, name, pmd):
     elif pmd == 'histology':
         out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        out = pd.DataFrame(pdx, columns=['MSI-H_score', 'MSS_score'])
+        out = pd.DataFrame(pdx, columns=['MSS_score', 'MSI-H_score'])
     else:
         out = pd.DataFrame(pdx, columns=['NEG_score', 'POS_score'])
     out.reset_index(drop=True, inplace=True)
@@ -301,8 +301,8 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        lbdict = {0: 'MSI-H', 1: 'MSS'}
-        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSS_score'])
+        lbdict = {1: 'MSI-H', 0: 'MSS'}
+        outt = pd.DataFrame(pdxt, columns=['MSS_score', 'MSI-H_score'])
     else:
         lbdict = {0: 'negative', 1: pmd}
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
@@ -434,8 +434,8 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
                 os.mkdir(DIR)
             except FileExistsError:
                 pass
-        catdict = {0: 'MSI-H', 1: 'MSS'}
-        dirdict = {0: DIRA, 1: DIRB}
+        catdict = {1: 'MSI-H', 0: 'MSS'}
+        dirdict = {1: DIRA, 0: DIRB}
     else:
         DIRA = "../Results/{}/out/{}_NEG_img".format(path, name)
         DIRB = "../Results/{}/out/{}_POS_img".format(path, name)
@@ -567,7 +567,7 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     elif pmd == 'histology':
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
-        outt = pd.DataFrame(pdxt, columns=['MSI-H_score', 'MSS_score'])
+        outt = pd.DataFrame(pdxt, columns=['MSS_score', 'MSI-H_score'])
     else:
         outt = pd.DataFrame(pdxt, columns=['NEG_score', 'POS_score'])
     outtlt = pd.DataFrame(tl, columns=['True_label'])
