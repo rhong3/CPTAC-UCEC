@@ -38,7 +38,8 @@ for (i in targets){
   tryCatch(
     {
       print(i)
-      keyname = substr(strsplit(i, '/')[[1]][2], 3, nchar(folder_name))
+      xxx = strsplit(i, '/')[[1]][2]
+      keyname = substr(xxx, 3, nchar(xxx))
       folder = strsplit(i, '-')[[1]][1]  #split replicated trials
       tiles = strsplit(folder, '/')[[1]][1]  #get NL number
       folder_name = strsplit(folder, '/')[[1]][2]  #get folder name

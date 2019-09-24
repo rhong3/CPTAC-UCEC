@@ -39,11 +39,9 @@ for (i in targets){
   tryCatch(
     {
       print(i)
-      keyname = substr(strsplit(i, '/')[[1]][2], 3, nchar(folder_name))
       folder = strsplit(i, '-')[[1]][1]  #split replicated trials
       tiles = strsplit(folder, '/')[[1]][1]  #get NL number
       folder_name = strsplit(folder, '/')[[1]][2]  #get folder name
-      pos = substr(folder_name, 3, nchar(folder_name))  #get mutation
       arch = substr(folder_name, 1, 2)  #get architecture used
       Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", i, "/out/Test_slide.csv", sep=''))
       Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", i, "/out/Test_tile.csv", sep=''))
@@ -52,17 +50,17 @@ for (i in targets){
       answers <- factor(Test_slide$True_label)
       results <- factor(Test_slide$Prediction)
       # statistical metrics
-      CMP = confusionMatrix(data=results, reference=answers, positive = pos)
+      CMP = confusionMatrix(data=results, reference=answers, positive = 'MSI-H')
       # ROC
-      roc =  roc(answers, Test_slide$POS_score, levels=c('negative', pos))
+      roc =  roc(answers, Test_slide$MSI.H_score, levels=c('MSS', 'MSI-H'))
       rocdf = t(data.frame(ci.auc(roc)))
       colnames(rocdf) = c('ROC.95.CI_lower', 'ROC', 'ROC.95.CI_upper')
       # PRC
-      SprcR = PRAUC(Test_slide$POS_score, factor(Test_slide$True_label))
+      SprcR = PRAUC(Test_slide$MSI.H_score, factor(Test_slide$True_label))
       Sprls = list()
       for (i in 1:100){
         sampleddf = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
-        Sprc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+        Sprc = PRAUC(sampleddf$MSI.H_score, factor(sampleddf$True_label))
         Sprls[i] = Sprc
       }
       Sprcci = ci(as.numeric(Sprls))
@@ -77,15 +75,15 @@ for (i in targets){
       # statistical metrics
       CMT = confusionMatrix(data=Tresults, reference=Tanswers)
       # ROC
-      Troc =  roc(Tanswers, Test_tile$POS_score, levels=c('negative', pos))
+      Troc =  roc(Tanswers, Test_tile$MSI.H_score, levels=c('MSS', 'MSI-H'))
       Trocdf = t(data.frame(ci.auc(Troc)))
       colnames(Trocdf) = c('ROC.95.CI_lower', 'ROC', 'ROC.95.CI_upper')
       # PRC
-      prcR = PRAUC(Test_tile$POS_score, factor(Test_tile$True_label))
+      prcR = PRAUC(Test_tile$MSI.H_score, factor(Test_tile$True_label))
       prls = list()
       for (i in 1:10){
         sampleddf = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
-        prc = PRAUC(sampleddf$POS_score, factor(sampleddf$True_label))
+        prc = PRAUC(sampleddf$MSI.H_score, factor(sampleddf$True_label))
         prls[i] = prc
       }
       Tprcci = ci(as.numeric(prls))
@@ -94,7 +92,7 @@ for (i in targets){
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
       colnames(Toverall) = paste('Tile', colnames(Toverall), sep='_')
       # Key names
-      keydf = data.frame("Mutation" = keyname, "Architecture" = arch, Tiles = tiles)
+      keydf = data.frame("Architecture" = arch, Tiles = tiles)
       # combine all df and reset row name
       tempdf = cbind(keydf, soverall, Toverall)
       rownames(tempdf) <- NULL
@@ -110,7 +108,7 @@ for (i in targets){
 
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
-New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Mutation, New_OUTPUT$Tiles, New_OUTPUT$Architecture),]
+New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Tiles, New_OUTPUT$Architecture),]
 write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_MSI.csv", row.names=FALSE)
 
 
