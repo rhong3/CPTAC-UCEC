@@ -58,10 +58,10 @@ for (i in targets){
       # PRC
       SprcR = PRAUC(Test_slide$MSI.H_score, factor(Test_slide$True_label))
       Sprls = list()
-      for (i in 1:100){
+      for (j in 1:100){
         sampleddf = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
         Sprc = PRAUC(sampleddf$MSI.H_score, factor(sampleddf$True_label))
-        Sprls[i] = Sprc
+        Sprls[j] = Sprc
       }
       Sprcci = ci(as.numeric(Sprls))
       Sprcdf = data.frame('PRC.95.CI_lower' = Sprcci[2], 'PRC' = SprcR, 'PRC.95.CI_upper' = Sprcci[3])
@@ -73,7 +73,7 @@ for (i in targets){
       Tanswers <- factor(Test_tile$True_label)
       Tresults <- factor(Test_tile$Prediction)
       # statistical metrics
-      CMT = confusionMatrix(data=Tresults, reference=Tanswers)
+      CMT = confusionMatrix(data=Tresults, reference=Tanswers, positive = 'MSI-H')
       # ROC
       Troc =  roc(Tanswers, Test_tile$MSI.H_score, levels=c('MSS', 'MSI-H'))
       Trocdf = t(data.frame(ci.auc(Troc)))
@@ -81,10 +81,10 @@ for (i in targets){
       # PRC
       prcR = PRAUC(Test_tile$MSI.H_score, factor(Test_tile$True_label))
       prls = list()
-      for (i in 1:10){
+      for (j in 1:10){
         sampleddf = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
         prc = PRAUC(sampleddf$MSI.H_score, factor(sampleddf$True_label))
-        prls[i] = prc
+        prls[j] = prc
       }
       Tprcci = ci(as.numeric(prls))
       Tprcdf = data.frame('PRC.95.CI_lower' = Tprcci[2], 'PRC' = prcR, 'PRC.95.CI_upper' = Tprcci[3])
@@ -92,7 +92,7 @@ for (i in targets){
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
       colnames(Toverall) = paste('Tile', colnames(Toverall), sep='_')
       # Key names
-      keydf = data.frame("Architecture" = arch, Tiles = tiles)
+      keydf = data.frame("Architecture" = arch, "Tiles" = tiles)
       # combine all df and reset row name
       tempdf = cbind(keydf, soverall, Toverall)
       rownames(tempdf) <- NULL
