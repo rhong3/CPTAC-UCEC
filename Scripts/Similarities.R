@@ -1,5 +1,6 @@
 library(Hmisc)
 library(Rfast)
+library(dplyr)
 # Correlation check
 dict=read.csv('~/Documents/CPTAC-UCEC/dummy_His_MUT_joined.csv')
 dict$subtype_Endometrioid = dict$subtype_Endometrioid-dict$subtype_0NA
@@ -37,7 +38,10 @@ for (i in 1:ncol(dict)){
       OUTPUT[colnames(dict)[i], colnames(dict)[j]] = y
   }
 }
+
 OUTPUT[is.na(OUTPUT)] = 1
+OUTPUT = round(OUTPUT, digits = 2)
 write.csv(OUTPUT, '~/Documents/CPTAC-UCEC/YuleY_similarities.csv', row.names=TRUE)
+
 
 
