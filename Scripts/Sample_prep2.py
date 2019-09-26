@@ -13,6 +13,7 @@ import re
 
 tile_path = "../tiles/"
 
+
 # get all full paths of images
 def image_ids_in(root_dir, ignore=['.DS_Store','dict.csv', 'all.csv']):
     ids = []
