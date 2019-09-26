@@ -263,4 +263,3 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
     validation_tiles.to_csv(path+'/va_sample.csv', header=True, index=False)
 
     return train_tiles, test_tiles, validation_tiles
-
