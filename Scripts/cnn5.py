@@ -178,8 +178,8 @@ class INCEPTION():
                         #     wa = w[:int(np.shape(w)[0] / 3), :]
                         #     wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
                         #     wc = w[2 * int(np.shape(w)[0] / 3):, :]
-                        #     ac.CAM(neta, wa, pred, xc, y, dirr, 'Test_level0', bs, pmd, rd)
-                        #     ac.CAM(netb, wb, pred, xc, y, dirr, 'Test_level1', bs, pmd, rd)
+                        #     ac.CAM(neta, wa, pred, xa, y, dirr, 'Test_level0', bs, pmd, rd)
+                        #     ac.CAM(netb, wb, pred, xb, y, dirr, 'Test_level1', bs, pmd, rd)
                         #     ac.CAM(netc, wc, pred, xc, y, dirr, 'Test_level2', bs, pmd, rd)
                         net = np.mean(net, axis=(1, 2))
                         if rd == 0:
@@ -213,8 +213,8 @@ class INCEPTION():
                             wa = w[:int(np.shape(w)[0] / 3), :]
                             wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
                             wc = w[2 * int(np.shape(w)[0] / 3):, :]
-                            ac.CAM_R(neta, wa, pred, xc, dirr, 'Test_level0', bs, rd)
-                            ac.CAM_R(netb, wb, pred, xc, dirr, 'Test_level1', bs, rd)
+                            ac.CAM_R(neta, wa, pred, xa, dirr, 'Test_level0', bs, rd)
+                            ac.CAM_R(netb, wb, pred, xb, dirr, 'Test_level1', bs, rd)
                             ac.CAM_R(netc, wc, pred, xc, dirr, 'Test_level2', bs, rd)
                         if rd == 0:
                             pdx = pred
@@ -425,8 +425,8 @@ class INCEPTION():
                                 wa = w[:int(np.shape(w)[0] / 3), :]
                                 wb = w[int(np.shape(w)[0] / 3):2 * int(np.shape(w)[0] / 3), :]
                                 wc = w[2 * int(np.shape(w)[0] / 3):, :]
-                                ac.CAM(neta, wa, pred, xc, y, dirr, 'Validation_level0', bs, pmd)
-                                ac.CAM(netb, wb, pred, xc, y, dirr, 'Validation_level1', bs, pmd)
+                                ac.CAM(neta, wa, pred, xa, y, dirr, 'Validation_level0', bs, pmd)
+                                ac.CAM(netb, wb, pred, xb, y, dirr, 'Validation_level1', bs, pmd)
                                 ac.CAM(netc, wc, pred, xc, y, dirr, 'Validation_level2', bs, pmd)
                             ac.metrics(pred, y, dirr, 'Validation', pmd)
                             now = datetime.now().isoformat()[11:]
@@ -473,8 +473,8 @@ class INCEPTION():
                             wb = w[int(np.shape(w)[0]/3):2*int(np.shape(w)[0]/3), :]
                             wc = w[2*int(np.shape(w)[0]/3):, :]
 
-                            ac.CAM(neta, wa, pred, xc, y, dirr, 'Validation_level0', bs, pmd)
-                            ac.CAM(netb, wb, pred, xc, y, dirr, 'Validation_level1', bs, pmd)
+                            ac.CAM(neta, wa, pred, xa, y, dirr, 'Validation_level0', bs, pmd)
+                            ac.CAM(netb, wb, pred, xb, y, dirr, 'Validation_level1', bs, pmd)
                             ac.CAM(netc, wc, pred, xc, y, dirr, 'Validation_level2', bs, pmd)
                         ac.metrics(pred, y, dirr, 'Validation', pmd)
                         now = datetime.now().isoformat()[11:]
