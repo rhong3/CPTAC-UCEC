@@ -1,6 +1,7 @@
 library(Hmisc)
 library(Rfast)
 library(dplyr)
+library(pheatmap)
 # Correlation check
 dict=read.csv('~/Documents/CPTAC-UCEC/dummy_His_MUT_joined.csv')
 dict$subtype_Endometrioid = dict$subtype_Endometrioid-dict$subtype_0NA
@@ -40,6 +41,13 @@ for (i in 1:ncol(dict)){
 }
 
 OUTPUT[is.na(OUTPUT)] = 1
+
+out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities.pdf'
+pdf(file=out_fig,
+    width=8.5,height=7)
+pheatmap(OUTPUT, cluster_cols = FALSE)
+dev.off()
+
 OUTPUT = round(OUTPUT, digits = 2)
 write.csv(OUTPUT, '~/Documents/CPTAC-UCEC/YuleY_similarities.csv', row.names=TRUE)
 
