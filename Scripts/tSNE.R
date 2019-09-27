@@ -9,10 +9,10 @@
 # bins=args[5]
 # POS_score=args[6]
 
-input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I6MLH1/out/For_tSNE.csv'
-output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I6MLH1/out/tSNE_P_N.csv'
-out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL3/I6MLH1/out/P_N.pdf'
-start=9
+input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1RPL22/out/For_tSNE.csv'
+output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1RPL22/out/tSNE_P_N.csv'
+out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1RPL22/out/P_N.pdf'
+start=10
 bins=50
 POS_score='POS_score'
 

@@ -55,26 +55,26 @@ def sample(dat, md, bins):
 if __name__ == "__main__":
     dirls = dirr.split(',')
 
-    # ### special ###
-    # dirls = []
-    # for n in range(6):
-    #     num = str(n+1)
-    #     genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
-    #                     'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
-    #                     'PTEN', 'RPL22', 'TP53']
-    #     for g in genes:
-    #         dirls.append('X{}{}'.format(num, g))
-    # ### special ###
+    ### special ###
+    dirls = []
+    for n in range(6):
+        num = str(n+1)
+        genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+                        'PTEN', 'RPL22', 'TP53']
+        for g in genes:
+            dirls.append('X{}{}'.format(num, g))
+    ### special ###
 
     for i in dirls:
         try:
-            ipdat = pd.read_csv('../Results/NL3/{}/out/{}.csv'.format(i, filename))
+            ipdat = pd.read_csv('../Results/NL4/{}/out/{}.csv'.format(i, filename))
             imdat = sample(ipdat, pdmd, bin)
-            imdat.to_csv('../Results/NL3/{}/out/tsne_selected.csv'.format(i), index=False)
+            imdat.to_csv('../Results/NL4/{}/out/tsne_selected.csv'.format(i), index=False)
             for j in range(3):
                 new_im = Image.new(mode='RGB', size=(size*(bin+1), size*(bin+1)), color='white')
 
-                for rows in imdat.itertuples():
+                for idx, rows in imdat.iterrows():
                     impath = rows['L{}impath'.format(j)]
                     x = rows.x_int
                     y = rows.y_int
@@ -85,7 +85,7 @@ if __name__ == "__main__":
                     except FileNotFoundError:
                         print(impath)
                         pass
-                new_im.save(os.path.abspath('../Results/NL3/{}/out/{}_{}.jpeg'.format(i, outim, j)), "JPEG")
+                new_im.save(os.path.abspath('../Results/NL4/{}/out/{}_{}.jpeg'.format(i, outim, j)), "JPEG")
                 print('{} done'.format(i))
         except FileNotFoundError:
             print('{} passed'.format(i))
