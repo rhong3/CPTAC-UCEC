@@ -73,9 +73,9 @@ def paired_tile_ids_in(slide, label, root_dir):
     dirc = os.path.isdir(root_dir + 'level2')
     if dira and dirb and dirc:
         if "TCGA" in root_dir:
-            fac = 2000.1
+            fac = 1000
         else:
-            fac = 1000.1
+            fac = 500
         ids = []
         for level in range(3):
             dirr = root_dir + 'level{}'.format(str(level))
@@ -101,6 +101,8 @@ def paired_tile_ids_in(slide, label, root_dir):
         idsc = idsc.drop(columns=['slide', 'label', 'level'])
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
         idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa['x'] = idsa['x'] - (idsa['x'] % 2)
+        idsa['y'] = idsa['y'] - (idsa['y'] % 2)
         idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = idsa.drop(columns=['x', 'y', 'dup'])
         # idsa = idsa.fillna(method='ffill', axis=0)
