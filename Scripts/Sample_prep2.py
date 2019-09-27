@@ -105,8 +105,6 @@ def paired_tile_ids_in(slide, label, root_dir):
         idsa['y'] = idsa['y'] - (idsa['y'] % 2)
         idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
         idsa = idsa.drop(columns=['x', 'y', 'dup'])
-        # idsa = idsa.fillna(method='ffill', axis=0)
-        # idsa = idsa.fillna(method='bfill', axis=0)
         idsa = idsa.dropna()
         idsa = sku.shuffle(idsa)
     else:
