@@ -353,8 +353,8 @@ class INCEPTION():
                                     saver.save(self.sesh, outfile, global_step=None)
                                     svs = i
 
-                                if i > 79999:
-                                    valid_mean_cost = np.mean(validation_cost[-10:-1])
+                                if i > 199999:
+                                    valid_mean_cost = np.mean(validation_cost[-100:-1])
                                     print('Mean validation loss: {}'.format(valid_mean_cost))
                                     if valid_cost > valid_mean_cost:
                                         print("Early stopped! No improvement for at least 10000 iterations")
