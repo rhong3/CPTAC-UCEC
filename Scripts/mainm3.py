@@ -166,7 +166,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
                            meta_dir=LOG_DIR, model=md, weights=weight)
         print("Loaded! Restart training.", flush=True)
         HE = tfreloader('train', ep, bs, cls, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, cls, trc, tec, vac)
+        VHE = tfreloader('validation', ep*100, bs, cls, trc, tec, vac)
         itt = int(trc * ep / bs)
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
@@ -182,7 +182,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, log_dir=LOG_DIR, model=md, weights=weight)
         print("Start a new training!")
         HE = tfreloader('train', ep, bs, cls, trc, tec, vac)
-        VHE = tfreloader('validation', ep*10, bs, cls, trc, tec, vac)
+        VHE = tfreloader('validation', ep*100, bs, cls, trc, tec, vac)
         itt = int(trc*ep/bs)+1
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
