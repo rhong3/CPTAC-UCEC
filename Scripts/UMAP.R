@@ -53,27 +53,27 @@ p1=ggplot(data=dat,aes(x=umap1,y=umap2,col=POS_score))+
   scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
   geom_point(alpha=0.2)+
   #theme(legend.position='bottom')+
-  xlim(-20,20)+
-  ylim(-20,20)
+  xlim(-15,15)+
+  ylim(-15,15)
 
 p2=ggplot(data=dat,aes(x=umap1,y=umap2))+
   geom_point(aes(col=True_label),alpha=0.2)+
   scale_color_manual(values = c('gray70','red'))+
   #theme(legend.position='bottom')+
-  xlim(-20,20)+
-  ylim(-20,20)
+  xlim(-15,15)+
+  ylim(-15,15)
 
 p3=ggplot(data=dat,aes(x=umap1,y=umap2))+
   geom_point(aes(col=slide),alpha=0.2)+
   theme(legend.position='none')+
-  xlim(-20,20)+
-  ylim(-20,20)
+  xlim(-15,15)+
+  ylim(-15,15)
 
 p4=ggplot(data=subset(dat,True_label==1),aes(x=umap1,y=umap2))+
   geom_point(aes(col=slide),alpha=0.2)+
   theme(legend.position='none')+
-  xlim(-20,20)+
-  ylim(-20,20)
+  xlim(-15,15)+
+  ylim(-15,15)
 
 pdf(file=out_fig,
     width=14,height=7)
