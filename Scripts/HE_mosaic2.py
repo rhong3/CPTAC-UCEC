@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     ### special ###
     dirls = []
-    for n in range(6):
+    for n in range(4):
         num = str(n+1)
         genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
                         'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
