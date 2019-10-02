@@ -33,7 +33,7 @@ def load_image(addr):
     return img
 
 
-# loading images for dictionaries and generate tfrecords
+# loading images
 def loader(totlist_dir):
     RGB=[]
     all = pd.read_csv(totlist_dir+'/All_images.csv', header=0)
