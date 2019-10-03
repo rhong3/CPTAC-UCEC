@@ -80,13 +80,13 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
             SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
             POLEimg = intersection(ref.loc[ref['subtype_POLE'] == 1]['name'].tolist(), allimg)
             for i in MSIimg:
-                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
-            for i in EMimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
-            for i in SLimg:
+            for i in EMimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 2])
-            for i in POLEimg:
+            for i in SLimg:
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 3])
+            for i in POLEimg:
+                big_images.append([i, level, path + "{}/level{}".format(i, level), 0])
         elif pmd == 'histology':
             allimg = intersection(ref.loc[ref['histology_Mixed'] == 0]['name'].tolist(), allimg)
             EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)

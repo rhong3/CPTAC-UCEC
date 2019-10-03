@@ -201,8 +201,8 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
     inter_pd = inter_pd.round({'True_label': 0})
     if pmd == 'subtype':
         inter_pd['Prediction'] = inter_pd[
-            ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].idxmax(axis=1)
-        redict = {'MSI_score': int(0), 'Endometrioid_score': int(1), 'Serous-like_score': int(2), 'POLE_score': int(3)}
+            ['POLE_score', 'MSI_score', 'Endometrioid_score', 'Serous-like_score']].idxmax(axis=1)
+        redict = {'MSI_score': int(1), 'Endometrioid_score': int(2), 'Serous-like_score': int(3), 'POLE_score': int(0)}
     elif pmd == 'histology':
         inter_pd['Prediction'] = inter_pd[
             ['Endometrioid_score', 'Serous_score']].idxmax(axis=1)
@@ -243,7 +243,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
     try:
         outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
         if pmd == 'subtype':
-            pdx_slide = inter_pd[['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score']].values
+            pdx_slide = inter_pd[['POLE_score', 'MSI_score', 'Endometrioid_score', 'Serous-like_score']].values
         elif pmd == 'MSIst':
             pdx_slide = inter_pd[['MSS_score', 'MSI-H_score']].values
         elif pmd == 'histology':
@@ -261,7 +261,7 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
 # for real image prediction, just output the prediction scores as csv
 def realout(pdx, path, name, pmd):
     if pmd == 'subtype':
-        lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
+        lbdict = {1: 'MSI', 2: 'Endometrioid', 3: 'Serous-like', 0: 'POLE'}
     elif pmd == 'histology':
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
     elif pmd == 'MSIst':
@@ -270,10 +270,10 @@ def realout(pdx, path, name, pmd):
         lbdict = {0: 'negative', 1: pmd}
     pdx = np.asmatrix(pdx)
     prl = pdx.argmax(axis=1).astype('uint8')
-    prl = pd.DataFrame(prl, columns = ['Prediction'])
+    prl = pd.DataFrame(prl, columns=['Prediction'])
     prl = prl.replace(lbdict)
     if pmd == 'subtype':
-        out = pd.DataFrame(pdx, columns = ['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+        out = pd.DataFrame(pdx, columns=['POLE_score', 'MSI_score', 'Endometrioid_score', 'Serous-like_score'])
     elif pmd == 'histology':
         out = pd.DataFrame(pdx, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
@@ -296,8 +296,8 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
     prl = pdxt.argmax(axis=1).astype('uint8')
     prl = pd.DataFrame(prl, columns=['Prediction'])
     if pmd == 'subtype':
-        lbdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
-        outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+        lbdict = {1: 'MSI', 2: 'Endometrioid', 3: 'Serous-like', 0: 'POLE'}
+        outt = pd.DataFrame(pdxt, columns=['POLE_score', 'MSI_score', 'Endometrioid_score', 'Serous-like_score'])
     elif pmd == 'histology':
         lbdict = {0: 'Endometrioid', 1: 'Serous'}
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
@@ -416,8 +416,8 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
                 os.mkdir(DIR)
             except FileExistsError:
                 pass
-        catdict = {0: 'MSI', 1: 'Endometrioid', 2: 'Serous-like', 3: 'POLE'}
-        dirdict = {0: DIRA, 1: DIRB, 2: DIRC, 3: DIRD}
+        catdict = {1: 'MSI', 2: 'Endometrioid', 3: 'Serous-like', 0: 'POLE'}
+        dirdict = {1: DIRA, 2: DIRB, 3: DIRC, 0: DIRD}
     elif pmd == 'histology':
         DIRA = "../Results/{}/out/{}_img/Endometrioid".format(path, name)
         DIRB = "../Results/{}/out/{}_img/Serous".format(path, name)
@@ -566,7 +566,7 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     print(np.shape(flatnet))
     act = pd.DataFrame(np.asmatrix(flatnet))
     if pmd == 'subtype':
-        outt = pd.DataFrame(pdxt, columns=['MSI_score', 'Endometrioid_score', 'Serous-like_score', 'POLE_score'])
+        outt = pd.DataFrame(pdxt, columns=['POLE_score', 'MSI_score', 'Endometrioid_score', 'Serous-like_score'])
     elif pmd == 'histology':
         outt = pd.DataFrame(pdxt, columns=['Endometrioid_score', 'Serous_score'])
     elif pmd == 'MSIst':
