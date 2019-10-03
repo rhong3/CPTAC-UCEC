@@ -9,9 +9,9 @@
 # bins=args[5]
 # POS_score=args[6]
 
-input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X4TP53/out/For_tSNE.csv'
-output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X4TP53/out/tSNE_P_N.csv'
-out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X4TP53/out/P_N.pdf'
+input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1ATM/out/For_tSNE.csv'
+output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1ATM/out/tSNE_P_N.csv'
+out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1ATM/out/P_N.pdf'
 start=10
 bins=50
 POS_score='POS_score'
