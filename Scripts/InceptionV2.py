@@ -21,7 +21,7 @@ def inceptionv2(input,
               dropout_keep_prob=0.8,
               num_classes=1000,
               is_training=True,
-              scope='InceptionV2'):
+              scope='InceptionV2', supermd=False):
     with tf.name_scope(scope, "InceptionV2", [input]):
 
         conv1_7x7_s2 = Conv2D(64, (7, 7), strides=(2, 2), padding='same', activation='relu', name='conv1/7x7_s2',

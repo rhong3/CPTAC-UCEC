@@ -22,14 +22,15 @@ class INCEPTION():
         "batch_size": 128,
         "dropout": 0.5,
         "learning_rate": 1E-3,
-        "classes": 4
+        "classes": 4,
+        "sup": False
     }
 
     RESTORE_KEY = "cnn_to_restore"
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta", model='I1', weights = tf.constant([1., 1., 1., 1.])):
+                 log_dir="./log", meta_dir="./meta", model='X1', weights = tf.constant([1., 1., 1., 1.])):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
@@ -88,6 +89,7 @@ class INCEPTION():
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
         classes = self.classes
+        sup = self.sup
 
         if model == 'X1':
             import XeptionV1
@@ -95,7 +97,7 @@ class INCEPTION():
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV1')
+                                                   scope='XecptionV1', supermd=sup)
             print('Using Xeption-V1')
         elif model == 'X2':
             import XeptionV2
@@ -103,7 +105,7 @@ class INCEPTION():
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV2')
+                                                   scope='XecptionV2', supermd=sup)
             print('Using Xeption-V2')
         elif model == 'X3':
             import XeptionV3
@@ -111,7 +113,7 @@ class INCEPTION():
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV3')
+                                                   scope='XecptionV3', supermd=sup)
             print('Using Xeption-V3')
         elif model == 'X4':
             import XeptionV4
@@ -119,7 +121,7 @@ class INCEPTION():
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV4')
+                                                   scope='XecptionV4', supermd=sup)
             print('Using Xeption-V4')
         else:
             import XeptionV1
@@ -127,7 +129,7 @@ class INCEPTION():
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV1')
+                                                   scope='XecptionV1', supermd=sup)
             print('Using Default: Xeption-V1')
 
         pred = tf.nn.softmax(logits, name="prediction")

@@ -21,7 +21,7 @@ def googlenet(input,
               dropout_keep_prob=0.8,
               num_classes=1000,
               is_training=True,
-              scope='GoogleNet'):
+              scope='GoogleNet', supermd=False):
     # creates GoogLeNet a.k.a. Inception v1 (Szegedy, 2015)
     with tf.name_scope(scope, "googlenet", [input]):
 

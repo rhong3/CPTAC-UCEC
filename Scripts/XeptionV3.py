@@ -206,7 +206,7 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
     return x, loss2_classifier
 
 
-def XecptionV3(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV1'):
+def XecptionV3(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV3', supermd=False):
     with tf.variable_scope(scope, 'XecptionV3', [inputa, inputb, inputc]):
 
         xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)

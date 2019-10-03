@@ -49,7 +49,8 @@ HYPERPARAMS = {
     "batch_size": bs,
     "dropout": 0.3,
     "learning_rate": 1E-4,
-    "classes": classes
+    "classes": classes,
+    "sup": False
 }
 
 # paths to directories

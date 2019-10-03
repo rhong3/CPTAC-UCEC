@@ -142,7 +142,8 @@ def reduction_resnet_v1_B(input):
     return rbr
 
 
-def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionResnetV1'):
+def inceptionresnetv1(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True,
+                      scope='InceptionResnetV1', supermd=False):
     '''Creates the Inception_ResNet_v1 network.'''
     with tf.variable_scope(scope, 'InceptionResnetV1', [input]):
         # Input shape is 299 * 299 * 3

@@ -22,7 +22,8 @@ class INCEPTION():
         "batch_size": 128,
         "dropout": 0.5,
         "learning_rate": 1E-3,
-        "classes": 4
+        "classes": 4,
+        "sup": False
     }
 
     RESTORE_KEY = "cnn_to_restore"
@@ -84,6 +85,7 @@ class INCEPTION():
         # train or test
         is_train = tf.placeholder_with_default(True, shape=[], name="is_train")
         classes = self.classes
+        sup = self.sup
 
         if model == 'I1':
             import InceptionV1
@@ -91,7 +93,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='GoogleNet')
+                                                   scope='GoogleNet', supermd=sup)
             print('Using Inception-V1')
         elif model == 'I2':
             import InceptionV2
@@ -99,7 +101,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV2')
+                                                   scope='InceptionV2', supermd=sup)
             print('Using Inception-V2')
         elif model == 'I3':
             import InceptionV3
@@ -107,7 +109,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV3')
+                                                   scope='InceptionV3', supermd=sup)
             print('Using Inception-V3')
         elif model == 'I4':
             import InceptionV4
@@ -115,7 +117,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV4')
+                                                   scope='InceptionV4', supermd=sup)
             print('Using Inception-V4')
         elif model == 'I5':
             import InceptionV5
@@ -123,7 +125,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionResV1')
+                                                   scope='InceptionResV1', supermd=sup)
             print('Using Inception-Resnet-V1')
         elif model == 'I6':
             import InceptionV6
@@ -131,7 +133,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionResV2')
+                                                   scope='InceptionResV2', supermd=sup)
             print('Using Inception-Resnet-V2')
         else:
             import InceptionV1
@@ -139,7 +141,7 @@ class INCEPTION():
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='GoogleNet')
+                                                   scope='GoogleNet', supermd=sup)
             print('Using Default: Inception-V1')
 
         pred = tf.nn.softmax(logits, name="prediction")

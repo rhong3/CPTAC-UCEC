@@ -44,7 +44,8 @@ def conv2d_bn(x,
     return x
 
 
-def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, scope='InceptionV3', channel_axis=3):
+def inceptionv3(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True,
+                scope='InceptionV3', channel_axis=3, supermd=False):
 
     with tf.name_scope(scope, "InceptionV3", [input]):
 
