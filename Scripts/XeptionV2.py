@@ -14,6 +14,7 @@ from keras.layers.core import Dense, Dropout, Flatten, Activation, Lambda
 from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import concatenate, add
 from keras.regularizers import l2
+import numpy as np
 
 
 def resnet_v1_stem(input):
@@ -141,7 +142,7 @@ def reduction_resnet_v1_B(input):
 
     return rbr
 
-def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
+def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, supermd=False):
     # Input shape is 299 * 299 * 3
     x = resnet_v1_stem(input)  # Output: 35 * 35 * 256
 
@@ -174,7 +175,17 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
 
     loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
-    loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+    if supermd:
+        loss2_classifier_a = Dense(2, name='loss2/classifiera', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+        loss2_classifier_a, loss2_classifier_a2 = tf.split(loss2_classifier_a, [1, 3], 1)
+        loss2_classifier_a2 = Activation('relu')(loss2_classifier_a2)
+        loss2_classifier_b = Dense(2, name='loss2/classifierb', kernel_regularizer=l2(0.0002))(loss2_classifier_a2)
+        loss2_classifier_b, loss2_classifier_b2 = tf.split(loss2_classifier_b, [1, 2], 1)
+        loss2_classifier_b2 = Activation('relu')(loss2_classifier_b2)
+        loss2_classifier_c = Dense(2, name='loss2/classifierc', kernel_regularizer=l2(0.0002))(loss2_classifier_b2)
+        loss2_classifier = concatenate([loss2_classifier_a, loss2_classifier_b, loss2_classifier_c], axis=-1)
+    else:
+        loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
 
     # Reduction B
     x = reduction_resnet_v1_B(x)  # Output: 8 * 8 * 1792
@@ -191,9 +202,9 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
 
 def XecptionV2(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV2', supermd=False):
     with tf.variable_scope(scope, 'XecptionV2', [inputa, inputb, inputc]):
-        xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
-        xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
-        xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
+        xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
+        xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
+        xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
 
@@ -206,11 +217,31 @@ def XecptionV2(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True,
 
         pool5_drop_10x10_s1 = Dropout(dropout)(x, training=is_train)
 
-        loss3_classifier_W = Dense(num_cls, name='loss3/classifier', kernel_regularizer=l2(0.0002))
+        if supermd:
+            loss3_classifier_aw = Dense(4, name='loss3/classifiera', kernel_regularizer=l2(0.0002))
+            loss3_classifier_a = loss3_classifier_aw(pool5_drop_10x10_s1)
+            loss3_classifier_a, loss3_classifier_a2 = tf.split(loss3_classifier_a, [1, 3], 1)
+            loss3_classifier_a2 = Activation('relu')(loss3_classifier_a2)
+            loss3_classifier_bw = Dense(3, name='loss3/classifierb', kernel_regularizer=l2(0.0002))
+            loss3_classifier_b = loss3_classifier_bw(loss3_classifier_a2)
+            loss3_classifier_b, loss3_classifier_b2 = tf.split(loss3_classifier_b, [1, 2], 1)
+            loss3_classifier_b2 = Activation('relu')(loss3_classifier_b2)
+            loss3_classifier_cw = Dense(2, name='loss3/classifierc', kernel_regularizer=l2(0.0002))
+            loss3_classifier_c = loss3_classifier_cw(loss3_classifier_b2)
+            loss3_classifier = concatenate([loss3_classifier_a, loss3_classifier_b, loss3_classifier_c], axis=-1)
 
-        loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
+            aw_variables = [loss3_classifier_aw.get_weights()[0][0]]
+            bw_variables = [loss3_classifier_bw.get_weights()[0][0]]
+            w_variables = np.append(aw_variables, bw_variables, axis=0)
+            cw_variables = loss3_classifier_bw.get_weights()[0]
+            w_variables = np.append(w_variables, cw_variables, axis=0)
 
-        w_variables = loss3_classifier_W.get_weights()
+        else:
+            loss3_classifier_w = Dense(num_cls, name='loss3/classifier', kernel_regularizer=l2(0.0002))
+
+            loss3_classifier = loss3_classifier_w(pool5_drop_10x10_s1)
+
+            w_variables = loss3_classifier_w.get_weights()
 
         logits = tf.cond(tf.equal(is_train, tf.constant(True)),
                          lambda: tf.add(loss3_classifier, tf.scalar_mul(tf.constant(0.1), loss2_classifier)),

@@ -223,7 +223,7 @@ def inceptionresnetv2(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
 
         pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(x, training=is_training)
 
-        if super:
+        if supermd:
             loss3_classifier_aw = Dense(4, name='loss3/classifiera', kernel_regularizer=l2(0.0002))
             loss3_classifier_a = loss3_classifier_aw(pool5_drop_10x10_s1)
             loss3_classifier_a, loss3_classifier_a2 = tf.split(loss3_classifier_a, [1, 3], 1)

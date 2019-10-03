@@ -11,10 +11,11 @@ Created on 03/18/2019
 import tensorflow as tf
 from keras.layers.convolutional import Conv2D, ZeroPadding2D
 from keras.layers.pooling import MaxPooling2D, AveragePooling2D
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout, Flatten, Activation
 from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import concatenate
 from keras.regularizers import l2
+import numpy as np
 
 
 def inceptionv2(input,
@@ -146,7 +147,17 @@ def inceptionv2(input,
 
         loss1_drop_fc = Dropout(dropout_keep_prob)(loss1_fc, training=is_training)
 
-        loss1_classifier = Dense(num_classes, name='loss1/classifier', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
+        if supermd:
+            loss1_classifier_a = Dense(2, name='loss1/classifiera', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
+            loss1_classifier_a, loss1_classifier_a2 = tf.split(loss1_classifier_a, [1, 3], 1)
+            loss1_classifier_a2 = Activation('relu')(loss1_classifier_a2)
+            loss1_classifier_b = Dense(2, name='loss1/classifierb', kernel_regularizer=l2(0.0002))(loss1_classifier_a2)
+            loss1_classifier_b, loss1_classifier_b2 = tf.split(loss1_classifier_b, [1, 2], 1)
+            loss1_classifier_b2 = Activation('relu')(loss1_classifier_b2)
+            loss1_classifier_c = Dense(2, name='loss1/classifierc', kernel_regularizer=l2(0.0002))(loss1_classifier_b2)
+            loss1_classifier = concatenate([loss1_classifier_a, loss1_classifier_b, loss1_classifier_c], axis=-1)
+        else:
+            loss1_classifier = Dense(num_classes, name='loss1/classifier', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
 
         inception_4b_1x1 = Conv2D(160, (1, 1), padding='same', activation='relu', name='inception_4b/1x1',
                                          kernel_regularizer=l2(0.0002))(inception_4a_output)
@@ -246,7 +257,17 @@ def inceptionv2(input,
 
         loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
-        loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+        if supermd:
+            loss2_classifier_a = Dense(2, name='loss2/classifiera', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+            loss2_classifier_a, loss2_classifier_a2 = tf.split(loss2_classifier_a, [1, 3], 1)
+            loss2_classifier_a2 = Activation('relu')(loss2_classifier_a2)
+            loss2_classifier_b = Dense(2, name='loss2/classifierb', kernel_regularizer=l2(0.0002))(loss2_classifier_a2)
+            loss2_classifier_b, loss2_classifier_b2 = tf.split(loss2_classifier_b, [1, 2], 1)
+            loss2_classifier_b2 = Activation('relu')(loss2_classifier_b2)
+            loss2_classifier_c = Dense(2, name='loss2/classifierc', kernel_regularizer=l2(0.0002))(loss2_classifier_b2)
+            loss2_classifier = concatenate([loss2_classifier_a, loss2_classifier_b, loss2_classifier_c], axis=-1)
+        else:
+            loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
 
         inception_4e_1x1 = Conv2D(256, (1, 1), padding='same', activation='relu', name='inception_4e/1x1',
                                          kernel_regularizer=l2(0.0002))(inception_4d_output)
@@ -347,11 +368,31 @@ def inceptionv2(input,
 
         pool5_drop_10x10_s1 = Dropout(dropout_keep_prob)(loss3_flat, training=is_training)
 
-        loss3_classifier_W = Dense(num_classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))
+        if supermd:
+            loss3_classifier_aw = Dense(4, name='loss3/classifiera', kernel_regularizer=l2(0.0002))
+            loss3_classifier_a = loss3_classifier_aw(pool5_drop_10x10_s1)
+            loss3_classifier_a, loss3_classifier_a2 = tf.split(loss3_classifier_a, [1, 3], 1)
+            loss3_classifier_a2 = Activation('relu')(loss3_classifier_a2)
+            loss3_classifier_bw = Dense(3, name='loss3/classifierb', kernel_regularizer=l2(0.0002))
+            loss3_classifier_b = loss3_classifier_bw(loss3_classifier_a2)
+            loss3_classifier_b, loss3_classifier_b2 = tf.split(loss3_classifier_b, [1, 2], 1)
+            loss3_classifier_b2 = Activation('relu')(loss3_classifier_b2)
+            loss3_classifier_cw = Dense(2, name='loss3/classifierc', kernel_regularizer=l2(0.0002))
+            loss3_classifier_c = loss3_classifier_cw(loss3_classifier_b2)
+            loss3_classifier = concatenate([loss3_classifier_a, loss3_classifier_b, loss3_classifier_c], axis=-1)
 
-        loss3_classifier = loss3_classifier_W(pool5_drop_10x10_s1)
+            aw_variables = [loss3_classifier_aw.get_weights()[0][0]]
+            bw_variables = [loss3_classifier_bw.get_weights()[0][0]]
+            w_variables = np.append(aw_variables, bw_variables, axis=0)
+            cw_variables = loss3_classifier_bw.get_weights()[0]
+            w_variables = np.append(w_variables, cw_variables, axis=0)
 
-        w_variables = loss3_classifier_W.get_weights()
+        else:
+            loss3_classifier_w = Dense(num_classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))
+
+            loss3_classifier = loss3_classifier_w(pool5_drop_10x10_s1)
+
+            w_variables = loss3_classifier_w.get_weights()
 
         logits = tf.cond(tf.equal(is_training, tf.constant(True)),
                          lambda: tf.add(loss3_classifier, tf.scalar_mul(tf.constant(0.3),
