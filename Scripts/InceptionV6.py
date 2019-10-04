@@ -196,10 +196,10 @@ def inceptionresnetv2(input, dropout_keep_prob=0.8, num_classes=1000, is_trainin
         loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
         if supermd:
-            loss2_classifier_a = Dense(2, name='loss2/classifiera', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+            loss2_classifier_a = Dense(4, name='loss2/classifiera', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
             loss2_classifier_a, loss2_classifier_a2 = tf.split(loss2_classifier_a, [1, 3], 1)
             loss2_classifier_a2 = Activation('relu')(loss2_classifier_a2)
-            loss2_classifier_b = Dense(2, name='loss2/classifierb', kernel_regularizer=l2(0.0002))(loss2_classifier_a2)
+            loss2_classifier_b = Dense(3, name='loss2/classifierb', kernel_regularizer=l2(0.0002))(loss2_classifier_a2)
             loss2_classifier_b, loss2_classifier_b2 = tf.split(loss2_classifier_b, [1, 2], 1)
             loss2_classifier_b2 = Activation('relu')(loss2_classifier_b2)
             loss2_classifier_c = Dense(2, name='loss2/classifierc', kernel_regularizer=l2(0.0002))(loss2_classifier_b2)
