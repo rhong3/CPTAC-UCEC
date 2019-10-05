@@ -140,10 +140,10 @@ def googlenet(input,
         loss1_drop_fc = Dropout(rate=dropout_keep_prob)(loss1_fc, training=is_training)
 
         if supermd:
-            loss1_classifier_a = Dense(2, name='loss1/classifiera', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
+            loss1_classifier_a = Dense(4, name='loss1/classifiera', kernel_regularizer=l2(0.0002))(loss1_drop_fc)
             loss1_classifier_a, loss1_classifier_a2 = tf.split(loss1_classifier_a, [1, 3], 1)
             loss1_classifier_a2 = Activation('relu')(loss1_classifier_a2)
-            loss1_classifier_b = Dense(2, name='loss1/classifierb', kernel_regularizer=l2(0.0002))(loss1_classifier_a2)
+            loss1_classifier_b = Dense(3, name='loss1/classifierb', kernel_regularizer=l2(0.0002))(loss1_classifier_a2)
             loss1_classifier_b, loss1_classifier_b2 = tf.split(loss1_classifier_b, [1, 2], 1)
             loss1_classifier_b2 = Activation('relu')(loss1_classifier_b2)
             loss1_classifier_c = Dense(2, name='loss1/classifierc', kernel_regularizer=l2(0.0002))(loss1_classifier_b2)
