@@ -381,11 +381,7 @@ def inceptionv2(input,
             loss3_classifier_c = loss3_classifier_cw(loss3_classifier_b2)
             loss3_classifier = concatenate([loss3_classifier_a, loss3_classifier_b, loss3_classifier_c], axis=-1)
 
-            aw_variables = [loss3_classifier_aw.get_weights()[0][0]]
-            bw_variables = [loss3_classifier_bw.get_weights()[0][0]]
-            w_variables = np.append(aw_variables, bw_variables, axis=0)
-            cw_variables = loss3_classifier_bw.get_weights()[0]
-            w_variables = np.append(w_variables, cw_variables, axis=0)
+            w_variables = loss3_classifier_aw.get_weights()
 
         else:
             loss3_classifier_w = Dense(num_classes, name='loss3/classifier', kernel_regularizer=l2(0.0002))
