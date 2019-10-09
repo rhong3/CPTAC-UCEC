@@ -230,15 +230,6 @@ def slide_metrics(inter_pd, path, name, fordict, pmd):
                 print('Slide {} Accuracy: '.format(fordict[i])+str(accuar))
             except ZeroDivisionError:
                 print("No data for {}.".format(fordict[i]))
-    elif pmd == 'MSIst':
-        for i in range(2):
-            accua = accout[accout.True_label == i].shape[0]
-            tota = inter_pd[inter_pd.True_label == i].shape[0]
-            try:
-                accuar = round(accua / tota, 5)
-                print('Slide {} Accuracy: '.format(fordict[i])+str(accuar))
-            except ZeroDivisionError:
-                print("No data for {}.".format(fordict[i]))
     try:
         outtl_slide = inter_pd['True_label'].to_frame(name='True_lable')
         if pmd == 'subtype':
@@ -339,24 +330,6 @@ def metrics(pdx, tl, path, name, pmd, ori_test=None):
     print('Tile Total Accuracy: '+str(accurw))
     if pmd == 'subtype':
         for i in range(4):
-            accua = accout[accout.True_label == i].shape[0]
-            tota = out[out.True_label == i].shape[0]
-            try:
-                accuar = round(accua / tota, 5)
-                print('Tile {} Accuracy: '.format(lbdict[i])+str(accuar))
-            except ZeroDivisionError:
-                print("No data for {}.".format(lbdict[i]))
-    elif pmd == 'MSIst':
-        for i in range(2):
-            accua = accout[accout.True_label == i].shape[0]
-            tota = out[out.True_label == i].shape[0]
-            try:
-                accuar = round(accua / tota, 5)
-                print('Tile {} Accuracy: '.format(lbdict[i])+str(accuar))
-            except ZeroDivisionError:
-                print("No data for {}.".format(lbdict[i]))
-    elif pmd == 'histology':
-        for i in range(2):
             accua = accout[accout.True_label == i].shape[0]
             tota = out[out.True_label == i].shape[0]
             try:
