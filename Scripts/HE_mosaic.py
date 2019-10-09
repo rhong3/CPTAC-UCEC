@@ -23,7 +23,6 @@ outim = sys.argv[6]
 
 # random select representative images and output the file paths
 def sample(dat, md, bins):
-
     if md == 'subtype':
         classes = 4
         redict = {0: 'MSI_score', 1: 'Endometrioid_score', 2: 'Serous-like_score', 3: 'POLE_score'}

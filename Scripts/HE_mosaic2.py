@@ -23,7 +23,6 @@ outim = sys.argv[6]
 
 # random select representative images and output the file paths
 def sample(dat, md, bins):
-
     if md == 'subtype':
         classes = 4
         redict = {0: 'MSI_score', 1: 'Endometrioid_score', 2: 'Serous-like_score', 3: 'POLE_score'}
@@ -55,16 +54,16 @@ def sample(dat, md, bins):
 if __name__ == "__main__":
     dirls = dirr.split(',')
 
-    ### special ###
-    dirls = []
-    for n in range(4):
-        num = str(n+1)
-        genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
-                        'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
-                        'PTEN', 'RPL22', 'TP53']
-        for g in genes:
-            dirls.append('X{}{}'.format(num, g))
-    ### special ###
+    # ### special ###
+    # dirls = []
+    # for n in range(4):
+    #     num = str(n+1)
+    #     genes = ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
+    #                     'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
+    #                     'PTEN', 'RPL22', 'TP53']
+    #     for g in genes:
+    #         dirls.append('X{}{}'.format(num, g))
+    # ### special ###
 
     for i in dirls:
         try:
