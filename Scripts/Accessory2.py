@@ -402,8 +402,8 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
         catdict = {0: 'Endometrioid', 1: 'Serous'}
         dirdict = {0: DIRA, 1: DIRB}
     elif pmd == 'MSIst':
-        DIRA = "../Results/{}/out/{}_MSI-H_img".format(path, name)
-        DIRB = "../Results/{}/out/{}_MSS_img".format(path, name)
+        DIRA = "../Results/{}/out/{}_img/MSI-H".format(path, name)
+        DIRB = "../Results/{}/out/{}_img/MSS".format(path, name)
         for DIR in (DIRA, DIRB):
             try:
                 os.mkdir(DIR)

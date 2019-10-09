@@ -31,41 +31,6 @@ def intersection(lst1, lst2):
     return lst3
 
 
-def tile_ids_in(slide, label, root_dir):
-    dira = os.path.isdir(root_dir + 'level0')
-    dirb = os.path.isdir(root_dir + 'level1')
-    dirc = os.path.isdir(root_dir + 'level2')
-    if dira and dirb and dirc:
-        ids = []
-        for level in range(3):
-            dirr = root_dir + 'level{}'.format(str(level))
-            for id in os.listdir(dirr):
-                if '.png' in id:
-                    ids.append([slide, label, level, dirr + '/' + id])
-                else:
-                    print('Skipping ID:', id)
-        ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path'])
-        idsa = ids.loc[ids['level'] == 0]
-        idsb = ids.loc[ids['level'] == 1]
-        idsc = ids.loc[ids['level'] == 2]
-        idss = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
-        idss['slide'] = idsa['slide']
-        idss['label'] = idsa['label']
-        idss['L0path'] = idsa['path']
-        idss = idss.reset_index(drop=True)
-        idsb = idsb.reset_index(drop=True)
-        idsc = idsc.reset_index(drop=True)
-        idss['L1path'] = idsb['path']
-        idss['L2path'] = idsc['path']
-        idss = sku.shuffle(idss)
-        idss = idss.fillna(method='ffill')
-        idss = idss.fillna(method='bfill')
-    else:
-        idss = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
-
-    return idss
-
-
 # pair tiles of 20x, 10x, 5x of the same area
 def paired_tile_ids_in(slide, label, root_dir):
     dira = os.path.isdir(root_dir + 'level0')
