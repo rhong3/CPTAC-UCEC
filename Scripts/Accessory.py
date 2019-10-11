@@ -354,8 +354,7 @@ def py_returnCAMmap(activation, weights_LR):
         weights_vec = np.reshape(weights_LR[t], [1, weights_LR[t].shape[0]])
         heatmap_vec = np.dot(weights_vec,act_vec)
         heatmap = np.reshape(np.squeeze(heatmap_vec), [w, h])
-        out[:,:,t] = heatmap
-
+        out[:, :, t] = heatmap
     return out
 
 
@@ -365,12 +364,8 @@ def im2double(im):
 
 
 # image to jpg
-def py_map2jpg(imgmap, rang, colorMap):
-    if rang is None:
-        rang = [np.min(imgmap), np.max(imgmap)]
-
+def py_map2jpg(imgmap):
     heatmap_x = np.round(imgmap*255).astype(np.uint8)
-
     return cv2.applyColorMap(heatmap_x, cv2.COLORMAP_JET)
 
 
@@ -449,19 +444,19 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
             curCAMmapLarge_crops = cv2.resize(curCAMmap_crops, (299, 299))
             curHeatMap = cv2.resize(im2double(curCAMmapLarge_crops), (299, 299))
             curHeatMap = im2double(curHeatMap)
-            curHeatMap = py_map2jpg(curHeatMap, None, 'jet')
+            curHeatMap = py_map2jpg(curHeatMap)
             xim = x[ij].reshape(-1, 3)
             xim1 = xim[:, 0].reshape(-1, 299)
             xim2 = xim[:, 1].reshape(-1, 299)
             xim3 = xim[:, 2].reshape(-1, 299)
-            image = np.empty([299,299,3])
+            image = np.empty([299, 299, 3])
             image[:, :, 0] = xim1
             image[:, :, 1] = xim2
             image[:, :, 2] = xim3
             a = im2double(image) * 255
             b = im2double(curHeatMap) * 255
             curHeatMap = a * 0.6 + b * 0.4
-            ab = np.hstack((a,b))
+            ab = np.hstack((a, b))
             full = np.hstack((curHeatMap, ab))
             # imname = DIRR + '/' + id + ddt + '_' + catt + '.png'
             # imname1 = DIRR + '/' + id + ddt + '_' + catt + '_img.png'
@@ -501,19 +496,19 @@ def CAM_R(net, w, pred, x, path, name, bs, rd=0):
             curCAMmapLarge_crops = cv2.resize(curCAMmap_crops, (299, 299))
             curHeatMap = cv2.resize(im2double(curCAMmapLarge_crops), (299, 299))  # this line is not doing much
             curHeatMap = im2double(curHeatMap)
-            curHeatMap = py_map2jpg(curHeatMap, None, 'jet')
+            curHeatMap = py_map2jpg(curHeatMap)
             xim = x[ij].reshape(-1, 3)
             xim1 = xim[:, 0].reshape(-1, 299)
             xim2 = xim[:, 1].reshape(-1, 299)
             xim3 = xim[:, 2].reshape(-1, 299)
-            image = np.empty([299,299,3])
+            image = np.empty([299, 299, 3])
             image[:, :, 0] = xim1
             image[:, :, 1] = xim2
             image[:, :, 2] = xim3
             a = im2double(image) * 255
             b = im2double(curHeatMap) * 255
             curHeatMap = a * 0.6 + b * 0.4
-            ab = np.hstack((a,b))
+            ab = np.hstack((a, b))
             full = np.hstack((curHeatMap, ab))
             # imname = DIRR + '/' + id + '.png'
             # imname1 = DIRR + '/' + id + '_img.png'
