@@ -9,12 +9,12 @@
 # bins=args[5]
 # POS_score=args[6]
 
-input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/I5his/out/For_tSNE.csv'
-output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/I5his/out/tSNE_P_N.csv'
-out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/I5his/out/P_N.pdf'
+input_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1PTEN/out/For_tSNE.csv'
+output_file='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1PTEN/out/tSNE_P_N.csv'
+out_fig='/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/X1PTEN/out/P_N.pdf'
 start=10
 bins=50
-POS_score='Serous_score'
+POS_score='POS_score'
 
 library(Rtsne)
 ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -46,7 +46,7 @@ write.table(dat, file=output_file, row.names = F, sep=',')
 library(ggplot2)
 library(gridExtra)
 
-p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=Serous_score))+
+p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=POS_score))+
   scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
   geom_point(alpha=0.2)+
   #theme(legend.position='bottom')+
