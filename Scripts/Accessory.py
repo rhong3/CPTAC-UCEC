@@ -547,5 +547,6 @@ def tSNE_prep(flatnet, ori_test, y, pred, path, pmd):
     out.reset_index(drop=True, inplace=True)
     act.reset_index(drop=True, inplace=True)
     out = pd.concat([ori_test, out, act], axis=1)
-    out = out.sample(30000, replace=False)
+    if out.shape[0] > 30000:
+        out = out.sample(30000, replace=False)
     out.to_csv("../Results/{}/out/For_tSNE.csv".format(path), index=False)
