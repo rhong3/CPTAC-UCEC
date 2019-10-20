@@ -50,7 +50,7 @@ HYPERPARAMS = {
     "dropout": 0.3,
     "learning_rate": 1E-4,
     "classes": classes,
-    "sup": True
+    "sup": False
 }
 
 # paths to directories
