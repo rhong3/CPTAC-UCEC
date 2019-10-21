@@ -55,10 +55,10 @@ HYPERPARAMS = {
 
 # paths to directories
 img_dir = '../tiles/'
-LOG_DIR = "../Results/{}".format(dirr)
-METAGRAPH_DIR = "../Results/{}".format(dirr)
-data_dir = "../Results/{}/data".format(dirr)
-out_dir = "../Results/{}/out".format(dirr)
+LOG_DIR = "/media/data02/{}".format(dirr)
+METAGRAPH_DIR = "/media/data02/{}".format(dirr)
+data_dir = "/media/data02/{}/data".format(dirr)
+out_dir = "/media/data02/{}/out".format(dirr)
 
 
 # count numbers of training and testing images
