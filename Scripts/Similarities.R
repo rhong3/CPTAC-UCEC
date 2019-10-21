@@ -2,7 +2,7 @@ library(Hmisc)
 library(Rfast)
 library(dplyr)
 library(pheatmap)
-library("ComplexHeatmap", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
+library(ComplexHeatmap)
 # Correlation check
 dict=read.csv('~/Documents/CPTAC-UCEC/dummy_His_MUT_joined.csv')
 dict$subtype_Endometrioid = dict$subtype_Endometrioid-dict$subtype_0NA
@@ -17,7 +17,7 @@ dict$MSIst_MSI.H = dict$MSIst_MSI.H-dict$MSIst_0NA
 dict$MSIst_MSI.H = gsub(-1, NA, dict$MSIst_MSI.H)
 dict$MSIst_MSS = dict$MSIst_MSS-dict$MSIst_0NA
 dict$MSIst_MSS = gsub(-1, NA, dict$MSIst_MSS)
-dict = subset(dict, select = -c(name, subtype_0NA, histology_Clear.cell, MSIst_MSI.L, MSIst_0NA))
+dict = subset(dict, select = -c(name, subtype_0NA, histology_Clear.cell, MSIst_MSI.L, MSIst_0NA, histology_Mixed))
 
 # Yule's Y Coefficient of colligation column-wise calculation 
 YuleY = function(col1, col2){
@@ -66,7 +66,7 @@ rownames(OUTPUT_hm) = gsub('Serous.like','SL', rownames(OUTPUT_hm))
 out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities.pdf'
 pdf(file=out_fig,
     width=8.5,height=7)
-pheatmap(OUTPUT_hm, cluster_cols = FALSE)
+pheatmap(OUTPUT_hm, cluster_cols = FALSE, main = "YuleY Colligation")
 dev.off()
 
 nm = rownames(OUTPUT_hm)
@@ -76,7 +76,7 @@ col_fun = circlize::colorRamp2(c(-1, 0, 1), c( "#4575B4", "#ffffff", "#D73027"))
 out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities_COMPLEX.pdf'
 pdf(file=out_fig,
     width=20,height=15)
-Heatmap(OUTPUT_hm, name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
+Heatmap(OUTPUT_hm, column_title = "YuleY Colligation", name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
         cell_fun = function(j, i, x, y, width, height, fill) {
           grid.rect(x = x, y = y, width = width, height = height, 
                     gp = gpar(col = "grey", fill = NA))
