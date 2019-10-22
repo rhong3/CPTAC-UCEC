@@ -41,50 +41,53 @@ def rename():
     CPTAClist = image_ids_in(CPTACpath, 'CPTAC')
     TCGAlist = image_ids_in(TCGApath, 'TCGA')
 
-    # CPTACpp = pd.DataFrame(CPTAClist, columns=['id', 'dir', 'sld'])
-    # CPTACcc = CPTACpp['dir'].value_counts()
-    # CPTACcc = CPTACcc[CPTACcc > 1].index.tolist()
-    #
-    # TCGApp = pd.DataFrame(TCGAlist, columns=['id', 'dir', 'sld'])
-    # TCGAcc = TCGApp['dir'].value_counts()
-    # TCGAcc = TCGAcc[TCGAcc > 1].index.tolist()
+    CPTACpp = pd.DataFrame(CPTAClist, columns=['id', 'dir', 'sld'])
+    CPTACcc = CPTACpp['dir'].value_counts()
+    CPTACcc = CPTACcc[CPTACcc > 1].index.tolist()
+
+    TCGApp = pd.DataFrame(TCGAlist, columns=['id', 'dir', 'sld'])
+    TCGAcc = TCGApp['dir'].value_counts()
+    TCGAcc = TCGAcc[TCGAcc > 1].index.tolist()
+
 
     # CPTAC
     for i in CPTAClist:
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        for m in range(3):
-            print(i)
-            for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
-                if '.png' in q:
-                    old = q.split('.pn')[0]
-                    old = old.split('_{}'.format(str(i[2])))[0]
-                    os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                              "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
-                elif '.csv' in q:
-                    old = q.split('.cs')[0]
-                    old = old.split('_{}'.format(str(i[2])))[0]
-                    os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                              "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
+        if i[1] not in CPTACcc:
+            print(i[1])
+            for m in range(3):
+                for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
+                    if '.png' in q:
+                        old = q.split('.pn')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
+                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
+                    elif '.csv' in q:
+                        old = q.split('.cs')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
+                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
     # TCGA
     for i in TCGAlist:
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        for m in range(3):
-            print(i)
-            for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
-                if '.png' in q:
-                    old = q.split('.pn')[0]
-                    old = old.split('_{}'.format(str(i[2])))[0]
-                    os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                              "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
-                elif '.csv' in q:
-                    old = q.split('.cs')[0]
-                    old = old.split('_{}'.format(str(i[2])))[0]
-                    os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                              "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
+        if i[1] not in TCGAcc:
+            print(i[1])
+            for m in range(3):
+                for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
+                    if '.png' in q:
+                        old = q.split('.pn')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
+                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
+                    elif '.csv' in q:
+                        old = q.split('.cs')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
+                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
