@@ -9,11 +9,8 @@ Created on 11/01/2018
 import time
 import matplotlib
 import os
-import shutil
 import pandas as pd
 matplotlib.use('Agg')
-import Slicer
-import staintools
 
 
 # Get all images in the root directory
