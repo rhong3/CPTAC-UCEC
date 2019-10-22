@@ -64,72 +64,78 @@ def cut():
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        if i[1] in CPTACcc:
+        # if i[1] in CPTACcc:
+        try:
+            os.mkdir("../tiles/{}".format(i[1]))
+        except(FileExistsError):
+            pass
+        for m in range(3, 4):
+            if m == 0:
+                tff = 1
+                level = 0
+            elif m == 1:
+                tff = 2
+                level = 0
+            elif m == 2:
+                tff = 1
+                level = 1
+            elif m == 3:
+                tff = 2
+                level = 1
+            otdir = "../tiles/{}/level{}".format(i[1], str(m))
             try:
-                os.mkdir("../tiles/{}".format(i[1]))
+                os.mkdir(otdir)
             except(FileExistsError):
                 pass
-            for m in range(3):
-                if m == 0:
-                    tff = 1
-                    level = 0
-                elif m == 1:
-                    tff = 2
-                    level = 0
-                else:
-                    tff = 1
-                    level = 1
-                otdir = "../tiles/{}/level{}".format(i[1], str(m))
-                try:
-                    os.mkdir(otdir)
-                except(FileExistsError):
-                    pass
-                try:
-                    n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
-                                                                    level=level, std_img=std, dp=i[2], ft=tff)
-                except(IndexError):
-                    pass
-                if len(os.listdir(otdir)) < 2:
-                    shutil.rmtree(otdir, ignore_errors=True)
-        else:
-            print("pass: {}".format(str(i)))
+            try:
+                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
+                                                                level=level, std_img=std, dp=i[2], ft=tff)
+            except(IndexError):
+                pass
+            if len(os.listdir(otdir)) < 2:
+                shutil.rmtree(otdir, ignore_errors=True)
+        # else:
+        #     print("pass: {}".format(str(i)))
 
     # TCGA
     for i in TCGAlist:
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        if i[1] in TCGAcc:
+        # if i[1] in TCGAcc:
+        try:
+            os.mkdir("../tiles/{}".format(i[1]))
+        except(FileExistsError):
+            pass
+        for m in range(3, 4):
+            if m == 0:
+                tff = 2
+                level = 0
+            elif m == 1:
+                tff = 1
+                level = 1
+            elif m == 2:
+                tff = 2
+                level = 1
+            elif m == 3:
+                tff = 1
+                level = 2
+            otdir = "../tiles/{}/level{}".format(i[1], str(m))
             try:
-                os.mkdir("../tiles/{}".format(i[1]))
+                os.mkdir(otdir)
             except(FileExistsError):
                 pass
-            for m in range(3):
-                if m == 0:
-                    tff = 2
-                    level = 0
-                elif m == 1:
-                    tff = 1
-                    level = 1
-                else:
-                    tff = 2
-                    level = 1
-                otdir = "../tiles/{}/level{}".format(i[1], str(m))
-                try:
-                    os.mkdir(otdir)
-                except(FileExistsError):
-                    pass
-                try:
-                    n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
-                                                                    level=level, std_img=std, dp=i[2], ft=tff)
-                except Exception as e:
-                    print('Error!')
-                    pass
+            try:
+                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
+                                                                level=level, std_img=std, dp=i[2], ft=tff)
+            except Exception as e:
+                print('Error!')
+                pass
 
-                if len(os.listdir(otdir)) < 2:
-                    shutil.rmtree(otdir, ignore_errors=True)
-        else:
-            print("pass: {}".format(str(i)))
+            if len(os.listdir(otdir)) < 2:
+                shutil.rmtree(otdir, ignore_errors=True)
+        # else:
+        #     print("pass: {}".format(str(i)))
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

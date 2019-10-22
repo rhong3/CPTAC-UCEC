@@ -140,7 +140,7 @@ for a in ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
 
     TCGA_mlist[a] = TCGA_mlist[a].fillna(0)
 
-    pcl = pd.read_csv("../TCGA_MUT/TCGA_clinical/{}_clinical.tsv".format(str(a)), sep='\t', header=0)
+    pcl = pd.read_csv("../TCGA_MUT/TCGA_clinical/clinical.tsv".format(str(a)), sep='\t', header=0)
 
     pcl[a] = 1
 

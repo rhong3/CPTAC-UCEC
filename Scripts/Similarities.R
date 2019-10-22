@@ -83,7 +83,7 @@ Heatmap(OUTPUT_hm, column_title = "YuleY Colligation", name = "colligation", col
           if(i == j) {
             grid.text(nm[i], x = x, y = y, gp = gpar(fontsize = 10))
           } else if(i > j) {
-            grid.circle(x = x, y = y, r = sqrt(abs(INTER[i, j])/max(INTER))/2 * min(unit.c(width, height)), 
+            grid.circle(x = x, y = y, r = abs(INTER[i, j])/max(INTER)/2 * min(unit.c(width, height)), 
                         gp = gpar(fill = col_fun(OUTPUT_hm[i, j]), col = NA))
           } else {
             grid.text(sprintf("%.2f", OUTPUT_hm[i, j]), x, y, gp = gpar(fontsize = 10))
