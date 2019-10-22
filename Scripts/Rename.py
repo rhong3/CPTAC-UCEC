@@ -63,10 +63,12 @@ def rename():
                 for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
                     if '.png' in q:
                         old = q.split('.pn')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
                         os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
                                   "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
                     elif '.csv' in q:
                         old = q.split('.cs')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
                         os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
                                   "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
     # TCGA
@@ -79,10 +81,12 @@ def rename():
                 for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
                     if '.png' in q:
                         old = q.split('.pn')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
                         os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
                                   "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
                     elif '.csv' in q:
                         old = q.split('.cs')[0]
+                        old = old.split('_{}'.format(str(i[2])))[0]
                         os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
                                   "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
 
