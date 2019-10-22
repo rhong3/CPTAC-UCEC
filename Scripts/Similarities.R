@@ -63,20 +63,27 @@ rownames(OUTPUT_hm) = gsub('Endometrioid','Endo', rownames(OUTPUT_hm))
 colnames(OUTPUT_hm) = gsub('Serous.like','SL', colnames(OUTPUT_hm))
 rownames(OUTPUT_hm) = gsub('Serous.like','SL', rownames(OUTPUT_hm))
 
+OUTPUT_hm_full = OUTPUT_hm
+
+OUTPUT_hm_inter = OUTPUT_hm[1:21, 22:29]
+
+OUTPUT_hm_gene = OUTPUT_hm[1:21, 1:21]
+
+
 out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities.pdf'
 pdf(file=out_fig,
     width=8.5,height=7)
-pheatmap(OUTPUT_hm, cluster_cols = FALSE, main = "YuleY Colligation")
+pheatmap(OUTPUT_hm_full, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation")
 dev.off()
 
-nm = rownames(OUTPUT_hm)
+nm = rownames(OUTPUT_hm_inter)
 col_fun = circlize::colorRamp2(c(-1, 0, 1), c( "#4575B4", "#ffffff", "#D73027"))
 # `col = col_fun` here is used to generate the legend
 
-out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities_COMPLEX.pdf'
+out_fig='~/Documents/CPTAC-UCEC/Inter_YuleY_similarities_COMPLEX.pdf'
 pdf(file=out_fig,
     width=20,height=15)
-Heatmap(OUTPUT_hm, column_title = "YuleY Colligation", name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
+Heatmap(OUTPUT_hm_inter, column_title = "YuleY Colligation", name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
         cell_fun = function(j, i, x, y, width, height, fill) {
           grid.rect(x = x, y = y, width = width, height = height, 
                     gp = gpar(col = "grey", fill = NA))
@@ -84,9 +91,9 @@ Heatmap(OUTPUT_hm, column_title = "YuleY Colligation", name = "colligation", col
             grid.text(nm[i], x = x, y = y, gp = gpar(fontsize = 10))
           } else if(i > j) {
             grid.circle(x = x, y = y, r = abs(INTER[i, j])/max(INTER)/2 * min(unit.c(width, height)), 
-                        gp = gpar(fill = col_fun(OUTPUT_hm[i, j]), col = NA))
+                        gp = gpar(fill = col_fun(OUTPUT_hm_inter[i, j]), col = NA))
           } else {
-            grid.text(sprintf("%.2f", OUTPUT_hm[i, j]), x, y, gp = gpar(fontsize = 10))
+            grid.text(sprintf("%.2f", OUTPUT_hm_inter[i, j]), x, y, gp = gpar(fontsize = 10))
           }
         }, cluster_rows = FALSE, cluster_columns = FALSE,
         show_row_names = FALSE, show_column_names = FALSE)
