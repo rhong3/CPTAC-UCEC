@@ -55,6 +55,7 @@ def rename():
         if matchrow.empty:
             continue
         for m in range(3):
+            print(i)
             for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
                 if '.png' in q:
                     old = q.split('.pn')[0]
@@ -72,6 +73,7 @@ def rename():
         if matchrow.empty:
             continue
         for m in range(3):
+            print(i)
             for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
                 if '.png' in q:
                     old = q.split('.pn')[0]
