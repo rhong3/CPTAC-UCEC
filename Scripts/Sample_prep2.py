@@ -31,21 +31,21 @@ def intersection(lst1, lst2):
 
 # pair tiles of 20x, 10x, 5x of the same area
 def paired_tile_ids_in(slide, label, root_dir):
-    dira = os.path.isdir(root_dir + 'level0')
-    dirb = os.path.isdir(root_dir + 'level1')
-    dirc = os.path.isdir(root_dir + 'level2')
+    dira = os.path.isdir(root_dir + 'level1')
+    dirb = os.path.isdir(root_dir + 'level2')
+    dirc = os.path.isdir(root_dir + 'level3')
     if dira and dirb and dirc:
         if "TCGA" in root_dir:
-            fac = 1000
+            fac = 2000
         else:
-            fac = 500
+            fac = 1000
         ids = []
         for level in range(3):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if '.png' in id:
                     x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
-                    y = int(float(re.split('.p| |_', id.split('y-', 1)[1])[0]) / fac)
+                    y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
                     try:
                         dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
                     except IndexError:
