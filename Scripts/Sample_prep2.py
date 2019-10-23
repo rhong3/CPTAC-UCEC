@@ -29,7 +29,7 @@ def intersection(lst1, lst2):
     return lst3
 
 
-# pair tiles of 20x, 10x, 5x of the same area
+# pair tiles of 10x, 5x, 2.5x of the same area
 def paired_tile_ids_in(slide, label, root_dir):
     dira = os.path.isdir(root_dir + 'level1')
     dirb = os.path.isdir(root_dir + 'level2')
@@ -40,7 +40,7 @@ def paired_tile_ids_in(slide, label, root_dir):
         else:
             fac = 1000
         ids = []
-        for level in range(3):
+        for level in range(1, 4):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if '.png' in id:
@@ -54,13 +54,13 @@ def paired_tile_ids_in(slide, label, root_dir):
                 else:
                     print('Skipping ID:', id)
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
-        idsa = ids.loc[ids['level'] == 0]
+        idsa = ids.loc[ids['level'] == 1]
         idsa = idsa.drop(columns=['level'])
         idsa = idsa.rename(index=str, columns={"path": "L0path"})
-        idsb = ids.loc[ids['level'] == 1]
+        idsb = ids.loc[ids['level'] == 2]
         idsb = idsb.drop(columns=['slide', 'label', 'level'])
         idsb = idsb.rename(index=str, columns={"path": "L1path"})
-        idsc = ids.loc[ids['level'] == 2]
+        idsc = ids.loc[ids['level'] == 3]
         idsc = idsc.drop(columns=['slide', 'label', 'level'])
         idsc = idsc.rename(index=str, columns={"path": "L2path"})
         idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
