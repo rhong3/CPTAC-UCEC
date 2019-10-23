@@ -11,10 +11,10 @@ import matplotlib
 import os
 import shutil
 import pandas as pd
-import numpy as np
 matplotlib.use('Agg')
 import Slicer
 import staintools
+import re
 
 
 # Get all images in the root directory
@@ -29,7 +29,7 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
                 sldnum = id.split('_')[-2].split('-')[-1]
                 ids.append((id, dirname, sldnum))
             if mode == 'TCGA':
-                dirname = id.split('-01Z')[0]
+                dirname = re.split('-01Z|-02Z', id)[0]
                 sldnum = id.split('-')[5].split('.')[0]
                 ids.append((id, dirname, sldnum))
     return ids
@@ -69,7 +69,7 @@ def cut():
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
             pass
-        for m in range(3, 4):
+        for m in range(4):
             if m == 0:
                 tff = 1
                 level = 0
@@ -99,6 +99,7 @@ def cut():
 
     # TCGA
     for i in TCGAlist:
+        print(i[1])
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
@@ -107,7 +108,7 @@ def cut():
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
             pass
-        for m in range(3, 4):
+        for m in range(4):
             if m == 0:
                 tff = 2
                 level = 0

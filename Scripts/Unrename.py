@@ -1,7 +1,7 @@
 """
-Rename
+Unrename
 
-Created on 10/22/2019
+Created on 10/23/2019
 
 @author: RH
 """
@@ -32,7 +32,7 @@ def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
     return ids
 
 
-def rename():
+def unrename():
     CPTACpath = '../images/CPTAC/'
     TCGApath = '../images/TCGA/'
     ref = pd.read_csv('../dummy_His_MUT_joined.csv', header=0)
@@ -59,17 +59,12 @@ def rename():
         if i[1] not in CPTACcc:
             print(i[1])
             for m in range(3):
-                for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
+                for q in os.listdir("../tiles_new/{}/level{}".format(i[1], str(m))):
                     if '.png' in q:
                         old = q.split('.pn')[0]
                         old = old.split('_{}'.format(str(i[2])))[0]
-                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                                  "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
-                    elif '.csv' in q:
-                        old = q.split('.cs')[0]
-                        old = old.split('_{}'.format(str(i[2])))[0]
-                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                                  "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
+                        os.rename("../tiles_new/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles_new/{}/level{}/{}.png".format(i[1], str(m), old))
     # TCGA
     for i in TCGAlist:
         matchrow = ref.loc[ref['name'] == i[1]]
@@ -78,22 +73,17 @@ def rename():
         if i[1] not in TCGAcc:
             print(i[1])
             for m in range(3):
-                for q in os.listdir("../tiles/{}/level{}".format(i[1], str(m))):
+                for q in os.listdir("../tiles_new/{}/level{}".format(i[1], str(m))):
                     if '.png' in q:
                         old = q.split('.pn')[0]
                         old = old.split('_{}'.format(str(i[2])))[0]
-                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                                  "../tiles/{}/level{}/{}_{}.png".format(i[1], str(m), old, str(i[2])))
-                    elif '.csv' in q:
-                        old = q.split('.cs')[0]
-                        old = old.split('_{}'.format(str(i[2])))[0]
-                        os.rename("../tiles/{}/level{}/{}".format(i[1], str(m), q),
-                                  "../tiles/{}/level{}/{}_{}.csv".format(i[1], str(m), str(i[2]), old))
+                        os.rename("../tiles_new/{}/level{}/{}".format(i[1], str(m), q),
+                                  "../tiles_new/{}/level{}/{}.png".format(i[1], str(m), old))
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
 # Run as main
 if __name__ == "__main__":
-    rename()
+    unrename()
 
