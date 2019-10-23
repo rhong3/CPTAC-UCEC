@@ -73,7 +73,9 @@ OUTPUT_hm_gene = OUTPUT_hm[1:15, 1:15]
 out_fig='~/Documents/CPTAC-UCEC/Gene_YuleY_similarities.pdf'
 pdf(file=out_fig,
     width=8.5,height=7)
-pheatmap(OUTPUT_hm_gene, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation")
+myBreaks <- c(seq(min(OUTPUT_hm), 0, length.out=ceiling(100/2) + 1), 
+              seq(max(OUTPUT_hm)/100, max(OUTPUT_hm), length.out=floor(100/2)))
+pheatmap(OUTPUT_hm_gene, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", breaks = myBreaks)
 dev.off()
 
 nm = rownames(OUTPUT_hm_gene)

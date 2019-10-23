@@ -49,7 +49,7 @@ HYPERPARAMS = {
 }
 
 # paths to directories
-img_dir = '../tiles_new/'
+img_dir = '../tiles/'
 LOG_DIR = "../Results/{}".format(dirr)
 METAGRAPH_DIR = "../Results/{}".format(dirr)
 data_dir = "../Results/{}/data".format(dirr)
