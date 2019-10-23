@@ -68,8 +68,7 @@ def cut():
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
-            print(i[1])
-            continue
+            pass
         for m in range(4):
             if m == 0:
                 tff = 1
@@ -107,8 +106,7 @@ def cut():
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
-            print(i[1])
-            continue
+            pass
         for m in range(4):
             if m == 0:
                 tff = 2
