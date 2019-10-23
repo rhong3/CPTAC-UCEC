@@ -12,8 +12,8 @@ alldict$MSIst_MSI.H = alldict$MSIst_MSI.H-alldict$MSIst_0NA
 alldict$MSIst_MSI.H = as.numeric(gsub(-1, NA, alldict$MSIst_MSI.H))
 alldict$MSIst_MSS = alldict$MSIst_MSS-alldict$MSIst_0NA
 alldict$MSIst_MSS = as.numeric(gsub(-1, NA, alldict$MSIst_MSS))
-alldict = subset(alldict, select = -c(subtype_0NA, histology_Clear.cell, MSIst_0NA, MSIst_MSI.L))
-OUTPUT = setNames(data.frame(matrix(ncol = 30, nrow = 6)), colnames(alldict)[2:31])
+alldict = subset(alldict, select = -c(subtype_0NA, MSIst_0NA))
+OUTPUT = setNames(data.frame(matrix(ncol = 33, nrow = 6)), colnames(alldict)[2:34])
 row.names(OUTPUT)=c('POS', 'NEG', 'POS.Rate', 'TCGA', 'CPTAC', 'Total')
 
 # count numbers of patients

@@ -43,7 +43,7 @@ def cut():
     CPTACpath = '../images/CPTAC/'
     TCGApath = '../images/TCGA/'
     ref = pd.read_csv('../dummy_His_MUT_joined.csv', header=0)
-
+    refls = ref['name'].tolist()
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
     CPTAClist = image_ids_in(CPTACpath, 'CPTAC')
@@ -68,7 +68,8 @@ def cut():
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
-            pass
+            print(i[1])
+            continue
         for m in range(4):
             if m == 0:
                 tff = 1
@@ -99,7 +100,6 @@ def cut():
 
     # TCGA
     for i in TCGAlist:
-        print(i[1])
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
@@ -107,7 +107,8 @@ def cut():
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
-            pass
+            print(i[1])
+            continue
         for m in range(4):
             if m == 0:
                 tff = 2
@@ -139,7 +140,10 @@ def cut():
         #     print("pass: {}".format(str(i)))
 
     print("--- %s seconds ---" % (time.time() - start_time))
-
+    subfolders = [f.name for f in os.scandir('../tiles/') if f.is_dir()]
+    for w in subfolders:
+        if w not in refls:
+            print(w)
     # # Time measure tool
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))
