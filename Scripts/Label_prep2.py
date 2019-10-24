@@ -181,4 +181,7 @@ mgx['histology_Serous'] = mgx['histology_Serous'] + mgx['histology_Mixed']
 mgx['MSIst_MSS'] = mgx['MSIst_MSS'] + mgx['MSIst_MSI-L']
 mgx = mgx.drop(['histology_Clear cell', 'MSIst_MSI-L'], axis=1)
 mgx = mgx.set_index('name')
+mgx = mgx.drop(['TCGA-AX-A06H', 'TCGA-AX-A0IS', 'TCGA-AX-A2H5', 'TCGA-AX-A2HF', 'TCGA-AJ-A23O', 'TCGA-AX-A06J',
+                'TCGA-AX-A1CR', 'TCGA-AX-A2H8', 'TCGA-AX-A2HC', 'TCGA-AX-A2HD', 'TCGA-AX-A2HG', 'TCGA-AX-A2HH',
+                'TCGA-AX-A2HJ', 'TCGA-AX-A2HK', 'TCGA-E6-A1M0'])
 mgx.to_csv('../dummy_His_MUT_joined.csv', header=True, index=True)

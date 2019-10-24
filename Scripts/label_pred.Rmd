@@ -9,7 +9,7 @@ Hislb = as.numeric(lbtb$histology_Serous)
 MUT = lbtb[,2:25]
 MUT = subset(MUT, select = -c(MLH1, ERBB2, EGFR, PIK3R2, JAK1, BRCA2, MTOR, ATM, ARID5B))
 dat = MUT
-dat$label = SLlb
+dat$label = Hislb
 
 smp_size <- floor(0.8 * nrow(dat))
 index <- sample(seq_len(nrow(dat)),size=smp_size)
