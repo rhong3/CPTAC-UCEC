@@ -29,6 +29,53 @@ def intersection(lst1, lst2):
     return lst3
 
 
+# pair tiles of 20x, 10x, 5x of the same area
+def paired_tile_ids_in_old(slide, label, root_dir):
+    dira = os.path.isdir(root_dir + 'level0')
+    dirb = os.path.isdir(root_dir + 'level1')
+    dirc = os.path.isdir(root_dir + 'level2')
+    if dira and dirb and dirc:
+        if "TCGA" in root_dir:
+            fac = 1000
+        else:
+            fac = 500
+        ids = []
+        for level in range(3):
+            dirr = root_dir + 'level{}'.format(str(level))
+            for id in os.listdir(dirr):
+                if '.png' in id:
+                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
+                    y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
+                    try:
+                        dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
+                    except IndexError:
+                        dup = np.nan
+                    ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
+                else:
+                    print('Skipping ID:', id)
+        ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
+        idsa = ids.loc[ids['level'] == 0]
+        idsa = idsa.drop(columns=['level'])
+        idsa = idsa.rename(index=str, columns={"path": "L0path"})
+        idsb = ids.loc[ids['level'] == 1]
+        idsb = idsb.drop(columns=['slide', 'label', 'level'])
+        idsb = idsb.rename(index=str, columns={"path": "L1path"})
+        idsc = ids.loc[ids['level'] == 2]
+        idsc = idsc.drop(columns=['slide', 'label', 'level'])
+        idsc = idsc.rename(index=str, columns={"path": "L2path"})
+        idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa['x'] = idsa['x'] - (idsa['x'] % 2)
+        idsa['y'] = idsa['y'] - (idsa['y'] % 2)
+        idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+        idsa = idsa.drop(columns=['x', 'y', 'dup'])
+        idsa = idsa.dropna()
+        idsa = sku.shuffle(idsa)
+    else:
+        idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+
+    return idsa
+
+
 # pair tiles of 10x, 5x, 2.5x of the same area
 def paired_tile_ids_in(slide, label, root_dir):
     dira = os.path.isdir(root_dir + 'level1')
