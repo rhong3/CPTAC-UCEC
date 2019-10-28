@@ -254,6 +254,7 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
         validation_tiles = pd.concat([validation_tiles, tile_ids])
 
     train_tiles = balance(train_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
