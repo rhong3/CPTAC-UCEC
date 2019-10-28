@@ -181,6 +181,7 @@ def set_sep(alll, path, cls, level=None, cut=0.2, batchsize=64):
     validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'level', 'path', 'label'])
 
     train_tiles = balance(train_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)

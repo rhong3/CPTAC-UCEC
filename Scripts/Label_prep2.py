@@ -33,6 +33,21 @@ def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
     return ids
 
 
+# Get all images in the root directory
+def image_ids_in_TCGA(root_dir, ignore=['.DS_Store', 'dict.csv']):
+    ids = []
+    for id in os.listdir(root_dir):
+        if id in ignore:
+            print('Skipping ID:', id)
+        else:
+            dirname = re.split('-01Z|-02Z', id)[0]
+            sldnum = id.split('-')[5].split('.')[0]
+            ids.append((dirname, sldnum))
+    ids = pd.DataFrame(ids, columns=['bcr_patient_barcode', 'slide'])
+
+    return ids
+
+
 imlist = pd.read_excel('../S043_CPTAC_UCEC_Discovery_Cohort_Study_Specimens_r1_Sept2018.xlsx', header=4)
 imlist = imlist[imlist['Group'] == 'Tumor ']
 cllist = pd.read_csv('../UCEC_V2.1/waffles_updated.txt', sep='\t', header = 0)
@@ -99,16 +114,13 @@ CPTAC_lite = CPTAC_lite.rename(index=str, columns={'Participant_ID': 'name',
                                                    'Histologic_type': 'histology', 'MSI_status': 'MSIst'})
 
 # TCGA
-image_meta = pd.read_csv('../TCGA_Image_meta.tsv', sep='\t', header=0)
+image_meta = image_ids_in_TCGA('../images/TCGA/')
 TCGA = pd.read_excel('../datafile.S1.1.KeyClinicalData.xls', header=0)
+image_meta.to_csv('../TCGA_Images_in_folder.csv', header=0)
 
-namelist = []
-for idx, row in image_meta.iterrows():
-    namelist.append(re.split('-01Z|-02Z', row['File Name'])[0])
+unique = list(image_meta.bcr_patient_barcode.unique())
 
-image_meta['bcr_patient_barcode'] = namelist
-
-TCGA = TCGA.join(image_meta.set_index('bcr_patient_barcode'), on='bcr_patient_barcode')
+TCGA = TCGA[TCGA['bcr_patient_barcode'].isin(unique)]
 
 # new_TCGA_list.csv
 
@@ -117,24 +129,32 @@ TCGA_list = TCGA[TCGA['IntegrativeCluster'] != "Notassigned"]
 
 TCGA_list = TCGA_list.rename(columns={'IntegrativeCluster': 'subtype', 'bcr_patient_barcode': 'name'})
 
-lbdict = {'CN low': 'Endometrioid', 'CN high': 'Serous-like'}
+lbdict = {'CN low': 'Endometrioid', 'CN high': 'Serous-like',
+          'UCEC_CN_HIGH': 'Serous-like', 'UCEC_CN_LOW': 'Endometrioid', 'UCEC_MSI': 'MSI', 'UCEC_POLE': 'POLE'}
 TCGA_list['subtype'] = TCGA_list['subtype'].replace(lbdict)
 TCGA_list = TCGA_list[['name', 'subtype']]
 
+TCGA_MUT = pd.read_csv('../TCGA_MUT_CBP_pan/All_with_mutation_data.tsv', sep='\t', header=0)
+TCGA_list_sup = TCGA_MUT.rename(index=str, columns={'Patient ID': 'name', 'Subtype': 'subtype'})
+TCGA_list_sup = TCGA_list_sup[['name', 'subtype']]
+TCGA_list_sup = TCGA_list_sup[TCGA_list_sup['name'].isin(TCGA['bcr_patient_barcode'].tolist())]
+TCGA_list_sup['subtype'] = TCGA_list_sup['subtype'].replace(lbdict)
+TCGA_list = TCGA_list.reset_index(drop=True)
+TCGA_list_sup = TCGA_list_sup.reset_index(drop=True)
+TCGA_list = pd.concat([TCGA_list_sup, TCGA_list])
+TCGA_list = TCGA_list.drop_duplicates()
 
 ### Mutation
-TCGA_MUT = pd.read_csv('../TCGA_MUT_CBP/All_with_mutation_data.tsv', sep='\t', header=0)
-
 mut_list = TCGA_MUT['Patient ID']
 TCGA_mlist = TCGA[TCGA['bcr_patient_barcode'].isin(mut_list)]
 
 for a in ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2', 'FBXW7', 'FGFR2', 'JAK1', 'KRAS',
           'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A', 'PTEN', 'RPL22', 'TP53', 'FAT1', 'FAT4', 'ZFHX3']:
-    cl = pd.read_csv("../TCGA_MUT_CBP/{}.tsv".format(str(a)), sep='\t', header=0)
+    cl = pd.read_csv("../TCGA_MUT_CBP_pan/{}.tsv".format(str(a)), sep='\t', header=0)
 
     cl[a] = 1
 
-    cl.to_csv("../TCGA_MUT_CBP/{}_MUT.csv".format(str(a)), header=True, index=False)
+    cl.to_csv("../TCGA_MUT_CBP_pan/{}_MUT.csv".format(str(a)), header=True, index=False)
 
     cll = cl[['Patient ID', a]]
 
@@ -144,7 +164,7 @@ for a in ['ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
 
 TCGA_mlist = TCGA_mlist.groupby('bcr_patient_barcode').max()
 
-TCGA_mlist.insert(0, 'bcr_patient_barcode', TCGA_mlist.index, allow_duplicates=False) # MUT_TCGA_list.csv
+TCGA_mlist.insert(0, 'bcr_patient_barcode', TCGA_mlist.index, allow_duplicates=False)  # MUT_TCGA_list.csv
 
 TCGA_mlist = TCGA_mlist[['bcr_patient_barcode', 'ARID1A', 'ARID5B', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'EGFR', 'ERBB2',
                         'FBXW7', 'FGFR2', 'JAK1', 'KRAS', 'MLH1', 'MTOR', 'PIK3CA', 'PIK3R1', 'PIK3R2', 'PPP2R1A',
@@ -181,7 +201,4 @@ mgx['histology_Serous'] = mgx['histology_Serous'] + mgx['histology_Mixed']
 mgx['MSIst_MSS'] = mgx['MSIst_MSS'] + mgx['MSIst_MSI-L']
 mgx = mgx.drop(['histology_Clear cell', 'MSIst_MSI-L'], axis=1)
 mgx = mgx.set_index('name')
-mgx = mgx.drop(['TCGA-AX-A06H', 'TCGA-AX-A0IS', 'TCGA-AX-A2H5', 'TCGA-AX-A2HF', 'TCGA-AJ-A23O', 'TCGA-AX-A06J',
-                'TCGA-AX-A1CR', 'TCGA-AX-A2H8', 'TCGA-AX-A2HC', 'TCGA-AX-A2HD', 'TCGA-AX-A2HG', 'TCGA-AX-A2HH',
-                'TCGA-AX-A2HJ', 'TCGA-AX-A2HK', 'TCGA-E6-A1M0'])
 mgx.to_csv('../dummy_His_MUT_joined.csv', header=True, index=True)

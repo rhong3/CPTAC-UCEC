@@ -9,7 +9,7 @@
 # bins=args[5]
 # POS_score=args[6]
 
-inlist=c('X1ARID1A','X2ARID1A','X3ARID1A','X4ARID1A','X1CTCF','X2CTCF','X3CTCF','X4CTCF','X1CTNNB1','X2CTNNB1','X3CTNNB1','X4CTNNB1','X1FGFR2','X2FGFR2','X3FGFR2','X4FGFR2','X1FFBXW7','X2FFBXW7','X3FFBXW7','X4FFBXW7')
+inlist=c('X1FBXW7','X2FBXW7','X3FBXW7','X4FBXW7')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/',xx,'/out/For_tSNE.csv',sep='')
