@@ -9,12 +9,12 @@
 # bins=args[5]
 # POS_score=args[6]
 
-inlist=c('X1FBXW7','X2FBXW7','X3FBXW7','X4FBXW7')
+inlist=c('X4TP53-244')
 
 for(xx in inlist){
-  input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/',xx,'/out/For_tSNE.csv',sep='')
-  output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/',xx,'/out/tSNE_P_N.csv',sep='')
-  out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL4/',xx,'/out/P_N.pdf',sep='')
+  input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
+  output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
+  out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
   start=10
   bins=50
   POS_score='POS_score'

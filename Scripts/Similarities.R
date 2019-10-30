@@ -17,7 +17,7 @@ dict$MSIst_MSI.H = dict$MSIst_MSI.H-dict$MSIst_0NA
 dict$MSIst_MSI.H = gsub(-1, NA, dict$MSIst_MSI.H)
 dict$MSIst_MSS = dict$MSIst_MSS-dict$MSIst_0NA
 dict$MSIst_MSS = gsub(-1, NA, dict$MSIst_MSS)
-dict = subset(dict, select = -c(name, subtype_0NA, MSIst_0NA, histology_Mixed, MLH1, ERBB2, EGFR, PIK3R2, JAK1, BRCA2, MTOR, ATM, ARID5B))
+dict = subset(dict, select = -c(name, subtype_0NA, MSIst_0NA, histology_Mixed, MLH1, ERBB2, EGFR, PIK3R2, FAT4, ARID5B))
 
 # Yule's Y Coefficient of colligation column-wise calculation 
 YuleY = function(col1, col2){
@@ -65,9 +65,9 @@ rownames(OUTPUT_hm) = gsub('Serous.like','SL', rownames(OUTPUT_hm))
 
 OUTPUT_hm_full = OUTPUT_hm
 
-OUTPUT_hm_inter = OUTPUT_hm[1:15, 16:23]
+OUTPUT_hm_inter = OUTPUT_hm[1:18, 19:26]
 
-OUTPUT_hm_gene = OUTPUT_hm[1:15, 1:15]
+OUTPUT_hm_gene = OUTPUT_hm[1:18, 1:18]
 
 
 out_fig='~/Documents/CPTAC-UCEC/Inter_YuleY_similarities.pdf'
@@ -100,3 +100,69 @@ Heatmap(OUTPUT_hm_inter, column_title = "YuleY Colligation", name = "colligation
         }, cluster_rows = FALSE, cluster_columns = FALSE,
         show_row_names = FALSE, show_column_names = FALSE)
 dev.off()
+
+
+
+out_fig='~/Documents/CPTAC-UCEC/Gene_YuleY_similarities.pdf'
+pdf(file=out_fig,
+    width=8.5,height=7)
+myBreaks <- c(seq(min(OUTPUT_hm), 0, length.out=ceiling(100/2) + 1), 
+              seq(max(OUTPUT_hm)/100, max(OUTPUT_hm), length.out=floor(100/2)))
+pheatmap(OUTPUT_hm_gene, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", breaks = myBreaks)
+dev.off()
+
+nm = rownames(OUTPUT_hm_gene)
+col_fun = circlize::colorRamp2(c(-1, 0, 1), c( "#4575B4", "#ffffff", "#D73027"))
+# `col = col_fun` here is used to generate the legend
+
+out_fig='~/Documents/CPTAC-UCEC/Gene_YuleY_similarities_COMPLEX.pdf'
+pdf(file=out_fig,
+    width=20,height=15)
+Heatmap(OUTPUT_hm_gene, column_title = "YuleY Colligation", name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
+        cell_fun = function(j, i, x, y, width, height, fill) {
+          grid.rect(x = x, y = y, width = width, height = height, 
+                    gp = gpar(col = "grey", fill = NA))
+          if(i == j) {
+            grid.text(nm[i], x = x, y = y, gp = gpar(fontsize = 10))
+          } else if(i > j) {
+            grid.circle(x = x, y = y, r = abs(INTER[i, j])/max(INTER)/2 * min(unit.c(width, height)), 
+                        gp = gpar(fill = col_fun(OUTPUT_hm_gene[i, j]), col = NA))
+          } else {
+            grid.text(sprintf("%.2f", OUTPUT_hm_gene[i, j]), x, y, gp = gpar(fontsize = 10))
+          }
+        }, cluster_rows = FALSE, cluster_columns = FALSE,
+        show_row_names = FALSE, show_column_names = FALSE)
+dev.off()
+
+
+out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities.pdf'
+pdf(file=out_fig,
+    width=8.5,height=7)
+myBreaks <- c(seq(min(OUTPUT_hm), 0, length.out=ceiling(100/2) + 1), 
+              seq(max(OUTPUT_hm)/100, max(OUTPUT_hm), length.out=floor(100/2)))
+pheatmap(OUTPUT_hm_full, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", breaks = myBreaks)
+dev.off()
+
+nm = rownames(OUTPUT_hm_full)
+col_fun = circlize::colorRamp2(c(-1, 0, 1), c( "#4575B4", "#ffffff", "#D73027"))
+# `col = col_fun` here is used to generate the legend
+
+out_fig='~/Documents/CPTAC-UCEC/YuleY_similarities_COMPLEX.pdf'
+pdf(file=out_fig,
+    width=20,height=15)
+Heatmap(OUTPUT_hm_full, column_title = "YuleY Colligation", name = "colligation", col = col_fun, rect_gp = gpar(type = "none"), 
+        cell_fun = function(j, i, x, y, width, height, fill) {
+          grid.rect(x = x, y = y, width = width, height = height, 
+                    gp = gpar(col = "grey", fill = NA))
+          if(i == j) {
+            grid.text(nm[i], x = x, y = y, gp = gpar(fontsize = 10))
+          } else if(i > j) {
+            grid.circle(x = x, y = y, r = abs(INTER[i, j])/max(INTER)/2 * min(unit.c(width, height)), 
+                        gp = gpar(fill = col_fun(OUTPUT_hm_full[i, j]), col = NA))
+          } else {
+            grid.text(sprintf("%.2f", OUTPUT_hm_full[i, j]), x, y, gp = gpar(fontsize = 10))
+          }
+        }, cluster_rows = FALSE, cluster_columns = FALSE,
+        show_row_names = FALSE, show_column_names = FALSE)
+dev.off()
+
