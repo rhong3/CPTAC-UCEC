@@ -1,5 +1,11 @@
+"""
+Prepare labels as CSV dictionaries for fusion
+
+Created on 11/01/2019
+
+@author: RH
+"""
 import pandas as pd
-import numpy as np
 
 labels = pd.read_csv('../dummy_His_MUT_joined.csv', header=0)
 CPTAC = pd.read_csv('../CPTAC_clinical.csv', header=0)

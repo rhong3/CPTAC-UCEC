@@ -1,3 +1,10 @@
+"""
+Count images and patients
+
+Created on 11/01/2019
+
+@author: RH
+"""
 import os
 import pandas as pd
 
