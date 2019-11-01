@@ -10,20 +10,26 @@ for w in refls:
 
 TCGA = 0
 CPTAC = 0
+sumlist = []
 for m in os.listdir('../tiles/'):
     print(m)
+    summ = 0
     if m not in refls:
-        print('Not In: {}'.format(m))
+        print('Not In: ', m)
     try:
         for n in os.listdir('../tiles/{}/level0'.format(m)):
             if '.csv' in n:
+                summ += 1
                 if 'TCGA' in m:
                     TCGA += 1
                 else:
                     CPTAC += 1
+        sumlist.append([m, summ])
     except FileNotFoundError:
-        print('Error: {}'.format(m))
+        print('Error: ', m)
 print(TCGA)
 print(CPTAC)
 print(TCGA+CPTAC)
 
+sumlist = pd.DataFrame(sumlist, columns=["patient", "num_of_slides"])
+sumlist.to_csv("../patient_slides_count.csv", index=False)

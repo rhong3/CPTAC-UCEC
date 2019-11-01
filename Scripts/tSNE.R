@@ -9,7 +9,7 @@
 # bins=args[5]
 # POS_score=args[6]
 
-inlist=c('X4TP53-244')
+inlist=c('X1TP53-244','X3TP53-244')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
