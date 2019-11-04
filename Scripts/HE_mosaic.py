@@ -41,7 +41,7 @@ def sample(dat, md, bins):
             for j in range(bins):
                 try:
                     sub = dat.loc[(dat['x_int'] == i) & (dat['y_int'] == j)
-                                    & (dat[redict[m]] > 0.51) & (dat['True_label'] == m)]
+                                    & (dat[redict[m]] > 0.6) & (dat['True_label'] == m)]
                     picked = sub.sample(1, replace=False)
                     for idx, row in picked.iterrows():
                         sampledls.append([row['path'], row['x_int'], row['y_int']])
