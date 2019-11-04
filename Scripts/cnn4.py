@@ -135,6 +135,51 @@ class INCEPTION:
                                                    dropout_keep_prob=dropout,
                                                    scope='InceptionResV2', supermd=sup)
             print('Using Inception-Resnet-V2')
+        elif model == 'R18':
+            import ResNet
+            logits, nett, ww = ResNet.resnet(x_in_reshape,
+                                             mode=18,
+                                             num_classes=classes,
+                                             is_training=is_train,
+                                             dropout_keep_prob=dropout,
+                                             scope='ResNet18')
+            print('Using ResNet18')
+        elif model == 'R34':
+            import ResNet
+            logits, nett, ww = ResNet.resnet(x_in_reshape,
+                                             mode=34,
+                                             num_classes=classes,
+                                             is_training=is_train,
+                                             dropout_keep_prob=dropout,
+                                             scope='ResNet34')
+            print('Using ResNet34')
+        elif model == 'R50':
+            import ResNet
+            logits, nett, ww = ResNet.resnet(x_in_reshape,
+                                             mode=50,
+                                             num_classes=classes,
+                                             is_training=is_train,
+                                             dropout_keep_prob=dropout,
+                                             scope='ResNet50')
+            print('Using ResNet50')
+        elif model == 'R101':
+            import ResNet
+            logits, nett, ww = ResNet.resnet(x_in_reshape,
+                                             mode=101,
+                                             num_classes=classes,
+                                             is_training=is_train,
+                                             dropout_keep_prob=dropout,
+                                             scope='ResNet101')
+            print('Using ResNet101')
+        elif model == 'R152':
+            import ResNet
+            logits, nett, ww = ResNet.resnet(x_in_reshape,
+                                             mode=152,
+                                             num_classes=classes,
+                                             is_training=is_train,
+                                             dropout_keep_prob=dropout,
+                                             scope='ResNet152')
+            print('Using ResNet152')
         else:
             import InceptionV1
             logits, nett, ww = InceptionV1.googlenet(x_in_reshape,
