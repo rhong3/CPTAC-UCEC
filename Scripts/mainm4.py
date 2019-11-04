@@ -156,7 +156,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
     if test:  # restore for testing only
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR,
                            meta_dir=LOG_DIR, model=md, weights=weight)
-        print("Loaded! Ready for test!", flush=True)
+        print("Loaded! Ready for test!")
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
             m.inference(THE, dirr, testset=testset, pmd=pdmd)
@@ -166,14 +166,14 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
     elif to_reload:  # restore for further training and testing
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR,
                            meta_dir=LOG_DIR, model=md, weights=weight)
-        print("Loaded! Restart training.", flush=True)
+        print("Loaded! Restart training.")
         HE = tfreloader('train', ep, bs, cls, trc, tec, vac)
         VHE = tfreloader('validation', ep*100, bs, cls, trc, tec, vac)
         itt = int(trc * ep / bs)
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
-            m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
+            m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
             m.inference(THE, dirr, testset=testset, pmd=pdmd)
@@ -189,7 +189,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
         if trc <= 2 * bs or vac <= bs:
             print("Not enough training/validation images!")
         else:
-            m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, verbose=True, save=True, outdir=METAGRAPH_DIR)
+            m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
             m.inference(THE, dirr, testset=testset, pmd=pdmd)
