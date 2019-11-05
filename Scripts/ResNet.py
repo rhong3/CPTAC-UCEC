@@ -42,6 +42,36 @@ def conv2d_bn(x,
     return x
 
 
+def conv2d_bn_a(x,
+              filters,
+              num_row,
+              num_col,
+              padding='same',
+              strides=(1, 1),
+              name=None):
+
+    if name is not None:
+        bn_name = name + '_bn'
+        conv_name = name + '_conv'
+    else:
+        bn_name = None
+        conv_name = None
+    bn_axis = 3
+    x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
+    x = Activation('relu', name=name)(x)
+    x = Conv2D(
+        filters, (num_row, num_col),
+        strides=strides,
+        padding=padding,
+        use_bias=False,
+        name=conv_name,
+        data_format="channels_last",
+        kernel_regularizer=l2(0.0002))(x)
+
+    return x
+
+
+
 def resnet_stem(input):
     x = conv2d_bn(input, 64, 7, 7, padding='valid')
     x = MaxPooling2D((3, 3), strides=(2, 2))(x)
@@ -49,17 +79,31 @@ def resnet_stem(input):
 
 
 def block_1(input, sizea, sizeb, scale=0.5):
-    x = conv2d_bn(input, sizea, 3, 3)
-    x = conv2d_bn(x, sizeb, 3, 3)
+    input = Conv2D(
+        sizeb, (1, 1),
+        strides=(1, 1),
+        padding='same',
+        use_bias=False,
+        data_format="channels_last",
+        kernel_regularizer=l2(0.0002))(input)
+    x = conv2d_bn_a(input, sizea, 3, 3)
+    x = conv2d_bn_a(x, sizeb, 3, 3)
     x = x * scale
     output = add([input, x])
     return output
 
 
 def block_2(input, sizea, sizeb, scale=0.5):
-    x = conv2d_bn(input, sizea, 1, 1)
-    x = conv2d_bn(x, sizea, 3, 3)
-    x = conv2d_bn(x, sizeb, 1, 1)
+    input = Conv2D(
+        sizeb, (1, 1),
+        strides=(1, 1),
+        padding='same',
+        use_bias=False,
+        data_format="channels_last",
+        kernel_regularizer=l2(0.0002))(input)
+    x = conv2d_bn_a(input, sizea, 1, 1)
+    x = conv2d_bn_a(x, sizea, 3, 3)
+    x = conv2d_bn_a(x, sizeb, 1, 1)
     x = x * scale
     output = add([input, x])
     return output
