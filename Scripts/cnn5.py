@@ -97,40 +97,40 @@ class INCEPTION:
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV1', supermd=sup)
-            print('Using Xeption-V1')
+                                                   scope='X1', supermd=sup)
+            print('Using X1')
         elif model == 'X2':
             import XeptionV2
             logits, nett, ww = XeptionV2.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV2', supermd=sup)
-            print('Using Xeption-V2')
+                                                   scope='X2', supermd=sup)
+            print('Using X2')
         elif model == 'X3':
             import XeptionV3
             logits, nett, ww = XeptionV3.XecptionV3(xa_in_reshape, xb_in_reshape, xc_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV3', supermd=sup)
-            print('Using Xeption-V3')
+                                                   scope='X3', supermd=sup)
+            print('Using X3')
         elif model == 'X4':
             import XeptionV4
             logits, nett, ww = XeptionV4.XecptionV4(xa_in_reshape, xb_in_reshape, xc_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV4', supermd=sup)
-            print('Using Xeption-V4')
+                                                   scope='X4', supermd=sup)
+            print('Using X4')
         else:
             import XeptionV1
             logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
-                                                   scope='XecptionV1', supermd=sup)
-            print('Using Default: Xeption-V1')
+                                                   scope='X1', supermd=sup)
+            print('Using Default: X1')
 
         pred = tf.nn.softmax(logits, name="prediction")
 
