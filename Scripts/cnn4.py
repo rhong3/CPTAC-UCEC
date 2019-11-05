@@ -265,7 +265,7 @@ class INCEPTION:
                         break
 
         now = datetime.now().isoformat()[11:]
-        print("------- Testing end: {} -------\n".format(now))
+        print("------- Testing end: {} -------\n".format(now), flush=True)
 
     # get global step
     def get_global_step(self, X):
@@ -375,11 +375,11 @@ class INCEPTION:
                             except ValueError:
                                 minvalid = 0
                             validation_cost.append(tempminvalid)
-                            print("round {} --> Step Average validation loss: ".format(i), tempminvalid)
+                            print("round {} --> Step Average validation loss: ".format(i), tempminvalid, flush=True)
 
                             if save and tempminvalid <= minvalid:
                                 print("New Min loss model found!")
-                                print("round {} --> loss: ".format(i), cost)
+                                print("round {} --> loss: ".format(i), cost, flush=True)
                                 outfile = os.path.join(os.path.abspath(outdir),
                                                        "{}_{}".format(self.model,
                                                                       "_".join(['dropout', str(self.dropout)])))
@@ -390,7 +390,7 @@ class INCEPTION:
                                 valid_mean_cost = np.mean(validation_cost[-10:-1])
                                 print('Mean validation loss: {}'.format(valid_mean_cost))
                                 if valid_cost > valid_mean_cost:
-                                    print("Early stopped! No improvement for at least 10000 iterations")
+                                    print("Early stopped! No improvement for at least 10000 iterations", flush=True)
                                     break
                                 else:
                                     print("Passed early stopping evaluation. Continue training!")
@@ -412,7 +412,7 @@ class INCEPTION:
                             self.valid_logger.add_summary(valid_summary, i)
                             print("round {} --> Final Last validation loss: ".format(i), valid_cost)
                             now = datetime.now().isoformat()[11:]
-                            print("------- Final Validation end: {} -------\n".format(now))
+                            print("------- Final Validation end: {} -------\n".format(now), flush=True)
                             try:
                                 self.train_logger.flush()
                                 self.train_logger.close()
@@ -442,7 +442,7 @@ class INCEPTION:
                         ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs, pmd)
                         ac.metrics(pred, y, dirr, 'Validation', pmd)
                         now = datetime.now().isoformat()[11:]
-                        print("------- Final Validation end: {} -------\n".format(now))
+                        print("------- Final Validation end: {} -------\n".format(now), flush=True)
 
                         try:
                             self.train_logger.flush()
@@ -478,7 +478,7 @@ class INCEPTION:
                     ac.CAM(net, w, pred, x, y, dirr, 'Validation', bs, pmd)
                     ac.metrics(pred, y, dirr, 'Validation', pmd)
                     now = datetime.now().isoformat()[11:]
-                    print("------- Validation end: {} -------\n".format(now))
+                    print("------- Validation end: {} -------\n".format(now), flush=True)
 
                     try:
                         self.train_logger.flush()
@@ -505,7 +505,7 @@ class INCEPTION:
                 i, np.around(i / ct * bs), err_train / i))
 
             now = datetime.now().isoformat()[11:]
-            print("------- Training end: {} -------\n".format(now))
+            print("------- Training end: {} -------\n".format(now), flush=True)
 
             if save:
                 outfile = os.path.join(os.path.abspath(outdir),
