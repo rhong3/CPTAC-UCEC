@@ -51,9 +51,13 @@ def conv2d_bn_a(x,
               name=None):
 
     if name is not None:
+        bn_name = name + '_bn'
         conv_name = name + '_conv'
     else:
+        bn_name = None
         conv_name = None
+    bn_axis = 3
+    x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x)
     x = Activation('relu', name=name)(x)
     x = Conv2D(
         filters, (num_row, num_col),
@@ -65,6 +69,7 @@ def conv2d_bn_a(x,
         kernel_regularizer=l2(0.0002))(x)
 
     return x
+
 
 
 def resnet_stem(input):
@@ -84,7 +89,6 @@ def block_1(input, sizea, sizeb, scale=0.5):
     x = conv2d_bn_a(input, sizea, 3, 3)
     x = conv2d_bn_a(x, sizeb, 3, 3)
     x = x * scale
-    x = BatchNormalization(axis=3, scale=False)(x)
     output = add([input, x])
     return output
 
@@ -101,7 +105,6 @@ def block_2(input, sizea, sizeb, scale=0.5):
     x = conv2d_bn_a(x, sizea, 3, 3)
     x = conv2d_bn_a(x, sizeb, 1, 1)
     x = x * scale
-    x = BatchNormalization(axis=3, scale=False)(x)
     output = add([input, x])
     return output
 
@@ -141,8 +144,4 @@ def resnet(input, mode=18, dropout_keep_prob=0.8, num_classes=1000, is_training=
     w_variables = loss3_classifier_w.get_weights()
 
     return loss3_classifier, net, tf.convert_to_tensor(w_variables[0])
-
-
-
-
 
