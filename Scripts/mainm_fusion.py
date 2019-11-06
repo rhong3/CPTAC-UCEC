@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main method for Xeption
+Main method (fusion)
 
-Created on 04/26/2019
+Created on 10/30/2019
 
 @author: RH
 """
@@ -11,14 +11,15 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
-import data_input3
-import cnn5
+import data_input_fusion as data_input3
+import cnn_fusion as cnn5
 import pandas as pd
 import cv2
-import Sample_prep2
+import Sample_prep_fusion as Sample_prep2
 import time
 import matplotlib
 matplotlib.use('Agg')
+
 
 dirr = sys.argv[1]  # output directory
 bs = sys.argv[2]    # batch size
@@ -27,13 +28,18 @@ md = sys.argv[3]    # architecture to use
 pdmd = sys.argv[4]  # feature to predict
 
 try:
-    ep = sys.argv[5]    # epochs to train
+    level = sys.argv[5]  # magnification of tiles to use
+except IndexError:
+    level = None
+
+try:
+    ep = sys.argv[6]  # epochs to train
     ep = int(ep)
 except IndexError:
     ep = 100
 
-if pdmd == 'subtype':
-    classes = 4
+if pdmd == 'telomere':
+    classes = 3
 else:
     classes = 2
 
@@ -44,8 +50,7 @@ HYPERPARAMS = {
     "batch_size": bs,
     "dropout": 0.3,
     "learning_rate": 1E-4,
-    "classes": classes,
-    "sup": False
+    "classes": classes
 }
 
 # paths to directories
@@ -67,7 +72,7 @@ def counters(totlist_dir, cls):
     weigh = []
     for i in range(cls):
         ccct = len(trlist.loc[trlist['label'] == i])+len(valist.loc[valist['label'] == i])\
-               + len(telist.loc[telist['label'] == i])
+               +len(telist.loc[telist['label'] == i])
         wt = ((trcc+tecc+vacc)/cls)/ccct
         weigh.append(wt)
     weigh = tf.constant(weigh)
@@ -79,6 +84,11 @@ def load_image(addr):
     img = cv2.imread(addr)
     img = img.astype(np.float32)
     return img
+
+
+# used for tfrecord float generation
+def _float_feature(value):
+    return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
 
 
 # used for tfrecord labels generation
@@ -105,7 +115,8 @@ def loader(totlist_dir, ds):
     imlistb = slist['L1path'].values.tolist()
     imlistc = slist['L2path'].values.tolist()
     lblist = slist['label'].values.tolist()
-
+    wtlist = slist['BMI'].values.tolist()
+    aglist = slist['age'].values.tolist()
     filename = data_dir + '/' + ds + '.tfrecords'
     writer = tf.python_io.TFRecordWriter(filename)
     for i in range(len(lblist)):
@@ -117,8 +128,12 @@ def loader(totlist_dir, ds):
             imgb = load_image(imlistb[i])
             imgc = load_image(imlistc[i])
             label = lblist[i]
+            wt = wtlist[i]
+            ag = aglist[i]
             # Create a feature
             feature = {ds + '/label': _int64_feature(label),
+                       ds + '/BMI': _float_feature(wt),
+                       ds + '/age': _int64_feature(ag),
                        ds + '/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
                        ds + '/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
                        ds + '/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
@@ -209,22 +224,22 @@ if __name__ == "__main__":
     # if not exist, prepare testing and training datasets from sampling
     try:
         trc, tec, vac, weights = counters(data_dir, classes)
-        trs = pd.read_csv(data_dir + '/tr_sample.csv', header=0)
+        trs = pd.read_csv(data_dir+'/tr_sample.csv', header=0)
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
         alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir)
-        trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes, batchsize=bs)
+        trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes, level=level, batchsize=bs)
         trc, tec, vac, weights = counters(data_dir, classes)
         loader(data_dir, 'train')
         loader(data_dir, 'validation')
         loader(data_dir, 'test')
     # have trained model or not; train from scratch if not
     try:
-        modeltoload = sys.argv[6]
+        modeltoload = sys.argv[7]
         # test or not
         try:
-            testmode = sys.argv[7]
+            testmode = sys.argv[8]
             main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
             main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload)
@@ -235,5 +250,7 @@ if __name__ == "__main__":
             loader(data_dir, 'train')
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir, 'validation')
+
+        print(tf.shape(weights))
         main(trc, tec, vac, classes, weights, testset=tes)
 
