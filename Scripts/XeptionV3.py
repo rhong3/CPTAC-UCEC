@@ -218,7 +218,8 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     return x, loss2_classifier
 
 
-def XecptionV3(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV3', supermd=False):
+def XecptionV3(inputa, inputb, inputc, demographics=None,
+               dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV3', supermd=False):
     with tf.variable_scope(scope, 'XecptionV3', [inputa, inputb, inputc]):
 
         xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
@@ -239,30 +240,22 @@ def XecptionV3(inputa, inputb, inputc, dropout=0.8, num_cls=1000, is_train=True,
         pool5_drop_10x10_s1 = Dropout(dropout)(x, training=is_train)
 
         if supermd:
-            loss3_classifier_aw = Dense(4, name='loss3/classifiera', kernel_regularizer=l2(0.0002))
-            loss3_classifier_a = loss3_classifier_aw(pool5_drop_10x10_s1)
-            loss3_classifier_a, loss3_classifier_a2 = tf.split(loss3_classifier_a, [1, 3], 1)
-            loss3_classifier_a2 = Activation('relu')(loss3_classifier_a2)
-            loss3_classifier_bw = Dense(3, name='loss3/classifierb', kernel_regularizer=l2(0.0002))
-            loss3_classifier_b = loss3_classifier_bw(loss3_classifier_a2)
-            loss3_classifier_b, loss3_classifier_b2 = tf.split(loss3_classifier_b, [1, 2], 1)
-            loss3_classifier_b2 = Activation('relu')(loss3_classifier_b2)
-            loss3_classifier_cw = Dense(2, name='loss3/classifierc', kernel_regularizer=l2(0.0002))
-            loss3_classifier_c = loss3_classifier_cw(loss3_classifier_b2)
-            loss3_classifier = concatenate([loss3_classifier_a, loss3_classifier_b, loss3_classifier_c], axis=-1)
-
-            w_variables = loss3_classifier_aw.get_weights()
-
+            demographics = Dense(2, name='demographic_fc1', activation="relu", kernel_regularizer=l2(0.0002))(
+                demographics)
+            merged = concatenate([pool5_drop_10x10_s1, demographics])
         else:
-            loss3_classifier_w = Dense(num_cls, name='loss3/classifier', kernel_regularizer=l2(0.0002))
+            merged = pool5_drop_10x10_s1
 
-            loss3_classifier = loss3_classifier_w(pool5_drop_10x10_s1)
+        loss3_classifier_w = Dense(num_cls, name='loss3/classifier', kernel_regularizer=l2(0.0002))
 
-            w_variables = loss3_classifier_w.get_weights()
+        loss3_classifier = loss3_classifier_w(merged)
+
+        w_variables = loss3_classifier_w.get_weights()
+        w_variables = w_variables[0]
 
         logits = tf.cond(tf.equal(is_train, tf.constant(True)),
                          lambda: tf.add(loss3_classifier, tf.scalar_mul(tf.constant(0.1), loss2_classifier)),
                          lambda: loss3_classifier)
 
-        return logits, net, tf.convert_to_tensor(w_variables[0])
+        return logits, net, tf.convert_to_tensor(w_variables[:2688, ])
 

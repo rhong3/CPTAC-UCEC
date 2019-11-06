@@ -12,7 +12,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 import data_input_fusion as data_input3
-import cnn_fusion as cnn5
+import cnn5
 import pandas as pd
 import cv2
 import Sample_prep_fusion as Sample_prep2
@@ -51,6 +51,7 @@ HYPERPARAMS = {
     "dropout": 0.3,
     "learning_rate": 1E-4,
     "classes": classes
+    "sup": True
 }
 
 # paths to directories
@@ -133,7 +134,7 @@ def loader(totlist_dir, ds):
             # Create a feature
             feature = {ds + '/label': _int64_feature(label),
                        ds + '/BMI': _float_feature(wt),
-                       ds + '/age': _int64_feature(ag),
+                       ds + '/age': _float_feature(ag),
                        ds + '/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
                        ds + '/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
                        ds + '/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}

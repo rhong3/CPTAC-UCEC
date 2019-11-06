@@ -50,12 +50,20 @@ class DataSet(object):
         features = tf.parse_example(
             serialized_example,
             # Defaults are not specified since both keys are required.
-            features={self._mode + '/image': tf.FixedLenFeature([], tf.string)})
+            features={self._mode + '/imageL0': tf.FixedLenFeature([], tf.string),
+                      self._mode + '/imageL1': tf.FixedLenFeature([], tf.string),
+                      self._mode + '/imageL2': tf.FixedLenFeature([], tf.string),
+                      self._mode + '/age': tf.FixedLenFeature([], tf.int64),
+                      self._mode + '/BMI': tf.FixedLenFeature([], tf.float64), })
 
-        image = tf.decode_raw(features[self._mode + '/image'], tf.float32)
-        image = tf.reshape(image, [-1, 299, 299, 3])
+        imagea = tf.decode_raw(features[self._mode + '/imageL0'], tf.float32)
+        imagea = tf.reshape(imagea, [-1, 299, 299, 3])
+        imageb = tf.decode_raw(features[self._mode + '/imageL1'], tf.float32)
+        imageb = tf.reshape(imageb, [-1, 299, 299, 3])
+        imagec = tf.decode_raw(features[self._mode + '/imageL2'], tf.float32)
+        imagec = tf.reshape(imagec, [-1, 299, 299, 3])
 
-        return image
+        return imagea, imageb, imagec
 
     # augmentation including onehot encoding
     def augment(self, imagea, imageb, imagec, labels):
