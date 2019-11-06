@@ -59,51 +59,7 @@ def _bytes_feature(value):
 
 
 # loading images for dictionaries and generate tfrecords
-def simpleloader(totlist_dir, ds):
-    if ds == 'train':
-        slist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
-    elif ds == 'validation':
-        slist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
-    elif ds == 'test':
-        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
-    else:
-        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
-    imlista = slist['L0path'].values.tolist()
-    imlistb = slist['L1path'].values.tolist()
-    imlistc = slist['L2path'].values.tolist()
-    lblist = slist['label'].values.tolist()
-
-    filename = data_dir + '/' + ds + '.tfrecords'
-    writer = tf.python_io.TFRecordWriter(filename)
-    for i in range(len(lblist)):
-        if not i % 1000:
-            sys.stdout.flush()
-        try:
-            # Load the image
-            imga = load_image(imlista[i])
-            imgb = load_image(imlistb[i])
-            imgc = load_image(imlistc[i])
-            label = lblist[i]
-            # Create a feature
-            feature = {ds + '/label': _int64_feature(label),
-                       ds + '/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
-                       ds + '/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
-                       ds + '/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
-            # Create an example protocol buffer
-            example = tf.train.Example(features=tf.train.Features(feature=feature))
-
-            # Serialize to string and write on the file
-            writer.write(example.SerializeToString())
-        except AttributeError:
-            print('Error image: ' + imlista[i] + '~' + imlistb[i] + '~' + imlistc[i])
-            pass
-
-    writer.close()
-    sys.stdout.flush()
-
-
-# loading images for dictionaries and generate tfrecords
-def superloader(totlist_dir, ds):
+def loader(totlist_dir, ds):
     if ds == 'train':
         slist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
     elif ds == 'validation':
@@ -184,10 +140,8 @@ except IndexError:
     sup = False
 
 if sup:
-    loader = superloader
     import data_input_fusion as data_input3
 else:
-    loader = simpleloader
     import data_input3
 
 if pdmd == 'subtype':
