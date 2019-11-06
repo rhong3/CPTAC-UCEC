@@ -102,7 +102,6 @@ def loader(totlist_dir, ds):
             pass
 
     writer.close()
-    sys.stdout.flush()
 
 
 # load tfrecords and prepare datasets
