@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Main method for Xeption
+Main method for X
 
-Created on 04/26/2019
+Created on 04/26/2019; modified 11/06/2019
 
 @author: RH
 """
@@ -11,49 +11,13 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
-import data_input3
 import cnn5
+import Sample_prep2
 import pandas as pd
 import cv2
-import Sample_prep2
 import time
 import matplotlib
 matplotlib.use('Agg')
-
-dirr = sys.argv[1]  # output directory
-bs = sys.argv[2]    # batch size
-bs = int(bs)
-md = sys.argv[3]    # architecture to use
-pdmd = sys.argv[4]  # feature to predict
-
-try:
-    ep = sys.argv[5]    # epochs to train
-    ep = int(ep)
-except IndexError:
-    ep = 100
-
-if pdmd == 'subtype':
-    classes = 4
-else:
-    classes = 2
-
-# input image dimension
-INPUT_DIM = [bs, 299, 299, 3]
-# hyper parameters
-HYPERPARAMS = {
-    "batch_size": bs,
-    "dropout": 0.3,
-    "learning_rate": 1E-4,
-    "classes": classes,
-    "sup": False
-}
-
-# paths to directories
-img_dir = '../tiles/'
-LOG_DIR = "../Results/{}".format(dirr)
-METAGRAPH_DIR = "../Results/{}".format(dirr)
-data_dir = "../Results/{}/data".format(dirr)
-out_dir = "../Results/{}/out".format(dirr)
 
 
 # count numbers of training and testing images
@@ -81,6 +45,11 @@ def load_image(addr):
     return img
 
 
+# used for tfrecord float generation
+def _float_feature(value):
+    return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+
 # used for tfrecord labels generation
 def _int64_feature(value):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -92,7 +61,7 @@ def _bytes_feature(value):
 
 
 # loading images for dictionaries and generate tfrecords
-def loader(totlist_dir, ds):
+def simpleloader(totlist_dir, ds):
     if ds == 'train':
         slist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
     elif ds == 'validation':
@@ -135,6 +104,55 @@ def loader(totlist_dir, ds):
     sys.stdout.flush()
 
 
+# loading images for dictionaries and generate tfrecords
+def superloader(totlist_dir, ds):
+    if ds == 'train':
+        slist = pd.read_csv(totlist_dir + '/tr_sample.csv', header=0)
+    elif ds == 'validation':
+        slist = pd.read_csv(totlist_dir + '/va_sample.csv', header=0)
+    elif ds == 'test':
+        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    else:
+        slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    imlista = slist['L0path'].values.tolist()
+    imlistb = slist['L1path'].values.tolist()
+    imlistc = slist['L2path'].values.tolist()
+    lblist = slist['label'].values.tolist()
+    wtlist = slist['BMI'].values.tolist()
+    aglist = slist['age'].values.tolist()
+    filename = data_dir + '/' + ds + '.tfrecords'
+    writer = tf.python_io.TFRecordWriter(filename)
+    for i in range(len(lblist)):
+        if not i % 1000:
+            sys.stdout.flush()
+        try:
+            # Load the image
+            imga = load_image(imlista[i])
+            imgb = load_image(imlistb[i])
+            imgc = load_image(imlistc[i])
+            label = lblist[i]
+            wt = wtlist[i]
+            ag = aglist[i]
+            # Create a feature
+            feature = {ds + '/label': _int64_feature(label),
+                       ds + '/BMI': _float_feature(wt),
+                       ds + '/age': _float_feature(ag),
+                       ds + '/imageL0': _bytes_feature(tf.compat.as_bytes(imga.tostring())),
+                       ds + '/imageL1': _bytes_feature(tf.compat.as_bytes(imgb.tostring())),
+                       ds + '/imageL2': _bytes_feature(tf.compat.as_bytes(imgc.tostring()))}
+            # Create an example protocol buffer
+            example = tf.train.Example(features=tf.train.Features(feature=feature))
+
+            # Serialize to string and write on the file
+            writer.write(example.SerializeToString())
+        except AttributeError:
+            print('Error image: ' + imlista[i] + '~' + imlistb[i] + '~' + imlistc[i])
+            pass
+
+    writer.close()
+    sys.stdout.flush()
+
+
 # load tfrecords and prepare datasets
 def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
     filename = data_dir + '/' + mode + '.tfrecords'
@@ -148,6 +166,54 @@ def tfreloader(mode, ep, bs, cls, ctr, cte, cva):
     datasets = data_input3.DataSet(bs, ct, ep=ep, cls=cls, mode=mode, filename=filename)
 
     return datasets
+
+
+dirr = sys.argv[1]  # output directory
+bs = sys.argv[2]  # batch size
+bs = int(bs)
+md = sys.argv[3]  # architecture to use
+pdmd = sys.argv[4]  # feature to predict
+
+try:
+    ep = sys.argv[5]  # epochs to train
+    ep = int(ep)
+except IndexError:
+    ep = 100
+
+try:
+    sup = sys.argv[6]  # fusion mode
+except IndexError:
+    sup = False
+
+if sup:
+    loader = superloader
+    import data_input_fusion as data_input3
+else:
+    loader = simpleloader
+    import data_input3
+
+if pdmd == 'subtype':
+    classes = 4
+else:
+    classes = 2
+
+# input image dimension
+INPUT_DIM = [bs, 299, 299, 3]
+# hyper parameters
+HYPERPARAMS = {
+    "batch_size": bs,
+    "dropout": 0.3,
+    "learning_rate": 1E-4,
+    "classes": classes,
+    "sup": sup
+}
+
+# paths to directories
+img_dir = '../tiles/'
+LOG_DIR = "../Results/{}".format(dirr)
+METAGRAPH_DIR = "../Results/{}".format(dirr)
+data_dir = "../Results/{}/data".format(dirr)
+out_dir = "../Results/{}/out".format(dirr)
 
 
 # main; trc is training image count; tec is testing image count; to_reload is the model to load; test or not
@@ -221,10 +287,10 @@ if __name__ == "__main__":
         loader(data_dir, 'test')
     # have trained model or not; train from scratch if not
     try:
-        modeltoload = sys.argv[6]
+        modeltoload = sys.argv[7]
         # test or not
         try:
-            testmode = sys.argv[7]
+            testmode = sys.argv[8]
             main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload, test=True)
         except IndexError:
             main(trc, tec, vac, classes, weights, testset=tes, to_reload=modeltoload)

@@ -1,7 +1,7 @@
 """
 Prepare training and testing datasets as CSV dictionaries 2.0
 
-Created on 04/26/2019
+Created on 04/26/2019; modified on 11/06/2019
 
 @author: RH
 """
@@ -76,8 +76,20 @@ def paired_tile_ids_in_old(slide, label, root_dir):
     return idsa
 
 
+def tile_ids_in(inp):
+    ids = []
+    try:
+        for id in os.listdir(inp['path']):
+            if '_{}.png'.format(str(inp['sldnum'])) in id:
+                ids.append([inp['slide'], inp['level'], inp['path']+'/'+id, inp['BMI'], inp['age'], inp['label']])
+    except FileNotFoundError:
+        print('Ignore:', inp['path'])
+
+    return ids
+
+
 # pair tiles of 10x, 5x, 2.5x of the same area
-def paired_tile_ids_in(slide, label, root_dir):
+def paired_tile_ids_in(slide, label, root_dir, age, BMI):
     dira = os.path.isdir(root_dir + 'level1')
     dirb = os.path.isdir(root_dir + 'level2')
     dirc = os.path.isdir(root_dir + 'level3')
@@ -117,15 +129,17 @@ def paired_tile_ids_in(slide, label, root_dir):
         idsa = idsa.drop(columns=['x', 'y', 'dup'])
         idsa = idsa.dropna()
         idsa = sku.shuffle(idsa)
+        idsa['age'] = age
+        idsa['BMI'] = BMI
     else:
-        idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+        idsa = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
 
     return idsa
 
 
 # Balance CPTAC and TCGA tiles in each class
 def balance(pdls, cls):
-    balanced = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+    balanced = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
     for i in range(cls):
         ref = pdls.loc[pdls['label'] == i]
         CPTAC = ref[~ref['slide'].str.contains("TCGA")]
@@ -142,68 +156,45 @@ def balance(pdls, cls):
     return balanced
 
 
-# Get all svs images with its label as one file; level is the tile resolution level
-def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv'):
-    if not os.path.isdir(path):
-        os.mkdir(path)
-        import Cutter
-        Cutter.cut()
-    allimg = image_ids_in(path)
+# Prepare label at per patient level
+def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joined.csv'):
     ref = pd.read_csv(ref_file, header=0)
     big_images = []
     if pmd == 'subtype':
-        MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
-        EMimg = intersection(ref.loc[ref['subtype_Endometrioid'] == 1]['name'].tolist(), allimg)
-        SLimg = intersection(ref.loc[ref['subtype_Serous-like'] == 1]['name'].tolist(), allimg)
-        POLEimg = intersection(ref.loc[ref['subtype_POLE'] == 1]['name'].tolist(), allimg)
-        for i in MSIimg:
-            big_images.append([i, 1,  path + "{}/".format(i)])
-        for i in EMimg:
-            big_images.append([i, 2, path + "{}/".format(i)])
-        for i in SLimg:
-            big_images.append([i, 3, path + "{}/".format(i)])
-        for i in POLEimg:
-            big_images.append([i, 0, path + "{}/".format(i)])
+        ref = ref.loc[ref['subtype_0NA'] == 0]
+        for idx, row in ref.iterrows():
+            if row['subtype_POLE'] == 1:
+                big_images.append([row['name'], 0, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
+            elif row['subtype_MSI'] == 1:
+                big_images.append([row['name'], 1, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
+            elif row['subtype_Endometrioid'] == 1:
+                big_images.append([row['name'], 2, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
+            elif row['subtype_Serous-like'] == 1:
+                big_images.append([row['name'], 3, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
     elif pmd == 'histology':
-        allimg = intersection(ref.loc[ref['histology_Mixed'] == 0]['name'].tolist(), allimg)
-        EMimg = intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
-        Serousimg = intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
-        for i in EMimg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-        for i in Serousimg:
-            big_images.append([i, 1, path + "{}/".format(i)])
+        ref = ref.loc[ref['histology_Mixed'] == 0]
+        for idx, row in ref.iterrows():
+            if row['histology_Endometrioid'] == 1:
+                big_images.append([row['name'], 0, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
+            if row['histology_Serous'] == 1:
+                big_images.append([row['name'], 1, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
     elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
         ref = ref.loc[ref['subtype_0NA'] == 0]
-        negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
-        posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
-        for i in negimg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-        for i in posimg:
-            big_images.append([i, 1, path + "{}/".format(i)])
+        for idx, row in ref.iterrows():
+            big_images.append([row['name'], row['subtype_{}'.format(pmd)], path + "{}/".format(str(row['name'])),
+                               row['age'], row['BMI']])
     elif pmd == 'MSIst':
-        Himg = intersection(ref.loc[ref['MSIst_MSI-H'] == 1]['name'].tolist(), allimg)
-        Simg = intersection(ref.loc[ref['MSIst_MSS'] == 1]['name'].tolist(), allimg)
-        for i in Himg:
-            big_images.append([i, 1, path + "{}/".format(i)])
-        for i in Simg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-    elif pmd in ['MSIst_MSI-H', 'MSIst_MSI-L', 'MSIst_MSS']:
         ref = ref.loc[ref['MSIst_0NA'] == 0]
-        negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
-        posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
-        for i in negimg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-        for i in posimg:
-            big_images.append([i, 1, path + "{}/".format(i)])
+        for idx, row in ref.iterrows():
+            big_images.append([row['name'], row['MSIst_MSI-H'], path + "{}/".format(str(row['name'])),
+                               row['age'], row['BMI']])
     else:
-        negimg = intersection(ref.loc[ref[pmd] == 0]['name'].tolist(), allimg)
-        posimg = intersection(ref.loc[ref[pmd] == 1]['name'].tolist(), allimg)
-        for i in negimg:
-            big_images.append([i, 0, path + "{}/".format(i)])
-        for i in posimg:
-            big_images.append([i, 1, path + "{}/".format(i)])
+        ref = ref.dropna(subset=[pmd])
+        for idx, row in ref.iterrows():
+            big_images.append([row['name'], row[pmd], path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
 
-    datapd = pd.DataFrame(big_images, columns=['slide', 'label', 'path'])
+    datapd = pd.DataFrame(big_images, columns=['slide', 'label', 'path', 'age', 'BMI'])
+    datapd = datapd.dropna()
 
     return datapd
 
@@ -240,17 +231,17 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
     train = pd.concat(trlist)
     validation = pd.concat(valist)
 
-    test_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
-    train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
-    validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path'])
+    test_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
+    train_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
+    validation_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
     for idx, row in test.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
         test_tiles = pd.concat([test_tiles, tile_ids])
     for idx, row in train.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
         train_tiles = pd.concat([train_tiles, tile_ids])
     for idx, row in validation.iterrows():
-        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'])
+        tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
 
     train_tiles = balance(train_tiles, cls=cls)
