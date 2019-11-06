@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Main method for X
 
@@ -301,5 +299,7 @@ if __name__ == "__main__":
             loader(data_dir, 'train')
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir, 'validation')
+        if sup:
+            print("Using Fusion Mode!")
         main(trc, tec, vac, classes, weights, testset=tes)
 

@@ -1,7 +1,7 @@
 """
-Data input preparation from decoding TFrecords, onehot encoding, augmentation, and batching 3.0
+Data input preparation from decoding TFrecords, onehot encoding, augmentation, and batching 3.0 for fusion
 
-Created on 04/26/2019
+Created on 11/06/2019
 
 @author: RH
 """
