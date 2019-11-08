@@ -92,10 +92,11 @@ class INCEPTION:
         sup = self.sup
 
         dm_in = tf.placeholder(dtype=tf.float32, name="demographic")
+        dm_in_reshape = tf.reshape(dm_in, [-1, 2])
 
         if model == 'X1':
             import XeptionV1
-            logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in,
+            logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
@@ -103,7 +104,7 @@ class INCEPTION:
             print('Using X1')
         elif model == 'X2':
             import XeptionV2
-            logits, nett, ww = XeptionV2.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in,
+            logits, nett, ww = XeptionV2.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
@@ -111,7 +112,7 @@ class INCEPTION:
             print('Using X2')
         elif model == 'X3':
             import XeptionV3
-            logits, nett, ww = XeptionV3.XecptionV3(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in,
+            logits, nett, ww = XeptionV3.XecptionV3(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
@@ -119,7 +120,7 @@ class INCEPTION:
             print('Using X3')
         elif model == 'X4':
             import XeptionV4
-            logits, nett, ww = XeptionV4.XecptionV4(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in,
+            logits, nett, ww = XeptionV4.XecptionV4(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,
@@ -127,7 +128,7 @@ class INCEPTION:
             print('Using X4')
         else:
             import XeptionV1
-            logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in,
+            logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
                                                    is_train=is_train,
                                                    dropout=dropout,

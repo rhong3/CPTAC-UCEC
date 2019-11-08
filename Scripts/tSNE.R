@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # Old: I START AT 9, X START AT 10
-inlist=c('I5TP53-244')
+inlist=c('I2FAT1')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
