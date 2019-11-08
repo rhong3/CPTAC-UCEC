@@ -55,7 +55,7 @@ class INCEPTION:
 
         # unpack handles for tensor ops to feed or fetch for lower layers
         (self.xa_in, self.xb_in, self.xc_in, self.is_train, self.y_in, self.logits,
-         self.net, self.w, self.pred, self.pred_cost, self.demographic,
+         self.net, self.w, self.pred, self.pred_cost, self.dm_in,
          self.global_step, self.train_op, self.merged_summary) = handles
 
         if save_graph_def:  # tensorboard
@@ -155,7 +155,7 @@ class INCEPTION:
         merged_summary = tf.summary.merge_all()
 
         return (xa_in, xb_in, xc_in, is_train,
-                y_in, logits, nett, ww, pred, pred_cost,
+                y_in, logits, dm_in, nett, ww, pred, pred_cost,
                 global_step, train_op, merged_summary)
 
     # inference using trained models
