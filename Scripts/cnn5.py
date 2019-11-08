@@ -54,8 +54,8 @@ class INCEPTION:
             self.sesh.run(tf.global_variables_initializer())
 
         # unpack handles for tensor ops to feed or fetch for lower layers
-        (self.xa_in, self.xb_in, self.xc_in, self.is_train, self.y_in, self.logits,
-         self.net, self.w, self.pred, self.pred_cost, self.dm_in,
+        (self.xa_in, self.xb_in, self.xc_in, self.is_train, self.y_in, self.logits, self.dm_in,
+         self.net, self.w, self.pred, self.pred_cost,
          self.global_step, self.train_op, self.merged_summary) = handles
 
         if save_graph_def:  # tensorboard
@@ -175,7 +175,7 @@ class INCEPTION:
                         if self.sup:
                             xa, xb, xc, y, dm = sessa.run(next_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
-                                         self.demographic: dm, self.is_train: train_status}
+                                         self.dm_in: dm, self.is_train: train_status}
                         else:
                             xa, xb, xc, y, dm = sessa.run(next_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.is_train: train_status}
@@ -215,7 +215,7 @@ class INCEPTION:
                         if self.sup:
                             xa, xb, xc, dm = sessa.run(next_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
-                                         self.demographic: dm, self.is_train: train_status}
+                                         self.dm_in: dm, self.is_train: train_status}
                         else:
                             xa, xb, xc = sessa.run(next_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.is_train: train_status}
@@ -270,11 +270,11 @@ class INCEPTION:
                     try:
                         if self.sup:
                             xa, xb, xc, y, dm = sessa.run(next_element)
-                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
-                                         self.demographic: dm}
+                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
+                                         self.dm_in: dm}
                         else:
                             xa, xb, xc, y, dm = sessa.run(next_element)
-                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc}
+                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
                                    self.pred_cost, self.global_step, self.train_op]
@@ -298,7 +298,7 @@ class INCEPTION:
                                 if self.sup:
                                     xa, xb, xc, y, dm = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                                 self.demographic: dm, self.is_train: False}
+                                                 self.dm_in: dm, self.is_train: False}
                                 else:
                                     xa, xb, xc, y = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
@@ -337,7 +337,7 @@ class INCEPTION:
                                 if self.sup:
                                     xa, xb, xc, y, dm = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                                 self.demographic: dm, self.is_train: False}
+                                                 self.dm_in: dm, self.is_train: False}
                                 else:
                                     xa, xb, xc, y = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
@@ -384,7 +384,7 @@ class INCEPTION:
                             if self.sup:
                                 xa, xb, xc, y, dm = sessa.run(vanext_element)
                                 feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                             self.demographic: dm, self.is_train: False}
+                                             self.dm_in: dm, self.is_train: False}
                             else:
                                 xa, xb, xc, y = sessa.run(vanext_element)
                                 feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
@@ -418,7 +418,7 @@ class INCEPTION:
                         if self.sup:
                             xa, xb, xc, y, dm = sessa.run(vanext_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                         self.demographic: dm, self.is_train: False}
+                                         self.dm_in: dm, self.is_train: False}
                         else:
                             xa, xb, xc, y = sessa.run(vanext_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
@@ -470,7 +470,7 @@ class INCEPTION:
                     if self.sup:
                         xa, xb, xc, y, dm = sessa.run(vanext_element)
                         feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                     self.demographic: dm, self.is_train: False}
+                                     self.dm_in: dm, self.is_train: False}
                     else:
                         xa, xb, xc, y = sessa.run(vanext_element)
                         feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
