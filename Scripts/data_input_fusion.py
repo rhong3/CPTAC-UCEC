@@ -45,7 +45,7 @@ class DataSet(object):
 
         age = tf.cast(features[self._mode + '/age'], tf.float32)
         BMI = tf.cast(features[self._mode + '/BMI'], tf.float32)
-        demographic = tf.concat([age, BMI])
+        demographic = tf.concat([age, BMI], -1)
 
         # Convert label from a scalar uint8 tensor to an int32 scalar.
         label = tf.cast(features[self._mode + '/label'], tf.int32)
@@ -71,7 +71,7 @@ class DataSet(object):
 
         age = tf.cast(features[self._mode + '/age'], tf.float32)
         BMI = tf.cast(features[self._mode + '/BMI'], tf.float32)
-        demographic = tf.concat([age, BMI])
+        demographic = tf.concat([age, BMI], -1)
 
         return imagea, imageb, imagec, demographic
 
