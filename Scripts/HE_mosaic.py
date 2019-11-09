@@ -30,7 +30,7 @@ def sample(dat, md, bins):
         redict = {0: 'Endometrioid_score', 1: 'Serous_score'}
         classes = 2
     elif md == 'MSIst':
-        redict = {0: 'MSI-H_score', 1: 'MSS_score'}
+        redict = {0: 'MSI.H_score', 1: 'MSS_score'}
         classes = 2
     else:
         redict = {0: 'NEG_score', 1: 'POS_score'}

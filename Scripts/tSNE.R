@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # Old: I START AT 9, X START AT 10
-inlist=c('I2FAT1')
+inlist=c('I5MSIst', 'I6MSIst')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
@@ -18,7 +18,7 @@ for(xx in inlist){
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
   start=9
   bins=50
-  POS_score='POS_score'
+  POS_score='MSI.H_score'
   
   library(Rtsne)
   ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -50,7 +50,7 @@ for(xx in inlist){
   library(ggplot2)
   library(gridExtra)
   
-  p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=POS_score))+
+  p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=MSI.H_score))+
     scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
     geom_point(alpha=0.2)+
     #theme(legend.position='bottom')+
