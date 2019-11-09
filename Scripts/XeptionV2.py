@@ -236,4 +236,4 @@ def XecptionV2(inputa, inputb, inputc, demographics=None,
                          lambda: tf.add(loss3_classifier, tf.scalar_mul(tf.constant(0.1), loss2_classifier)),
                          lambda: loss3_classifier)
 
-        return logits, net, tf.convert_to_tensor(w_variables[:2688, ])
+        return logits, net, tf.convert_to_tensor(w_variables)
