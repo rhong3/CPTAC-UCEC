@@ -18,7 +18,8 @@ for(xx in inlist){
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
   start=9
   bins=50
-  POS_score='MSI.H_score'
+  POS_score=c('MSI.H_score')
+  TLB = 1  # ST is 3, others 1
   
   library(Rtsne)
   ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -46,31 +47,36 @@ for(xx in inlist){
   
   write.table(dat, file=output_file, row.names = F, sep=',')
   
+  
   ## plot the manifold with probability
   library(ggplot2)
   library(gridExtra)
+  palist <- list()
+  pblist <- list()
+  for(i in 1:length(POS_score)){
+    palist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2',col=POS_score[i]))+
+      scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=1/length(POS_score))+
+      geom_point(alpha=0.2)+
+      #theme(legend.position='bottom')+
+      xlim(-60,60)+
+      ylim(-60,60)
+    
+    pblist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
+      geom_point(aes(col=True_label),alpha=0.2)+
+      scale_color_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73",
+                                    "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))+
+      #theme(legend.position='bottom')+
+      xlim(-60,60)+
+      ylim(-60,60)
+  }
   
-  p1=ggplot(data=dat,aes(x=tsne1,y=tsne2,col=MSI.H_score))+
-    scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
-    geom_point(alpha=0.2)+
-    #theme(legend.position='bottom')+
-    xlim(-60,60)+
-    ylim(-60,60)
-  
-  p2=ggplot(data=dat,aes(x=tsne1,y=tsne2))+
-    geom_point(aes(col=True_label),alpha=0.2)+
-    scale_color_manual(values = c('gray70','red'))+
-    #theme(legend.position='bottom')+
-    xlim(-60,60)+
-    ylim(-60,60)
-  
-  p3=ggplot(data=dat,aes(x=tsne1,y=tsne2))+
+  p3=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
     geom_point(aes(col=slide),alpha=0.2)+
     theme(legend.position='none')+
     xlim(-60,60)+
     ylim(-60,60)
   
-  p4=ggplot(data=subset(dat,True_label==1),aes(x=tsne1,y=tsne2))+
+  p4=ggplot(data=subset(dat,True_label==TLB),aes_string(x='tsne1',y='tsne2'))+
     geom_point(aes(col=slide),alpha=0.2)+
     theme(legend.position='none')+
     xlim(-60,60)+
@@ -79,8 +85,11 @@ for(xx in inlist){
   pdf(file=out_fig,
       width=14,height=7)
   
-  grid.arrange(p1,p2,nrow=1)
+  for(i in 1:length(palist)){
+    grid.arrange(palist[[i]],pblist[[i]],nrow=1)
+  }
   grid.arrange(p3,p4,nrow=1)
   
   dev.off()
+  
 }
