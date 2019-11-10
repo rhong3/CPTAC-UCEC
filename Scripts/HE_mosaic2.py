@@ -26,22 +26,26 @@ def sample(dat, md, bins):
     if md == 'subtype':
         classes = 4
         redict = {0: 'MSI_score', 1: 'Endometrioid_score', 2: 'Serous-like_score', 3: 'POLE_score'}
+        cutoff = 0.35
     elif md == 'histology':
         redict = {0: 'Endometrioid_score', 1: 'Serous_score'}
         classes = 2
+        cutoff = 0.7
     elif md == 'MSIst':
         redict = {0: 'MSI.H_score', 1: 'MSS_score'}
         classes = 2
+        cutoff = 0.6
     else:
         redict = {0: 'NEG_score', 1: 'POS_score'}
         classes = 2
+        cutoff = 0.6
     sampledls = []
     for m in range(classes):
         for i in range(bins):
             for j in range(bins):
                 try:
                     sub = dat.loc[(dat['x_int'] == i) & (dat['y_int'] == j)
-                                    & (dat[redict[m]] > 0.6) & (dat['True_label'] == m)]
+                                    & (dat[redict[m]] > cutoff) & (dat['True_label'] == m)]
                     picked = sub.sample(1, replace=False)
                     for idx, row in picked.iterrows():
                         sampledls.append([row['L0path'], row['L1path'], row['L2path'], row['x_int'], row['y_int']])

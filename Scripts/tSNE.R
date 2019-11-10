@@ -9,17 +9,17 @@
 # bins=args[5]
 # POS_score=args[6]
 
-# Old: I START AT 9, X START AT 10
-inlist=c('I5MSIst', 'I6MSIst')
+# Old: I START AT 9, X START AT 10; ST start I at 11, X at 12
+inlist=c('I1ST')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
   output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
-  start=9
+  start=11
   bins=50
-  POS_score=c('MSI.H_score')
-  TLB = 1  # ST is 3, others 1
+  POS_score=c('POLE_score', 'MSI_score', 'Endometrioid_score','Serous.like_score')
+  TLB = 2  # ST is 2, others 1
   
   library(Rtsne)
   ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -68,6 +68,7 @@ for(xx in inlist){
       #theme(legend.position='bottom')+
       xlim(-60,60)+
       ylim(-60,60)
+    # "gray70", "red" , "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
   }
   
   p3=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
