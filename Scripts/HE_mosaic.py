@@ -30,7 +30,7 @@ def sample(dat, md, bins):
     elif md == 'histology':
         redict = {0: 'Endometrioid_score', 1: 'Serous_score'}
         classes = 2
-        cutoff = 0.7
+        cutoff = 0.6
     elif md == 'MSIst':
         redict = {0: 'MSI.H_score', 1: 'MSS_score'}
         classes = 2
