@@ -10,16 +10,17 @@
 # POS_score=args[6]
 
 # Old: I START AT 9, X START AT 10; ST start I at 11, X at 12
-inlist=c('I1ST')
+inlist=c('I3his', 'I2his', 'I5his', 'I6his')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
   output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
-  start=11
+  start=9
   bins=50
-  POS_score=c('POLE_score', 'MSI_score', 'Endometrioid_score','Serous.like_score')
-  TLB = 2  # ST is 2, others 1
+  POS_score=c('Serous_score')
+  TLB = 1 # ST is 2, others 1
+  MDP = 0.5 # 0.5 for binary; 1/length(POS_score))
   
   library(Rtsne)
   ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -55,7 +56,7 @@ for(xx in inlist){
   pblist <- list()
   for(i in 1:length(POS_score)){
     palist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2',col=POS_score[i]))+
-      scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=1/length(POS_score))+
+      scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
       geom_point(alpha=0.2)+
       #theme(legend.position='bottom')+
       xlim(-60,60)+
@@ -63,12 +64,12 @@ for(xx in inlist){
     
     pblist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
       geom_point(aes(col=True_label),alpha=0.2)+
-      scale_color_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73",
-                                    "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))+
+      # scale_color_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73",
+      #                               "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))+
+      scale_color_manual(values = c("gray70", "red"))+
       #theme(legend.position='bottom')+
       xlim(-60,60)+
       ylim(-60,60)
-    # "gray70", "red" , "#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
   }
   
   p3=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
