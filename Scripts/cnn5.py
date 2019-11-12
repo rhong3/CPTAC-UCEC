@@ -20,8 +20,8 @@ import Accessory2 as ac
 class INCEPTION:
     # hyper parameters
     DEFAULTS = {
-        "batch_size": 128,
-        "dropout": 0.5,
+        "batch_size": 24,
+        "dropout": 0.3,
         "learning_rate": 1E-3,
         "classes": 4,
         "sup": False
@@ -91,6 +91,7 @@ class INCEPTION:
         classes = self.classes
         sup = self.sup
 
+        # other features input
         dm_in = tf.placeholder(dtype=tf.float32, name="demographic")
         dm_in_reshape = tf.reshape(dm_in, [-1, 2])
 
