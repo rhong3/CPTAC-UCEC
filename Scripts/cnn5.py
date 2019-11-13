@@ -177,7 +177,8 @@ class INCEPTION:
                                          self.dm_in: dm, self.is_train: train_status}
                         else:
                             xa, xb, xc, y, dm = sessa.run(next_element)
-                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.is_train: train_status}
+                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
+                                         self.dm_in: None, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         # for i in range(3):
@@ -217,7 +218,8 @@ class INCEPTION:
                                          self.dm_in: dm, self.is_train: train_status}
                         else:
                             xa, xb, xc = sessa.run(next_element)
-                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.is_train: train_status}
+                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
+                                         self.dm_in: None, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
                         for i in range(3):
@@ -273,7 +275,8 @@ class INCEPTION:
                                          self.dm_in: dm}
                         else:
                             xa, xb, xc, y, dm = sessa.run(next_element)
-                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y}
+                            feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
+                                         self.dm_in: None}
 
                         fetches = [self.merged_summary, self.logits, self.pred,
                                    self.pred_cost, self.global_step, self.train_op]
@@ -301,7 +304,7 @@ class INCEPTION:
                                 else:
                                     xa, xb, xc, y = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                                 self.is_train: False}
+                                                 self.dm_in: None, self.is_train: False}
                                 fetches = [self.pred_cost, self.merged_summary]
                                 valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
                                 self.valid_logger.add_summary(valid_summary, i)
@@ -340,7 +343,7 @@ class INCEPTION:
                                 else:
                                     xa, xb, xc, y = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                                 self.is_train: False}
+                                                 self.dm_in: None, self.is_train: False}
                                 fetches = [self.pred_cost, self.merged_summary]
                                 valid_cost, valid_summary = self.sesh.run(fetches, feed_dict)
                                 self.valid_logger.add_summary(valid_summary, i)
@@ -387,7 +390,7 @@ class INCEPTION:
                             else:
                                 xa, xb, xc, y = sessa.run(vanext_element)
                                 feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                             self.is_train: False}
+                                             self.dm_in: None, self.is_train: False}
                             fetches = [self.pred_cost, self.merged_summary]
                             valid_cost, valid_summary= self.sesh.run(fetches, feed_dict)
 
@@ -421,7 +424,7 @@ class INCEPTION:
                         else:
                             xa, xb, xc, y = sessa.run(vanext_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                         self.is_train: False}
+                                         self.dm_in: None, self.is_train: False}
                         fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                         valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
@@ -473,7 +476,7 @@ class INCEPTION:
                     else:
                         xa, xb, xc, y = sessa.run(vanext_element)
                         feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
-                                     self.is_train: False}
+                                     self.dm_in: None, self.is_train: False}
                     fetches = [self.pred_cost, self.merged_summary, self.pred, self.net, self.w]
                     valid_cost, valid_summary, pred, net, w = self.sesh.run(fetches, feed_dict)
 
