@@ -13,6 +13,7 @@ import cnn5
 import Sample_prep2
 import pandas as pd
 import cv2
+import data_input_fusion as data_input3
 import time
 import matplotlib
 matplotlib.use('Agg')
@@ -135,11 +136,6 @@ try:
     sup = sys.argv[6]  # fusion mode
 except IndexError:
     sup = False
-
-if sup:
-    import data_input_fusion as data_input3
-else:
-    import data_input3
 
 if pdmd == 'subtype':
     classes = 4

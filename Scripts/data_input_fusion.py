@@ -32,8 +32,8 @@ class DataSet(object):
             features={self._mode + '/imageL0': tf.FixedLenFeature([], tf.string),
                       self._mode + '/imageL1': tf.FixedLenFeature([], tf.string),
                       self._mode + '/imageL2': tf.FixedLenFeature([], tf.string),
-                      self._mode + '/age': tf.FixedLenFeature([], tf.int64),
-                      self._mode + '/BMI': tf.FixedLenFeature([], tf.float64),
+                      self._mode + '/age': tf.FixedLenFeature([], tf.float32),
+                      self._mode + '/BMI': tf.FixedLenFeature([], tf.float32),
                       self._mode + '/label': tf.FixedLenFeature([], tf.int64), })
 
         imagea = tf.decode_raw(features[self._mode + '/imageL0'], tf.float32)
@@ -59,8 +59,8 @@ class DataSet(object):
             features={self._mode + '/imageL0': tf.FixedLenFeature([], tf.string),
                       self._mode + '/imageL1': tf.FixedLenFeature([], tf.string),
                       self._mode + '/imageL2': tf.FixedLenFeature([], tf.string),
-                      self._mode + '/age': tf.FixedLenFeature([], tf.int64),
-                      self._mode + '/BMI': tf.FixedLenFeature([], tf.float64), })
+                      self._mode + '/age': tf.FixedLenFeature([], tf.float32),
+                      self._mode + '/BMI': tf.FixedLenFeature([], tf.float32), })
 
         imagea = tf.decode_raw(features[self._mode + '/imageL0'], tf.float32)
         imagea = tf.reshape(imagea, [-1, 299, 299, 3])
