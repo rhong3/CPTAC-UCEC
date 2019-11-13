@@ -293,7 +293,7 @@ class INCEPTION:
 
                         if cost <= mintrain and i > 29999:
                             temp_valid = []
-                            for iii in range(25):
+                            for iii in range(20):
                                 if self.sup:
                                     xa, xb, xc, y, dm = sessa.run(vanext_element)
                                     feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc, self.y_in: y,
