@@ -8,6 +8,6 @@
 ## Architecture included
  - Inception (V1, V2, V3, V4)
  - inception-ResNet (V1, V2)
- - Xeption (V1, V2, V3, V4)
+ - X (V1, V2, V3, V4)
 
 ## TCGA 388 slides, CPTAC 107 slides
