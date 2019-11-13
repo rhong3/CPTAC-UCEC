@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Main method for preparing tfrecords for Prince on tensorflow 1 code and Inception architectures
 

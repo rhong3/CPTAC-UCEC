@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Main method for preparing tfrecords for prince on tensorflow 2 code and Xception architectures
 

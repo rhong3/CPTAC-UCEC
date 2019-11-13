@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Convolutional neural nets driving code for TF2.0 and Xeption
 

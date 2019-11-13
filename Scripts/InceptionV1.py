@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 InceptionV1 (GoogLeNet) for TF2.0
 
