@@ -142,6 +142,9 @@ if pdmd == 'subtype':
 else:
     classes = 2
 
+print('Input config:')
+print(dirr, bs, md, pdmd, ep, sup)
+
 # input image dimension
 INPUT_DIM = [bs, 299, 299, 3]
 # hyper parameters

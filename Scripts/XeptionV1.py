@@ -191,17 +191,7 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
 
     loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
-    if supermd:
-        loss2_classifier_a = Dense(4, name='loss2/classifiera', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
-        loss2_classifier_a, loss2_classifier_a2 = tf.split(loss2_classifier_a, [1, 3], 1)
-        loss2_classifier_a2 = Activation('relu')(loss2_classifier_a2)
-        loss2_classifier_b = Dense(3, name='loss2/classifierb', kernel_regularizer=l2(0.0002))(loss2_classifier_a2)
-        loss2_classifier_b, loss2_classifier_b2 = tf.split(loss2_classifier_b, [1, 2], 1)
-        loss2_classifier_b2 = Activation('relu')(loss2_classifier_b2)
-        loss2_classifier_c = Dense(2, name='loss2/classifierc', kernel_regularizer=l2(0.0002))(loss2_classifier_b2)
-        loss2_classifier = concatenate([loss2_classifier_a, loss2_classifier_b, loss2_classifier_c], axis=-1)
-    else:
-        loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+    loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
 
     # Reduction B
     x = reduction_resnet_v2_B(x)  # Output: 8 * 8 * 1792
