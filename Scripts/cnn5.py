@@ -93,7 +93,7 @@ class INCEPTION:
         dm_in = tf.placeholder(dtype=tf.float32, name="demographic")
         dm_in_reshape = tf.reshape(dm_in, [-1, 2])
 
-        if model == 'X1':
+        if model == 'X1' or 'F1':
             import XeptionV1
             logits, nett, ww = XeptionV1.XecptionV1(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
@@ -101,7 +101,7 @@ class INCEPTION:
                                                    dropout=dropout,
                                                    scope='X1', supermd=sup)
             print('Using X1')
-        elif model == 'X2':
+        elif model == 'X2' or 'F2':
             import XeptionV2
             logits, nett, ww = XeptionV2.XecptionV2(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
@@ -109,7 +109,7 @@ class INCEPTION:
                                                    dropout=dropout,
                                                    scope='X2', supermd=sup)
             print('Using X2')
-        elif model == 'X3':
+        elif model == 'X3' or 'F3':
             import XeptionV3
             logits, nett, ww = XeptionV3.XecptionV3(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
@@ -117,7 +117,7 @@ class INCEPTION:
                                                    dropout=dropout,
                                                    scope='X3', supermd=sup)
             print('Using X3')
-        elif model == 'X4':
+        elif model == 'X4' or 'F4':
             import XeptionV4
             logits, nett, ww = XeptionV4.XecptionV4(xa_in_reshape, xb_in_reshape, xc_in_reshape, dm_in_reshape,
                                                    num_cls=classes,
