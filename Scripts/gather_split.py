@@ -1,3 +1,10 @@
+"""
+Get baseline models data split
+
+Created on 11/15/2019
+
+@author: RH
+"""
 import pandas as pd
 
 flist = ['his', 'MSIst', 'ST', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FAT1', 'FBXW7', 'FGFR2', 'JAK1', 'KRAS',

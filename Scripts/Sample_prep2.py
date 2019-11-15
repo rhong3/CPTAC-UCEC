@@ -200,6 +200,8 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joine
     return datapd
 
 
+# TO KEEP SPLIT SAME AS BASELINES. seperate into training and testing; each type is the same separation
+# ratio on big images test and train csv files contain tiles' path.
 def set_sep_secondary(alll, path, cls, pmd, batchsize=24):
     if pmd == 'subtype':
         split = pd.read_csv('../split/ST.csv', header=0)
