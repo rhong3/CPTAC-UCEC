@@ -95,6 +95,12 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
                 big_images.append([i, level, path + "{}/level{}".format(i, level), 1])
         elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
             ref = ref.loc[ref['subtype_0NA'] == 0]
+
+            ### special version
+            ref = ref.loc[ref['histology_Mixed'] == 0]
+            ref = ref.loc[ref['histology_Endometrioid'] == 1]
+            ### special version
+
             negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
             posimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 1]['name'].tolist(), allimg)
             for i in negimg:
