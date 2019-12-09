@@ -399,7 +399,7 @@ def CAM(net, w, pred, x, y, path, name, bs, pmd, rd=0):
     elif pmd == 'MSIst':
         DIRA = "../Results/{}/out/{}_img/MSI-H".format(path, name)
         DIRB = "../Results/{}/out/{}_img/MSS".format(path, name)
-        for DIR in (DIRA, DIRB):
+        for DIR in (DIRT, DIRA, DIRB):
             try:
                 os.mkdir(DIR)
             except FileExistsError:
