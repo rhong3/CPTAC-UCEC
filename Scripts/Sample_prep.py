@@ -129,6 +129,72 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv')
     return datapd
 
 
+# TO KEEP SPLIT SAME AS BASELINES. seperate into training and testing; each type is the same separation
+# ratio on big images test and train csv files contain tiles' path.
+def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
+    if level:
+        alll = alll[alll.level == level]
+    if pmd == 'subtype':
+        split = pd.read_csv('../split/ST.csv', header=0)
+    elif pmd == 'histology':
+        split = pd.read_csv('../split/his.csv', header=0)
+    else:
+        split = pd.read_csv('../split/{}.csv'.format(pmd), header=0)
+    train = split.loc[split['set'] == 'train']['slide'].tolist()
+    validation = split.loc[split['set'] == 'validation']['slide'].tolist()
+    test = split.loc[split['set'] == 'test']['slide'].tolist()
+
+    trlist = []
+    telist = []
+    valist = []
+
+    subset = alll
+    valist.append(subset[subset['slide'].isin(validation)])
+    telist.append(subset[subset['slide'].isin(test)])
+    trlist.append(subset[subset['slide'].isin(train)])
+
+    test = pd.concat(telist)
+    train = pd.concat(trlist)
+    validation = pd.concat(valist)
+    test_tiles_list = []
+    train_tiles_list = []
+    validation_tiles_list = []
+
+    for idx, row in test.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        test_tiles_list.extend(tile_ids)
+    for idx, row in train.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        train_tiles_list.extend(tile_ids)
+    for idx, row in validation.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        validation_tiles_list.extend(tile_ids)
+
+    test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    train_tiles = pd.DataFrame(train_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    train_tiles = balance(train_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
+    # No shuffle on test set
+    train_tiles = sku.shuffle(train_tiles)
+    validation_tiles = sku.shuffle(validation_tiles)
+    if train_tiles.shape[0] > int(batchsize * 80000 / 3):
+        train_tiles = train_tiles.sample(int(batchsize * 80000 / 3), replace=False)
+        print('Truncate training set!')
+    if validation_tiles.shape[0] > int(batchsize * 80000 / 30):
+        validation_tiles = validation_tiles.sample(int(batchsize * 80000 / 30), replace=False)
+        print('Truncate validation set!')
+    if test_tiles.shape[0] > int(batchsize * 80000 / 3):
+        test_tiles = test_tiles.sample(int(batchsize * 80000 / 3), replace=False)
+        print('Truncate test set!')
+
+    test_tiles.to_csv(path + '/te_sample.csv', header=True, index=False)
+    train_tiles.to_csv(path + '/tr_sample.csv', header=True, index=False)
+    validation_tiles.to_csv(path + '/va_sample.csv', header=True, index=False)
+
+    return train_tiles, test_tiles, validation_tiles
+
+
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
 def set_sep(alll, path, cls, level=None, cut=0.2, batchsize=64):
