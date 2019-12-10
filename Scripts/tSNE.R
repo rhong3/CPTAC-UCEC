@@ -9,14 +9,15 @@
 # bins=args[5]
 # POS_score=args[6]
 
-# Old: I START AT 9, X START AT 10; ST start I at 11, X at 12
-inlist=c('I5ZFHX3', 'I6ZFHX3')
+# Old: I START AT 9, X START AT 12; ST start I at 11, X at 14
+inlist=c('F3FGFR2','X1PTEN','X3PTEN','X2TP53','X3TP53','X2ZFHX3','X4ZFHX3','F1ZFHX3','F2ZFHX3')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
   output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
+  sampled_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_sampled.csv',sep='')
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
-  start=9
+  start=12
   bins=50
   POS_score=c('POS_score')
   TLB = 1 # ST is 2, others 1
@@ -29,6 +30,7 @@ for(xx in inlist){
   # N = ori_dat[sample(nrow(N), 20000), ]
   # sp_ori_dat = rbind(P, N)
   sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
+  write.table(sp_ori_dat, file=sampled_file, row.names = F, sep=',')
   # sp_ori_dat=ori_dat
   X = as.matrix(sp_ori_dat[,start:dim(sp_ori_dat)[2]])
   res = Rtsne(X, initial_dims=100, check_duplicates = FALSE)
