@@ -95,7 +95,7 @@ for (i in targets){
       Toverall = cbind(Trocdf, Tprcdf, data.frame(t(CMT$overall)), data.frame(t(CMT$byClass)))
       colnames(Toverall) = paste('Tile', colnames(Toverall), sep='_')
       # Key names
-      keydf = data.frame("Feature" = feature, "Architecture" = arch, "Tiles" = tiles)
+      keydf = data.frame("Feature" = feature, "Architecture" = arch, "Tiles" = tiles, "Positive" = pos)
       # combine all df and reset row name
       tempdf = cbind(keydf, soverall, Toverall)
       rownames(tempdf) <- NULL

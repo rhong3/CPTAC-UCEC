@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # Old: I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('X1his','X2his','X3his','X4his','F1his','F2his','F3his','F4his')
+inlist=c('X1MSIst','X2MSIst','X3MSIst','F4MSIst')
 
 for(xx in inlist){
   input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
@@ -19,7 +19,7 @@ for(xx in inlist){
   out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
   start=12
   bins=50
-  POS_score=c('Serous_score')
+  POS_score=c('MSI.H_score')
   TLB = 1 # ST is 2, others 1
   MDP = 0.5 # 0.5 for binary; 1/length(POS_score))
   

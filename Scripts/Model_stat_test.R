@@ -1,0 +1,6 @@
+library(readxl)
+subtype=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 1)
+mutation=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 2)
+histology=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 3)
+MSI=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 4)
+special=read_excel('~/documents/CPTAC-UCEC/Results/Summary.xlsx', sheet = 5)
