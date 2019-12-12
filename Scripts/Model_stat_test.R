@@ -63,17 +63,17 @@ write.csv(wilcoxon, file = "~/documents/CPTAC-UCEC/Results/AUROC_test/Wilcoxon_p
 
 
 # ROC test
-arch = c('I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
+arch = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
 features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2')
 
 for (f in features){
-  PA_test = data.frame(matrix('', ncol=14, nrow=14),stringsAsFactors = FALSE)
-  colnames(PA_test) = c('I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
-  rownames(PA_test) = c('I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
+  PA_test = data.frame(matrix('', ncol=10, nrow=10),stringsAsFactors = FALSE)
+  colnames(PA_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+  rownames(PA_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
   
-  TI_test = data.frame(matrix('', ncol=14, nrow=14),stringsAsFactors = FALSE)
-  colnames(TI_test) = c('I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
-  rownames(TI_test) = c('I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
+  TI_test = data.frame(matrix('', ncol=10, nrow=10),stringsAsFactors = FALSE)
+  colnames(TI_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+  rownames(TI_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
   if (f == 'his'){
     pos = "Serous_score"
     lev = c('Endometrioid', 'Serous')  
@@ -84,9 +84,9 @@ for (f in features){
     pos = "POS_score"
     lev = c('negative', f)
   }
-  for (ara in 1:14){
-    for (arb in 1:14){
-      if (ara<arb){
+  for (ara in 1:10){
+    for (arb in 1:10){
+      if ((ara<arb) & (ara %% 2 == arb %% 2)){
         i = paste(arch[ara], f, sep='')
         j = paste(arch[arb], f, sep='')
         
@@ -121,7 +121,7 @@ for (f in features){
       }
     }
   }
-  write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
-  write.csv(TI_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/",f ,"_tile_AUROC_test.csv", sep=''), row.names=TRUE)
+  write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/lite_",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
+  write.csv(TI_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/lite_",f ,"_tile_AUROC_test.csv", sep=''), row.names=TRUE)
 }
  
