@@ -100,7 +100,7 @@ for (f in features){
         # ROC
         roca =  roc(answersa, Test_slidea[[pos]], levels=lev)
         rocb =  roc(answersb, Test_slideb[[pos]], levels=lev)
-        testa = roc.test(roca, rocb, method="delong", alternative="less")
+        testa = roc.test(roca, rocb, method="delong", alternative="greater")
         
         PA_test[ara, arb] = round(testa$p.value, digits = 5)
         
@@ -114,14 +114,14 @@ for (f in features){
         # ROC
         roca =  roc(answersa, Test_tilea[[pos]], levels=lev)
         rocb =  roc(answersb, Test_tileb[[pos]], levels=lev)
-        testb = roc.test(roca, rocb, method="delong", alternative="less")
+        testb = roc.test(roca, rocb, method="delong", alternative="greater")
         
         TI_test[ara, arb] = round(testb$p.value, digits = 5)
 
       }
     }
   }
-  write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/less_",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
-  write.csv(TI_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/less_",f ,"_tile_AUROC_test.csv", sep=''), row.names=TRUE)
+  write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/greater_",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
+  write.csv(TI_test, file = paste("~/documents/CPTAC-UCEC/Results/AUROC_test/greater_",f ,"_tile_AUROC_test.csv", sep=''), row.names=TRUE)
 }
  
