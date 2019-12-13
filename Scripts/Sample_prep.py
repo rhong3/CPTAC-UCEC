@@ -203,6 +203,60 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
     return train_tiles, test_tiles, validation_tiles
 
 
+# Training and validation on TCGA; Testing on CPTAC
+def set_sep_idp(alll, path, cls, level=None, cut=0.15, batchsize=64):
+    trlist = []
+    telist = []
+    valist = []
+    if level:
+        alll = alll[alll.level == level]
+
+    TCGA = alll[alll['slide'].str.contains("TCGA")]
+    CPTAC = alll[~alll['slide'].str.contains("TCGA")]
+    for i in range(cls):
+        subset = TCGA.loc[TCGA['label'] == i]
+        unq = list(subset.slide.unique())
+        np.random.shuffle(unq)
+        validation = unq[:int(len(unq) * cut)]
+        valist.append(subset[subset['slide'].isin(validation)])
+        train = unq[int(len(unq) * cut):]
+        trlist.append(subset[subset['slide'].isin(train)])
+    telist.append(CPTAC)
+    test = pd.concat(telist)
+    train = pd.concat(trlist)
+    validation = pd.concat(valist)
+    test_tiles_list = []
+    train_tiles_list = []
+    validation_tiles_list = []
+    for idx, row in test.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        test_tiles_list.extend(tile_ids)
+    for idx, row in train.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        train_tiles_list.extend(tile_ids)
+    for idx, row in validation.iterrows():
+        tile_ids = tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
+        validation_tiles_list.extend(tile_ids)
+    test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    train_tiles = pd.DataFrame(train_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'level', 'path', 'label'])
+    # No shuffle on test set
+    train_tiles = sku.shuffle(train_tiles)
+    validation_tiles = sku.shuffle(validation_tiles)
+    if train_tiles.shape[0] > int(batchsize * 30000):
+        train_tiles = train_tiles.sample(int(batchsize * 30000), replace=False)
+        print('Truncate training set!')
+    if validation_tiles.shape[0] > int(batchsize * 3000):
+        validation_tiles = validation_tiles.sample(int(batchsize * 3000), replace=False)
+        print('Truncate validation set!')
+
+    test_tiles.to_csv(path + '/te_sample.csv', header=True, index=False)
+    train_tiles.to_csv(path + '/tr_sample.csv', header=True, index=False)
+    validation_tiles.to_csv(path + '/va_sample.csv', header=True, index=False)
+
+    return train_tiles, test_tiles, validation_tiles
+
+
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
 def set_sep(alll, path, cls, level=None, cut=0.2, batchsize=64):
