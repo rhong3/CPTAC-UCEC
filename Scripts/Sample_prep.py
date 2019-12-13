@@ -204,7 +204,7 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
 
 
 # Training and validation on TCGA; Testing on CPTAC
-def set_sep_idp(alll, path, cls, level=None, cut=0.15, batchsize=64):
+def set_sep_idp(alll, path, cls, level=None, cut=0.1, batchsize=64):
     trlist = []
     telist = []
     valist = []
