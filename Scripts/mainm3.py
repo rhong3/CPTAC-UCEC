@@ -69,8 +69,8 @@ def counters(totlist_dir, cls):
     vacc = len(valist['label'])
     weigh = []
     for i in range(cls):
-        ccct = len(trlist.loc[trlist['label']==i])+len(valist.loc[valist['label']==i])\
-               +len(telist.loc[telist['label']==i])
+        ccct = len(trlist.loc[trlist['label'] == i]) + len(valist.loc[valist['label'] == i])\
+               + len(telist.loc[telist['label'] == i])
         wt = ((trcc+tecc+vacc)/cls)/ccct
         weigh.append(wt)
     weigh = tf.constant(weigh)
