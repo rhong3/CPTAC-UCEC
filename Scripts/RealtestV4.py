@@ -316,7 +316,7 @@ if __name__ == "__main__":
     # expand 5 times
     opt = opt.repeat(50, axis=0).repeat(50, axis=1)
     # remove small pieces
-    opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
+    opt = mph.remove_small_objects(opt.astype(bool), min_size=5000, connectivity=2).astype(np.uint8)
 
     # small-scaled original image
     resx = int(resx / 5 / fct)
