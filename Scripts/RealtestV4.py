@@ -301,6 +301,13 @@ if __name__ == "__main__":
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
+    print(numx)
+    print(numy)
+    print(residualx)
+    print(residualy)
+    print(tct)
+    cv2.imwrite(out_dir + '/Original.png', raw)
+
     # output heat map of pos and neg.
     # initialize a graph and for each RGB channel
     opt = np.full((n_x, n_y), 0)
