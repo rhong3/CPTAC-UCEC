@@ -284,7 +284,7 @@ if __name__ == "__main__":
     teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
     # join 2 dictionaries
     joined = pd.merge(slist, teresult, how='inner', on=['Num'])
-    tile_dict = pd.read_csv(data_dir+'level1/dict.csv', header=0)
+    tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
     tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
     joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
