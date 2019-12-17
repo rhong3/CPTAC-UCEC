@@ -33,6 +33,61 @@ meta = sys.argv[6]  # full path to the trained model to be loaded
 pdmd = sys.argv[7]  # feature to predict
 
 
+def tile_ids_in(root_dir, level=1):
+    ids = []
+    try:
+        for id in os.listdir(root_dir):
+            if '.png' in id:
+                ids.append([level, root_dir+'/'+id])
+            else:
+                print('Skipping ID:', id)
+    except FileNotFoundError:
+        print('Ignore:', root_dir)
+    test_tiles = pd.DataFrame(ids, columns=['level', 'L0path'])
+    test_tiles.insert(loc=0, column='Num', value=test_tiles.index)
+    return test_tiles
+
+
+# pair tiles of 10x, 5x, 2.5x of the same area
+def paired_tile_ids_in(root_dir):
+    if "TCGA" in root_dir:
+        fac = 2000
+    else:
+        fac = 1000
+    ids = []
+    for level in range(1, 4):
+        dirrr = root_dir + '/level{}'.format(str(level))
+        for id in os.listdir(dirrr):
+            if '.png' in id:
+                x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
+                y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
+                try:
+                    dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
+                except IndexError:
+                    dup = np.nan
+                ids.append([level, dirrr + '/' + id, x, y, dup])
+            else:
+                print('Skipping ID:', id)
+    ids = pd.DataFrame(ids, columns=['level', 'path', 'x', 'y', 'dup'])
+    idsa = ids.loc[ids['level'] == 1]
+    idsa = idsa.drop(columns=['level'])
+    idsa = idsa.rename(index=str, columns={"path": "L0path"})
+    idsb = ids.loc[ids['level'] == 2]
+    idsb = idsb.drop(columns=['level'])
+    idsb = idsb.rename(index=str, columns={"path": "L1path"})
+    idsc = ids.loc[ids['level'] == 3]
+    idsc = idsc.drop(columns=['level'])
+    idsc = idsc.rename(index=str, columns={"path": "L2path"})
+    idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+    idsa['x'] = idsa['x'] - (idsa['x'] % 2)
+    idsa['y'] = idsa['y'] - (idsa['y'] % 2)
+    idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+    idsa = idsa.drop(columns=['x', 'y', 'dup'])
+    idsa = idsa.dropna()
+
+    return idsa
+
+
 # read images
 def load_image(addr):
     img = cv2.imread(addr)
@@ -152,67 +207,6 @@ LOG_DIR = "../Results/{}".format(dirr)
 METAGRAPH_DIR = "../Results/{}".format(meta)
 data_dir = "../Results/{}".format(dirr)
 out_dir = "../Results/{}/out".format(dirr)
-
-
-def tile_ids_in(root_dir, level=1):
-    ids = []
-    try:
-        for id in os.listdir(root_dir):
-            if '.png' in id:
-                ids.append([level, root_dir+'/'+id])
-            else:
-                print('Skipping ID:', id)
-    except FileNotFoundError:
-        print('Ignore:', root_dir)
-    test_tiles = pd.DataFrame(ids, columns=['level', 'L0path'])
-    test_tiles.insert(loc=0, column='Num', value=test_tiles.index)
-    return test_tiles
-
-
-# pair tiles of 10x, 5x, 2.5x of the same area
-def paired_tile_ids_in(root_dir):
-    dira = os.path.isdir(root_dir + 'level1')
-    dirb = os.path.isdir(root_dir + 'level2')
-    dirc = os.path.isdir(root_dir + 'level3')
-    if dira and dirb and dirc:
-        if "TCGA" in root_dir:
-            fac = 2000
-        else:
-            fac = 1000
-        ids = []
-        for level in range(1, 4):
-            dirrr = root_dir + 'level{}'.format(str(level))
-            for id in os.listdir(dirrr):
-                if '.png' in id:
-                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
-                    y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
-                    try:
-                        dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
-                    except IndexError:
-                        dup = np.nan
-                    ids.append([level, dirrr + '/' + id, x, y, dup])
-                else:
-                    print('Skipping ID:', id)
-        ids = pd.DataFrame(ids, columns=['level', 'path', 'x', 'y', 'dup'])
-        idsa = ids.loc[ids['level'] == 1]
-        idsa = idsa.drop(columns=['level'])
-        idsa = idsa.rename(index=str, columns={"path": "L0path"})
-        idsb = ids.loc[ids['level'] == 2]
-        idsb = idsb.drop(columns=['level'])
-        idsb = idsb.rename(index=str, columns={"path": "L1path"})
-        idsc = ids.loc[ids['level'] == 3]
-        idsc = idsc.drop(columns=['level'])
-        idsc = idsc.rename(index=str, columns={"path": "L2path"})
-        idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
-        idsa['x'] = idsa['x'] - (idsa['x'] % 2)
-        idsa['y'] = idsa['y'] - (idsa['y'] % 2)
-        idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
-        idsa = idsa.drop(columns=['x', 'y', 'dup'])
-        idsa = idsa.dropna()
-    else:
-        idsa = pd.DataFrame(columns=['L0path', 'L1path', 'L2path'])
-
-    return idsa
 
 
 # load tfrecords and prepare datasets
