@@ -225,19 +225,19 @@ class INCEPTION:
                                          self.dm_in: None, self.is_train: train_status}
                         fetches = [self.pred, self.net, self.w]
                         pred, net, w = self.sesh.run(fetches, feed_dict)
-                        for i in range(3):
-                            neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
-                            netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
-                            netc = net[:, :, :, 2 * int(np.shape(net)[3] / 3):]
-                            wa = w[:int(np.shape(net)[3] / 3), :]
-                            wb = w[int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3), :]
-                            if self.sup:
-                                wc = w[2 * int(np.shape(net)[3] / 3):int(np.shape(w)[0]) - 2, :]
-                            else:
-                                wc = w[2 * int(np.shape(net)[3] / 3):, :]
-                            ac.CAM_R(neta, wa, pred, xa, dirr, 'Test_level0', bs, rd)
-                            ac.CAM_R(netb, wb, pred, xb, dirr, 'Test_level1', bs, rd)
-                            ac.CAM_R(netc, wc, pred, xc, dirr, 'Test_level2', bs, rd)
+                        # for i in range(3):
+                        #     neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
+                        #     netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
+                        #     netc = net[:, :, :, 2 * int(np.shape(net)[3] / 3):]
+                        #     wa = w[:int(np.shape(net)[3] / 3), :]
+                        #     wb = w[int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3), :]
+                        #     if self.sup:
+                        #         wc = w[2 * int(np.shape(net)[3] / 3):int(np.shape(w)[0]) - 2, :]
+                        #     else:
+                        #         wc = w[2 * int(np.shape(net)[3] / 3):, :]
+                        #     ac.CAM_R(neta, wa, pred, xa, dirr, 'Test_level0', bs, rd)
+                        #     ac.CAM_R(netb, wb, pred, xb, dirr, 'Test_level1', bs, rd)
+                        #     ac.CAM_R(netc, wc, pred, xc, dirr, 'Test_level2', bs, rd)
                         if rd == 0:
                             pdx = pred
                         else:

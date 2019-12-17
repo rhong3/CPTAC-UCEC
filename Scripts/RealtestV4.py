@@ -70,6 +70,22 @@ HYPERPARAMS = {
 LOG_DIR = "../Results/{}".format(dirr)
 METAGRAPH_DIR = "../Results/{}".format(dirr)
 data_dir = "../Results/{}".format(dirr)
+out_dir = "../Results/{}/out".format(dirr)
+
+
+def tile_ids_in(root_dir, level=1):
+    ids = []
+    try:
+        for id in os.listdir(root_dir):
+            if '.png' in id:
+                ids.append([level, root_dir+'/'+id])
+            else:
+                print('Skipping ID:', id)
+    except FileNotFoundError:
+        print('Ignore:', root_dir)
+    test_tiles = pd.DataFrame(ids, columns=['level', 'L0path'])
+    test_tiles.insert(loc=0, column='Num', value=test_tiles.index)
+    return test_tiles
 
 
 # pair tiles of 10x, 5x, 2.5x of the same area
@@ -143,7 +159,9 @@ def _bytes_feature(value):
 
 # loading images for dictionaries and generate tfrecords
 def loaderX(totlist_dir):
-    slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
+    slist = paired_tile_ids_in(totlist_dir)
+    slist.insert(loc=0, column='Num', value=slist.index)
+    slist.to_csv(totlist_dir + '/te_sample.csv', header=True, index=False)
     imlista = slist['L0path'].values.tolist()
     imlistb = slist['L1path'].values.tolist()
     imlistc = slist['L2path'].values.tolist()
@@ -173,8 +191,9 @@ def loaderX(totlist_dir):
 
 # loading images for dictionaries and generate tfrecords
 def loaderI(totlist_dir):
-    slist = pd.read_csv(totlist_dir + '/te_sample.csv', header=0)
-    imlist = slist['path'].values.tolist()
+    slist = tile_ids_in(totlist_dir)
+    slist.to_csv(totlist_dir + '/te_sample.csv', header=True, index=False)
+    imlist = slist['L0path'].values.tolist()
     filename = data_dir + '/test.tfrecords'
     writer = tf.python_io.TFRecordWriter(filename)
     for i in range(len(imlist)):
@@ -214,7 +233,7 @@ def test(bs, cls, to_reload):
 
 if __name__ == "__main__":
     # make directories if not exist
-    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir):
+    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
         try:
             os.mkdir(DIR)
         except FileExistsError:
@@ -232,8 +251,15 @@ if __name__ == "__main__":
             except(FileExistsError):
                 pass
             try:
-                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file=imgfile, outdir=otdir,
-                                                                level=level, std_img=std, ft=tff)
+                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
+                                                                         level=level, std_img=std, ft=tff)
+                if m == 1:
+                    n_x = numx
+                    n_y = numy
+                    raw_img = raw
+                    resx = residualx
+                    resy = residualy
+                    ct = tct
             except Exception as e:
                 print('Error!')
                 pass
@@ -247,16 +273,88 @@ if __name__ == "__main__":
             except(FileExistsError):
                 pass
             try:
-                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file=imgfile, outdir=otdir,
+                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
                                                                 level=level, std_img=std, ft=tff)
                 if m == 1:
-                    numx = n_x
-                    numy = n_y
-                    raw = raw_img
-                    residualx = resx
-                    residualy = resy
-                    tct = ct
-            except(IndexError):
+                    n_x = numx
+                    n_y = numy
+                    raw_img = raw
+                    resx = residualx
+                    resy = residualy
+                    ct = tct
+            except Exception as e:
+                print('Error!')
                 pass
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir)
+    test(bs, classes, to_reload=modeltoload)
+    slist = pd.read_csv(data_dir + '/tr_sample.csv', header=0)
+    # load dictionary of predictions on tiles
+    teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
+    # join 2 dictionaries
+    joined = pd.merge(slist, teresult, how='inner', on=['Num'])
+    tile_dict = pd.read_csv(data_dir+'level1/dict.csv', header=0)
+    tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
+    joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
+
+    # save joined dictionary
+    joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
+
+    # output heat map of pos and neg.
+    # initialize a graph and for each RGB channel
+    opt = np.full((n_x, n_y), 0)
+    hm_R = np.full((n_x, n_y), 0)
+    hm_G = np.full((n_x, n_y), 0)
+    hm_B = np.full((n_x, n_y), 0)
+
+    print(np.shape(opt))
+
+    lbdict = {0: 'negative', 1: pdmd}
+    # Positive is labeled red in output heat map
+    for index, row in joined.iterrows():
+        opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
+        hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
+        hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
+        hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
+    # expand 5 times
+    opt = opt.repeat(5, axis=0).repeat(5, axis=1)
+    # remove small pieces
+    opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
+
+    # small-scaled original image
+    ori_img = cv2.resize(raw_img, (np.shape(opt)[0] + resx, np.shape(opt)[1] + resy))
+    ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
+    tq = ori_img[:, :, 0]
+    ori_img[:, :, 0] = ori_img[:, :, 2]
+    ori_img[:, :, 2] = tq
+    cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
+
+    # binary output image
+    topt = np.transpose(opt)
+    opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
+    opt[:, :, 0] = topt
+    opt[:, :, 1] = topt
+    opt[:, :, 2] = topt
+    cv2.imwrite(out_dir + '/Mask.png', opt * 255)
+
+    # output heatmap
+    hm_R = np.transpose(hm_R)
+    hm_G = np.transpose(hm_G)
+    hm_B = np.transpose(hm_B)
+    hm_R = hm_R.repeat(5, axis=0).repeat(5, axis=1)
+    hm_G = hm_G.repeat(5, axis=0).repeat(5, axis=1)
+    hm_B = hm_B.repeat(5, axis=0).repeat(5, axis=1)
+    hm = np.dstack([hm_B, hm_G, hm_R])
+    hm = hm * opt
+    cv2.imwrite(out_dir + '/HM.png', hm)
+
+    # superimpose heatmap on scaled original image
+    ori_img = ori_img * opt
+    overlay = ori_img * 0.65 + hm * 0.35
+    cv2.imwrite(out_dir + '/Overlay.png', overlay)
+
+    # # Time measure tool
+    # start_time = time.time()
+    # print("--- %s seconds ---" % (time.time() - start_time))
+print("--- %s seconds ---" % (time.time() - start_time))
+
