@@ -89,7 +89,7 @@ def tile_ids_in(inp):
 
 
 # pair tiles of 10x, 5x, 2.5x of the same area
-def paired_tile_ids_in(slide, label, root_dir, age, BMI):
+def paired_tile_ids_in(slide, label, root_dir, age=None, BMI=None):
     dira = os.path.isdir(root_dir + 'level1')
     dirb = os.path.isdir(root_dir + 'level2')
     dirc = os.path.isdir(root_dir + 'level3')
@@ -179,7 +179,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joine
             if row['histology_Serous'] == 1:
                 big_images.append([row['name'], 1, path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
     elif pmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
-        # ref = ref.loc[ref['histology_Endometrioid'] == 1]
+        ref = ref.loc[ref['histology_Endometrioid'] == 1]
         ref = ref.loc[ref['subtype_0NA'] == 0]
         for idx, row in ref.iterrows():
             big_images.append([row['name'], int(row['subtype_{}'.format(pmd)]), path + "{}/".format(str(row['name'])),
