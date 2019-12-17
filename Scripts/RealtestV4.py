@@ -291,6 +291,11 @@ if __name__ == "__main__":
     tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
     joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
+    pos_score = joined_dict["POS_score"].mean()
+    if pos_score > 0.5:
+        print("Positive! Prediction score = " + str(pos_score.round(5)))
+    else:
+        print("Negative! Prediction score = " + str(pos_score.round(5)))
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
@@ -311,13 +316,13 @@ if __name__ == "__main__":
         hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
         hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
     # expand 5 times
-    opt = opt.repeat(5, axis=0).repeat(5, axis=1)
+    opt = opt.repeat(50, axis=0).repeat(5, axis=1)
     # remove small pieces
     opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
 
     # small-scaled original image
-    resx = int(resx / 50 / fct)
-    resy = int(resy / 50 / fct)
+    resx = int(resx / 5 / fct)
+    resy = int(resy / 5 / fct)
     ori_img = cv2.resize(raw_img, (np.shape(opt)[0] + resx, np.shape(opt)[1] + resy))
     ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
     tq = ori_img[:, :, 0]
