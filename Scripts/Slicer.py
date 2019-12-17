@@ -59,7 +59,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if 0.01 < wscore < 0.75:
+        if wscore < 0.9:
             img = img.resize((299, 299))
             img = normalization(img, std)
             if dp:
@@ -95,9 +95,9 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     n_x = int((bounds_width - 1) / stepsize)
     n_y = int((bounds_height - 1) / stepsize)
 
-    residue_x = int((bounds_width - n_x * stepsize)/50)
-    residue_y = int((bounds_height - n_y * stepsize)/50)
-    lowres = slide.read_region((x, y), 2, (int(n_x*stepsize/16), int(n_y*stepsize/16)))
+    residue_x = int((bounds_width - n_x * stepsize))
+    residue_y = int((bounds_height - n_y * stepsize))
+    lowres = slide.read_region((x, y), level+1, (int(n_x*stepsize/4), int(n_y*stepsize/4)))
     lowres = np.array(lowres)[:,:,:3]
 
     x0 = 0

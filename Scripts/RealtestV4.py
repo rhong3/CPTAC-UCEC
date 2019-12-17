@@ -251,6 +251,7 @@ if __name__ == "__main__":
                     resx = residualx
                     resy = residualy
                     ct = tct
+                    fct = tff
             except Exception as e:
                 print('Error!')
                 pass
@@ -273,6 +274,7 @@ if __name__ == "__main__":
                     resx = residualx
                     resy = residualy
                     ct = tct
+                    fct = tff
             except Exception as e:
                 print('Error!')
                 pass
@@ -314,6 +316,8 @@ if __name__ == "__main__":
     opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
 
     # small-scaled original image
+    resx = int(resx / 50 / fct)
+    resy = int(resy / 50 / fct)
     ori_img = cv2.resize(raw_img, (np.shape(opt)[0] + resx, np.shape(opt)[1] + resy))
     ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
     tq = ori_img[:, :, 0]
