@@ -60,15 +60,11 @@ def paired_tile_ids_in(root_dir):
         for id in os.listdir(dirrr):
             if '.png' in id:
                 x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
-                y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
-                try:
-                    dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
-                except IndexError:
-                    dup = np.nan
-                ids.append([level, dirrr + '/' + id, x, y, dup])
+                y = int(float(re.split('.p', id.split('y-', 1)[1])[0]) / fac)
+                ids.append([level, dirrr + '/' + id, x, y])
             else:
                 print('Skipping ID:', id)
-    ids = pd.DataFrame(ids, columns=['level', 'path', 'x', 'y', 'dup'])
+    ids = pd.DataFrame(ids, columns=['level', 'path', 'x', 'y'])
     idsa = ids.loc[ids['level'] == 1]
     idsa = idsa.drop(columns=['level'])
     idsa = idsa.rename(index=str, columns={"path": "L0path"})
@@ -78,11 +74,11 @@ def paired_tile_ids_in(root_dir):
     idsc = ids.loc[ids['level'] == 3]
     idsc = idsc.drop(columns=['level'])
     idsc = idsc.rename(index=str, columns={"path": "L2path"})
-    idsa = pd.merge(idsa, idsb, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
+    idsa = pd.merge(idsa, idsb, on=['x', 'y'], how='left', validate="many_to_many")
     idsa['x'] = idsa['x'] - (idsa['x'] % 2)
     idsa['y'] = idsa['y'] - (idsa['y'] % 2)
-    idsa = pd.merge(idsa, idsc, on=['x', 'y', 'dup'], how='left', validate="many_to_many")
-    idsa = idsa.drop(columns=['x', 'y', 'dup'])
+    idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_many")
+    idsa = idsa.drop(columns=['x', 'y'])
     idsa = idsa.dropna()
 
     return idsa
