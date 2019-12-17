@@ -284,6 +284,7 @@ if __name__ == "__main__":
     teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
     # join 2 dictionaries
     joined = pd.merge(slist, teresult, how='inner', on=['Num'])
+    joined = joined.drop(columns=['Num'])
     tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
     tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
     joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
@@ -302,7 +303,7 @@ if __name__ == "__main__":
 
     lbdict = {0: 'negative', 1: pdmd}
     # Positive is labeled red in output heat map
-    for index, row in joined.iterrows():
+    for index, row in joined_dict.iterrows():
         opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
         hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
         hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
@@ -347,5 +348,5 @@ if __name__ == "__main__":
     # # Time measure tool
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))
-print("--- %s seconds ---" % (time.time() - start_time))
+    print("--- %s seconds ---" % (time.time() - start_time))
 
