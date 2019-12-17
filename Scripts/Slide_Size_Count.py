@@ -62,7 +62,7 @@ def cut():
         bounds_height = slide.level_dimensions[0][1]
         j = i + (bounds_width, bounds_height)
         for f in range(4):
-            tl_num = count_tile('../tiles/{}/level{}'.format(i[2], str(f)), str('_'+i[3]))
+            tl_num = count_tile('../tiles/{}/level{}'.format(i[1], str(f)), str('_'+i[3]))
             j = j + (tl_num, )
 
         CPTAClist_new.append(j)
@@ -80,7 +80,7 @@ def cut():
         bounds_height = slide.level_dimensions[0][1]
         j = i + (bounds_width, bounds_height)
         for f in range(4):
-            tl_num = count_tile('../tiles/{}/level{}'.format(i[2], str(f)), str('_'+i[3]))
+            tl_num = count_tile('../tiles/{}/level{}'.format(i[1], str(f)), str('_'+i[3]))
             j = j + (tl_num, )
         TCGAlist_new.append(j)
     TCGApp = pd.DataFrame(TCGAlist_new, columns=['id', 'dir', 'sld', 'sld_num', 'width',
