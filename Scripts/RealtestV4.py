@@ -306,8 +306,6 @@ if __name__ == "__main__":
     hm_G = np.full((n_x, n_y), 0)
     hm_B = np.full((n_x, n_y), 0)
 
-    print(np.shape(opt))
-
     lbdict = {0: 'negative', 1: pdmd}
     # Positive is labeled red in output heat map
     for index, row in joined_dict.iterrows():
@@ -351,7 +349,7 @@ if __name__ == "__main__":
 
     # superimpose heatmap on scaled original image
     ori_img = ori_img * opt
-    overlay = ori_img * 0.65 + hm * 0.35
+    overlay = ori_img * 0.5 + hm * 0.5
     cv2.imwrite(out_dir + '/Overlay.png', overlay)
 
     # # Time measure tool

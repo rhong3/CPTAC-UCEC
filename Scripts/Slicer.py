@@ -21,13 +21,13 @@ def bgcheck(img, ts):
     the_imagea = np.nan_to_num(the_imagea)
     mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
-    greya = ((np.ptp(the_imagea[0])) < 100).astype(np.uint8)
-    greyb = ((np.ptp(the_imagea[1])) < 100).astype(np.uint8)
-    greyc = ((np.ptp(the_imagea[2])) < 100).astype(np.uint8)
-    grey = greya * greyb * greyc
+    # greya = ((np.ptp(the_imagea[0])) < 100).astype(np.uint8)
+    # greyb = ((np.ptp(the_imagea[1])) < 100).astype(np.uint8)
+    # greyc = ((np.ptp(the_imagea[2])) < 100).astype(np.uint8)
+    # grey = greya * greyb * greyc
     mask = mask[:, :, 0] * mask[:, :, 1] * mask[:, :, 2]
     maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
-    white = (np.sum(mask) + np.sum(maskb)) / (ts * ts) + grey
+    white = (np.sum(mask) + np.sum(maskb)) / (ts * ts)
     return white
 
 
