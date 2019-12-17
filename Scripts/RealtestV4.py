@@ -44,6 +44,7 @@ def tile_ids_in(root_dir, level=1):
     except FileNotFoundError:
         print('Ignore:', root_dir)
     test_tiles = pd.DataFrame(ids, columns=['level', 'L0path'])
+    test_tiles = test_tiles.reset_index(drop=True)
     test_tiles.insert(loc=0, column='Num', value=test_tiles.index)
     return test_tiles
 
@@ -80,6 +81,7 @@ def paired_tile_ids_in(root_dir):
     idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_many")
     idsa = idsa.drop(columns=['x', 'y'])
     idsa = idsa.dropna()
+    idsa = idsa.reset_index(drop=True)
 
     return idsa
 

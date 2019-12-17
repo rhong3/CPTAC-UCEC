@@ -65,7 +65,7 @@ def cut():
         TCGAlist_new.append(j)
     TCGApp = pd.DataFrame(TCGAlist_new, columns=['id', 'dir', 'sld', 'width', 'height'])
 
-    result = pd.concat([CPTACpp, TCGApp], axis=1, sort=False)
+    result = pd.concat([CPTACpp, TCGApp], axis=0, sort=False)
 
     result.to_csv('../Results/slide_dim.csv', index=False)
 
