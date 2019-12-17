@@ -59,7 +59,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
         image_y = (target_y + y)*(4**level)
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
-        if wscore < 0.8:
+        if wscore < 0.9:
             img = img.resize((299, 299))
             img = normalization(img, std)
             if dp:

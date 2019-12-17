@@ -316,7 +316,7 @@ if __name__ == "__main__":
         hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
         hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
     # expand 5 times
-    opt = opt.repeat(50, axis=0).repeat(5, axis=1)
+    opt = opt.repeat(50, axis=0).repeat(50, axis=1)
     # remove small pieces
     opt = mph.remove_small_objects(opt.astype(bool), min_size=500, connectivity=2).astype(np.uint8)
 
@@ -342,9 +342,9 @@ if __name__ == "__main__":
     hm_R = np.transpose(hm_R)
     hm_G = np.transpose(hm_G)
     hm_B = np.transpose(hm_B)
-    hm_R = hm_R.repeat(5, axis=0).repeat(5, axis=1)
-    hm_G = hm_G.repeat(5, axis=0).repeat(5, axis=1)
-    hm_B = hm_B.repeat(5, axis=0).repeat(5, axis=1)
+    hm_R = hm_R.repeat(50, axis=0).repeat(50, axis=1)
+    hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
+    hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
     hm = np.dstack([hm_B, hm_G, hm_R])
     hm = hm * opt
     cv2.imwrite(out_dir + '/HM.png', hm)
