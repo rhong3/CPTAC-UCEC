@@ -36,9 +36,9 @@ pdmd = sys.argv[7]  # feature to predict
 def tile_ids_in(root_dir, level=1):
     ids = []
     try:
-        for id in os.listdir(root_dir):
+        for id in os.listdir(root_dir+'/level1'):
             if '.png' in id:
-                ids.append([level, root_dir+'/'+id])
+                ids.append([level, root_dir+'/level1/'+id])
             else:
                 print('Skipping ID:', id)
     except FileNotFoundError:
