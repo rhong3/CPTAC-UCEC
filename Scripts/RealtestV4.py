@@ -292,7 +292,7 @@ if __name__ == "__main__":
     raw_img = np.array(lowres)[:, :, :3]
     fct = ft
 
-    if not os.path.isfile(data_dir + '/level3/dict.csv'):
+    if not os.path.isfile(data_dir + '/level1/dict.csv'):
         cutter(imgfile, dirr, cut)
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
