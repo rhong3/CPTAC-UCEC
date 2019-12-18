@@ -358,11 +358,9 @@ if __name__ == "__main__":
     hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
     hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
     hm = np.dstack([hm_B, hm_G, hm_R])
-    hm = hm * opt
     cv2.imwrite(out_dir + '/HM.png', hm)
 
     # superimpose heatmap on scaled original image
-    ori_img = ori_img * opt
     overlay = ori_img * 0.5 + hm * 0.5
     cv2.imwrite(out_dir + '/Overlay.png', overlay)
 
