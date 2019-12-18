@@ -223,38 +223,21 @@ def test(bs, cls, to_reload):
     m.inference(HE, dirr, Not_Realtest=False, bs=bs, pmd=pdmd)
 
 
-def cut(img, outdirr, cutt):
+if __name__ == "__main__":
+    # make directories if not exist
+    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
+        try:
+            os.mkdir(DIR)
+        except FileExistsError:
+            pass
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
-    if "TCGA" in img:
-        for m in range(1, cutt):
-            level = int(m / 3 + 1)
-            tff = int(m / level)
-            otdir = "../Results/{}/level{}".format(outdirr, str(m))
-            try:
-                os.mkdir(otdir)
-            except(FileExistsError):
-                pass
-            try:
-                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=img, outdir=otdir,
-                                                                         level=level, std_img=std, ft=tff)
-                if m == 1:
-                    n_x = numx
-                    n_y = numy
-                    raw_img = raw
-                    resx = residualx
-                    resy = residualy
-                    ct = tct
-                    fct = tff
-            except Exception as e:
-                print('Error!')
-                pass
-    else:
-        for m in range(1, cutt):
-            level = int(m / 2)
-            tff = int(m % 2 + 1)
-            otdir = "../Results/{}/level{}".format(outdirr, str(m))
+    if "TCGA" in imgfile:
+        for m in range(1, cut):
+            level = int(m/3 + 1)
+            tff = int(m/level)
+            otdir = "../Results/{}/level{}".format(dirr, str(m))
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
@@ -273,20 +256,30 @@ def cut(img, outdirr, cutt):
             except Exception as e:
                 print('Error!')
                 pass
-
-    return n_x, n_y, raw_img, resx, resy, ct, fct
-
-
-if __name__ == "__main__":
-    # make directories if not exist
-    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
-        try:
-            os.mkdir(DIR)
-        except FileExistsError:
-            pass
-
+    else:
+        for m in range(1, cut):
+            level = int(m/2)
+            tff = int(m % 2 + 1)
+            otdir = "../Results/{}/level{}".format(dirr, str(m))
+            try:
+                os.mkdir(otdir)
+            except(FileExistsError):
+                pass
+            try:
+                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
+                                                                level=level, std_img=std, ft=tff)
+                if m == 1:
+                    n_x = numx
+                    n_y = numy
+                    raw_img = raw
+                    resx = residualx
+                    resy = residualy
+                    ct = tct
+                    fct = tff
+            except Exception as e:
+                print('Error!')
+                pass
     if not os.path.isfile(data_dir + '/test.tfrecords'):
-        n_x, n_y, raw_img, resx, resy, ct, fct = cut(imgfile, dirr, cut)
         loader(data_dir)
     test(bs, classes, to_reload=modeltoload)
     slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
@@ -307,6 +300,12 @@ if __name__ == "__main__":
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
+    print(n_x)
+    print(n_y)
+    print(resx)
+    print(resy)
+    print(ct)
+    cv2.imwrite(out_dir + '/Original.png', raw_img)
 
     # output heat map of pos and neg.
     # initialize a graph and for each RGB channel
