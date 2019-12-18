@@ -238,7 +238,7 @@ def cutter(img, outdirr, cutt):
             except(FileExistsError):
                 pass
             try:
-                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=img, outdir=otdir,
+                numx, numy, raw, tct = Slicer.tile(image_file=img, outdir=otdir,
                                                                          level=level, std_img=std, ft=tff)
             except Exception as e:
                 print('Error!')
@@ -253,7 +253,7 @@ def cutter(img, outdirr, cutt):
             except(FileExistsError):
                 pass
             try:
-                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
+                numx, numy, raw, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
                                                                          level=level, std_img=std, ft=tff)
             except Exception as e:
                 print('Error!')

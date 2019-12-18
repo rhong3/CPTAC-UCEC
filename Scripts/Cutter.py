@@ -88,7 +88,7 @@ def cut():
             except(FileExistsError):
                 pass
             try:
-                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
+                n_x, n_y, raw_img, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
                                                                 level=level, std_img=std, dp=i[2], ft=tff)
             except(IndexError):
                 pass
@@ -127,7 +127,7 @@ def cut():
             except(FileExistsError):
                 pass
             try:
-                n_x, n_y, raw_img, resx, resy, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
+                n_x, n_y, raw_img, ct = Slicer.tile(image_file='TCGA/'+i[0], outdir=otdir,
                                                                 level=level, std_img=std, dp=i[2], ft=tff)
             except Exception as e:
                 print('Error!')

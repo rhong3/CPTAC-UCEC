@@ -95,8 +95,6 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     n_x = int((bounds_width - 1) / stepsize)
     n_y = int((bounds_height - 1) / stepsize)
 
-    residue_x = int((bounds_width - n_x * stepsize))
-    residue_y = int((bounds_height - n_y * stepsize))
     lowres = slide.read_region((x, y), level+1, (int(n_x*stepsize/4), int(n_y*stepsize/4)))
     lowres = np.array(lowres)[:,:,:3]
 
@@ -132,6 +130,6 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     ct = len(imloc)
     print(ct)
 
-    return n_x, n_y, lowres, residue_x, residue_y, ct
+    return n_x, n_y, lowres, ct
 
 
