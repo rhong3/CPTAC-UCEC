@@ -286,8 +286,6 @@ if __name__ == "__main__":
     n_x = int((bounds_width - 1) / stepsize)
     n_y = int((bounds_height - 1) / stepsize)
 
-    resx = int((bounds_width - n_x * stepsize))
-    resy = int((bounds_height - n_y * stepsize))
     lowres = slide.read_region((x, y), level+1, (int(n_x*stepsize/4), int(n_y*stepsize/4)))
     raw_img = np.array(lowres)[:, :, :3]
     fct = ft
@@ -333,9 +331,7 @@ if __name__ == "__main__":
     opt = opt.repeat(50, axis=0).repeat(50, axis=1)
 
     # small-scaled original image
-    resx = int(resx / 5 / fct)
-    resy = int(resy / 5 / fct)
-    ori_img = cv2.resize(raw_img, (np.shape(opt)[0] + resx, np.shape(opt)[1] + resy))
+    ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
     ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
     tq = ori_img[:, :, 0]
     ori_img[:, :, 0] = ori_img[:, :, 2]
