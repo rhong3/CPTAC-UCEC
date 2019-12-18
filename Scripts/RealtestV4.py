@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 import cv2
 import skimage.morphology as mph
-import sklearn.utils as sku
 import tensorflow as tf
 import staintools
 import re
@@ -301,12 +300,12 @@ if __name__ == "__main__":
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
-    print(numx)
-    print(numy)
-    print(residualx)
-    print(residualy)
-    print(tct)
-    cv2.imwrite(out_dir + '/Original.png', raw)
+    print(n_x)
+    print(n_y)
+    print(resx)
+    print(resy)
+    print(ct)
+    cv2.imwrite(out_dir + '/Original.png', raw_img)
 
     # output heat map of pos and neg.
     # initialize a graph and for each RGB channel
@@ -315,7 +314,6 @@ if __name__ == "__main__":
     hm_G = np.full((n_x, n_y), 0)
     hm_B = np.full((n_x, n_y), 0)
 
-    lbdict = {0: 'negative', 1: pdmd}
     # Positive is labeled red in output heat map
     for index, row in joined_dict.iterrows():
         opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
