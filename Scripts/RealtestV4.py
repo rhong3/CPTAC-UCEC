@@ -50,8 +50,8 @@ def tile_ids_in(root_dir, level=1):
 
 
 # pair tiles of 10x, 5x, 2.5x of the same area
-def paired_tile_ids_in(root_dir):
-    if "TCGA" in root_dir:
+def paired_tile_ids_in(root_dir, imgdirr):
+    if "TCGA" in imgdirr:
         fac = 2000
     else:
         fac = 1000
@@ -79,8 +79,8 @@ def paired_tile_ids_in(root_dir):
     idsa['x'] = idsa['x'] - (idsa['x'] % 2)
     idsa['y'] = idsa['y'] - (idsa['y'] % 2)
     idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_many")
-    # idsa = idsa.drop(columns=['x', 'y'])
-    # idsa = idsa.dropna()
+    idsa = idsa.drop(columns=['x', 'y'])
+    idsa = idsa.dropna()
     idsa = idsa.reset_index(drop=True)
 
     return idsa
@@ -109,8 +109,8 @@ def _bytes_feature(value):
 
 
 # loading images for dictionaries and generate tfrecords
-def loaderX(totlist_dir):
-    slist = paired_tile_ids_in(totlist_dir)
+def loaderX(totlist_dir, imgg):
+    slist = paired_tile_ids_in(totlist_dir, imgg)
     slist.insert(loc=0, column='Num', value=slist.index)
     slist.to_csv(totlist_dir + '/te_sample.csv', header=True, index=False)
     imlista = slist['L0path'].values.tolist()
@@ -141,7 +141,7 @@ def loaderX(totlist_dir):
 
 
 # loading images for dictionaries and generate tfrecords
-def loaderI(totlist_dir):
+def loaderI(totlist_dir, imgg):
     slist = tile_ids_in(totlist_dir)
     slist.to_csv(totlist_dir + '/te_sample.csv', header=True, index=False)
     imlist = slist['L0path'].values.tolist()
@@ -224,7 +224,7 @@ def test(bs, cls, to_reload):
     m.inference(HE, dirr, Not_Realtest=False, bs=bs, pmd=pdmd)
 
 
-def cut(img, outdirr, cutt):
+def cutter(img, outdirr, cutt):
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
@@ -269,7 +269,9 @@ if __name__ == "__main__":
             pass
     if "TCGA" in imgfile:
         ft = 1
+        level = 1
     else:
+        level = 0
         ft = 2
     slide = OpenSlide("../images/"+imgfile)
 
@@ -291,10 +293,10 @@ if __name__ == "__main__":
     fct = ft
 
     if not os.path.isfile(data_dir + '/level3/dict.csv'):
-        cut(imgfile, dirr, cut)
+        cutter(imgfile, dirr, cut)
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
-        loader(data_dir)
+        loader(data_dir, imgfile)
     test(bs, classes, to_reload=modeltoload)
     slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
     # load dictionary of predictions on tiles
