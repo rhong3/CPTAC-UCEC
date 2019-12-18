@@ -127,6 +127,59 @@ for (f in features){
 
 
 # Bootstrap t-test
+# ROC test
+arch = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
 
+for (f in features){
+  PA_test = data.frame(matrix('', ncol=10, nrow=10),stringsAsFactors = FALSE)
+  colnames(PA_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+  rownames(PA_test) = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+  
+  if (f == 'his'){
+    pos = "Serous_score"
+    lev = c('Endometrioid', 'Serous')  
+  } else if(f == 'MSIst'){
+    pos = "MSI.H_score"
+    lev = c('MSS', 'MSI-H')
+  } else if(f == 'SL' | f == 'CNVH'){
+    pos = "POS_score"
+    lev = c('negative', 'Serous-like')  
+  } else{
+    pos = "POS_score"
+    lev = c('negative', f)
+  }
+  for (ara in 1:10){
+    for (arb in 1:10){
+      if ((ara<arb) & (ara %% 2 == arb %% 2)){
+        i = paste(arch[ara], f, sep='')
+        j = paste(arch[arb], f, sep='')
+        
+        Test_slidea <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_slide.csv", sep=''))
+        Test_slideb <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", j, "/out/Test_slide.csv", sep=''))
+
+        Sprla = list()
+        Sprlb = list()
+        for (j in 1:50){
+          sampleddfa = Test_slidea[sample(nrow(Test_slidea), round(nrow(Test_slidea)*0.9)),]
+          answersa <- factor(sampleddfa$True_label)
+          resultsa <- factor(sampleddfa$Prediction)
+          roca =  roc(answersa, sampleddfa[[pos]], levels=lev)
+          Sprla[j] = roca$auc
+          
+          sampleddfb = Test_slideb[sample(nrow(Test_slideb), round(nrow(Test_slideb)*0.9)),]
+          answersb <- factor(sampleddfb$True_label)
+          resultsb <- factor(sampleddfb$Prediction)
+          rocb =  roc(answersb, sampleddfb[[pos]], levels=lev)
+          Sprlb[j] = rocb$auc
+        }
+        
+        PA_test[ara, arb] = t.test(as.numeric(Sprla), as.numeric(Sprlb), alternative = "less", paired = FALSE)$p.value
+        
+      }
+    }
+  }
+  write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/t-test/less_",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
+} 
 
  
