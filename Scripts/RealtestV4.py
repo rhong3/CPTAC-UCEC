@@ -18,6 +18,7 @@ import skimage.morphology as mph
 import tensorflow as tf
 import staintools
 import re
+from openslide import OpenSlide
 
 
 start_time = time.time()
@@ -78,8 +79,8 @@ def paired_tile_ids_in(root_dir):
     idsa['x'] = idsa['x'] - (idsa['x'] % 2)
     idsa['y'] = idsa['y'] - (idsa['y'] % 2)
     idsa = pd.merge(idsa, idsc, on=['x', 'y'], how='left', validate="many_to_many")
-    idsa = idsa.drop(columns=['x', 'y'])
-    idsa = idsa.dropna()
+    # idsa = idsa.drop(columns=['x', 'y'])
+    # idsa = idsa.dropna()
     idsa = idsa.reset_index(drop=True)
 
     return idsa
@@ -223,21 +224,30 @@ def test(bs, cls, to_reload):
     m.inference(HE, dirr, Not_Realtest=False, bs=bs, pmd=pdmd)
 
 
-if __name__ == "__main__":
-    # make directories if not exist
-    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
-        try:
-            os.mkdir(DIR)
-        except FileExistsError:
-            pass
+def cut(img, outdirr, cutt):
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
-    if "TCGA" in imgfile:
-        for m in range(1, cut):
-            level = int(m/3 + 1)
-            tff = int(m/level)
-            otdir = "../Results/{}/level{}".format(dirr, str(m))
+    if "TCGA" in img:
+        for m in range(1, cutt):
+            level = int(m / 3 + 1)
+            tff = int(m / level)
+            otdir = "../Results/{}/level{}".format(outdirr, str(m))
+            try:
+                os.mkdir(otdir)
+            except(FileExistsError):
+                pass
+            try:
+                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=img, outdir=otdir,
+                                                                         level=level, std_img=std, ft=tff)
+            except Exception as e:
+                print('Error!')
+                pass
+    else:
+        for m in range(1, cutt):
+            level = int(m / 2)
+            tff = int(m % 2 + 1)
+            otdir = "../Results/{}/level{}".format(outdirr, str(m))
             try:
                 os.mkdir(otdir)
             except(FileExistsError):
@@ -245,40 +255,44 @@ if __name__ == "__main__":
             try:
                 numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
                                                                          level=level, std_img=std, ft=tff)
-                if m == 1:
-                    n_x = numx
-                    n_y = numy
-                    raw_img = raw
-                    resx = residualx
-                    resy = residualy
-                    ct = tct
-                    fct = tff
             except Exception as e:
                 print('Error!')
                 pass
+
+
+if __name__ == "__main__":
+    # make directories if not exist
+    for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
+        try:
+            os.mkdir(DIR)
+        except FileExistsError:
+            pass
+    if "TCGA" in imgfile:
+        ft = 1
     else:
-        for m in range(1, cut):
-            level = int(m/2)
-            tff = int(m % 2 + 1)
-            otdir = "../Results/{}/level{}".format(dirr, str(m))
-            try:
-                os.mkdir(otdir)
-            except(FileExistsError):
-                pass
-            try:
-                numx, numy, raw, residualx, residualy, tct = Slicer.tile(image_file=imgfile, outdir=otdir,
-                                                                level=level, std_img=std, ft=tff)
-                if m == 1:
-                    n_x = numx
-                    n_y = numy
-                    raw_img = raw
-                    resx = residualx
-                    resy = residualy
-                    ct = tct
-                    fct = tff
-            except Exception as e:
-                print('Error!')
-                pass
+        ft = 2
+    slide = OpenSlide("../images/"+imgfile)
+
+    bounds_width = slide.level_dimensions[level][0]
+    bounds_height = slide.level_dimensions[level][1]
+    x = 0
+    y = 0
+    half_width_region = 49*ft
+    full_width_region = 299*ft
+    stepsize = (full_width_region - half_width_region)
+
+    n_x = int((bounds_width - 1) / stepsize)
+    n_y = int((bounds_height - 1) / stepsize)
+
+    resx = int((bounds_width - n_x * stepsize))
+    resy = int((bounds_height - n_y * stepsize))
+    lowres = slide.read_region((x, y), level+1, (int(n_x*stepsize/4), int(n_y*stepsize/4)))
+    raw_img = np.array(lowres)[:, :, :3]
+    fct = ft
+
+    if not os.path.isfile(data_dir + '/level3/dict.csv'):
+        cut(imgfile, dirr, cut)
+
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir)
     test(bs, classes, to_reload=modeltoload)
@@ -299,13 +313,6 @@ if __name__ == "__main__":
         print("Negative! Prediction score = " + str(pos_score.round(5)))
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
-
-    print(n_x)
-    print(n_y)
-    print(resx)
-    print(resy)
-    print(ct)
-    cv2.imwrite(out_dir + '/Original.png', raw_img)
 
     # output heat map of pos and neg.
     # initialize a graph and for each RGB channel
@@ -361,4 +368,3 @@ if __name__ == "__main__":
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s seconds ---" % (time.time() - start_time))
-
