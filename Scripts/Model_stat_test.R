@@ -182,4 +182,130 @@ for (f in features){
   write.csv(PA_test, file = paste("~/documents/CPTAC-UCEC/Results/t-test/less_",f ,"_patient_AUROC_test.csv", sep=''), row.names=TRUE)
 } 
 
+
+# t-test box plot 
+library(ggplot2)
+library(ggpubr)
+features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
+compa = list(c('I5', 'X2'), c('I5', 'X4'), c('I5', 'F2'), c('I5', 'F4'), c('I6', 'X1'), c('I6', 'X3'), c('I6', 'F1'), c('I6', 'F3'))
+for (f in features){
+  all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0))
+  if (f == 'his'){
+    pos = "Serous_score"
+    lev = c('Endometrioid', 'Serous')  
+  } else if(f == 'MSIst'){
+    pos = "MSI.H_score"
+    lev = c('MSS', 'MSI-H')
+  } else if(f == 'SL' | f == 'CNVH'){
+    pos = "POS_score"
+    lev = c('negative', 'Serous-like')  
+  } else{
+    pos = "POS_score"
+    lev = c('negative', f)
+  }
+  arch = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3')
+  for (a in arch){
+    i = paste(a, f, sep='')
+    Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_slide.csv", sep=''))
+    Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_tile.csv", sep=''))
+    Sprla = list()
+    Sprlb = list()
+    for (j in 1:50){
+      sampleddfa = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
+      answersa <- factor(sampleddfa$True_label)
+      resultsa <- factor(sampleddfa$Prediction)
+      roca =  roc(answersa, sampleddfa[[pos]], levels=lev)
+      Sprla[j] = roca$auc
+      
+      sampleddfb = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
+      answersb <- factor(sampleddfb$True_label)
+      resultsb <- factor(sampleddfb$Prediction)
+      rocb =  roc(answersb, sampleddfb[[pos]], levels=lev)
+      Sprlb[j] = rocb$auc
+    }
+    temp_all= data.frame(Slide_AUC=as.numeric(Sprla), Tile_AUC=as.numeric(Sprlb), Architecture=a)
+    all = rbind(all, temp_all)
+  }
+  pp = ggboxplot(all, x = "Architecture", y = "Slide_AUC",
+                 color = "black", fill = "Architecture", palette = "grey")+ 
+    stat_compare_means(method = "t.test", method.args = list(alternative = "less"), comparisons = compa, label = "p.signif")
+  pl = ggboxplot(all, x = "Architecture", y = "Tile_AUC",
+                 color = "black", fill = "Architecture", palette = "grey")+ 
+    stat_compare_means(method = "t.test", method.args = list(alternative = "less"), comparisons = compa, label = "p.signif") 
+  
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", f, ".pdf", sep=''),
+      width=28,height=7)
+  grid.arrange(pp,pl,nrow=1, ncol=2)
+  dev.off()
+}
+
+
+# t-test task based
+library(ggplot2)
+library(ggpubr)
+features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
+arch = c("I5", 'X2', "I6", 'X1')
+
+all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0))
+for (a in arch){
+  for (f in features){
+    if (f == 'his'){
+      pos = "Serous_score"
+      lev = c('Endometrioid', 'Serous')  
+    } else if(f == 'MSIst'){
+      pos = "MSI.H_score"
+      lev = c('MSS', 'MSI-H')
+    } else if(f == 'SL' | f == 'CNVH'){
+      pos = "POS_score"
+      lev = c('negative', 'Serous-like')  
+    } else{
+      pos = "POS_score"
+      lev = c('negative', f)
+    }
+    i = paste(a, f, sep="")
+    i = paste(a, f, sep='')
+    Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_slide.csv", sep=''))
+    Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_tile.csv", sep=''))
+    Sprla = list()
+    Sprlb = list()
+    for (j in 1:50){
+      sampleddfa = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
+      answersa <- factor(sampleddfa$True_label)
+      resultsa <- factor(sampleddfa$Prediction)
+      roca =  roc(answersa, sampleddfa[[pos]], levels=lev)
+      Sprla[j] = roca$auc
+      
+      sampleddfb = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
+      answersb <- factor(sampleddfb$True_label)
+      resultsb <- factor(sampleddfb$Prediction)
+      rocb =  roc(answersb, sampleddfb[[pos]], levels=lev)
+      Sprlb[j] = rocb$auc
+    }
+    temp_all= data.frame(Slide_AUC=as.numeric(Sprla), Tile_AUC=as.numeric(Sprlb), Architecture=a, Feature=f)
+    all = rbind(all, temp_all)
+  }
+}
+
+colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature")
+write.csv(all, file = "~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv", row.names=FALSE)
+
+wa = 'I6'
+wb = 'X1'
+all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
+# all_sub = all_sub[all_sub$Feature %in% c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'SL', 'CNVH'), ]
+
+pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
+               color = "black", fill = "Architecture", palette = "grey")+ 
+  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)
+pl = ggboxplot(all_sub, x = "Feature", y = "Tile_AUC",
+               color = "black", fill = "Architecture", palette = "grey")+ 
+  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)
+
+pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, ".pdf", sep=''),
+    width=28,height=10)
+grid.arrange(pp,pl,nrow=2, ncol=1)
+dev.off()
+
  

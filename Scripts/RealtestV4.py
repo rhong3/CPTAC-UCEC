@@ -324,9 +324,15 @@ if __name__ == "__main__":
     # Positive is labeled red in output heat map
     for index, row in joined_dict.iterrows():
         opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
-        hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
-        hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
-        hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1 - (row["POS_score"])) * 255)
+        if row["POS_score"] >= 0.5:
+            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["POS_score"]-0.5)*2)*255)
+            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["POS_score"]-0.5)*2)*255)
+        else:
+            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["NEG_score"]-0.5)*2)*255)
+            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["NEG_score"]-0.5)*2)*255)
+
     # expand 5 times
     opt = opt.repeat(50, axis=0).repeat(50, axis=1)
 
