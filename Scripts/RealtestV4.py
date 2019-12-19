@@ -315,11 +315,10 @@ if __name__ == "__main__":
     tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
     joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
-    pos_score = joined_dict[pos_score].mean()
-    if pos_score > 0.5:
-        print("Positive! Prediction score = " + str(pos_score.round(5)))
+    if joined_dict[pos_score].mean() > 0.5:
+        print("Positive! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
     else:
-        print("Negative! Prediction score = " + str(pos_score.round(5)))
+        print("Negative! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
     # save joined dictionary
     joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
