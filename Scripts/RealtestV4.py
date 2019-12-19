@@ -184,6 +184,15 @@ if pdmd == 'subtype':
     classes = 4
 else:
     classes = 2
+if pdmd == 'histology':
+    pos_score = "Serous_score"
+    neg_score = "Endometrioid_score"
+elif pdmd == 'MSIst':
+    pos_score = "MSI-H_score"
+    neg_score = "MSS_score"
+else:
+    pos_score = "POS_score"
+    neg_score = "NEG_score"
 
 print('Input config:')
 print(dirr, imgfile, bs, md, pdmd, sup, modeltoload, meta)
@@ -306,7 +315,7 @@ if __name__ == "__main__":
     tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
     joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
-    pos_score = joined_dict["POS_score"].mean()
+    pos_score = joined_dict[pos_score].mean()
     if pos_score > 0.5:
         print("Positive! Prediction score = " + str(pos_score.round(5)))
     else:
@@ -324,14 +333,14 @@ if __name__ == "__main__":
     # Positive is labeled red in output heat map
     for index, row in joined_dict.iterrows():
         opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
-        if row["POS_score"] >= 0.5:
+        if row[pos_score] >= 0.5:
             hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
-            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["POS_score"]-0.5)*2)*255)
-            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["POS_score"]-0.5)*2)*255)
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
         else:
             hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
-            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["NEG_score"]-0.5)*2)*255)
-            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row["NEG_score"]-0.5)*2)*255)
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
+            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
 
     # expand 5 times
     opt = opt.repeat(50, axis=0).repeat(50, axis=1)
