@@ -13,7 +13,6 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import concatenate, add
 from keras.regularizers import l2
 import numpy as np
-
 def resnet_v2_stem(input):
     '''The stem of the pure Inception-v4 and Inception-ResNet-v2 networks. This is input part of those networks.'''
 
