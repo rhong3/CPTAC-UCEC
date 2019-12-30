@@ -187,7 +187,7 @@ for (f in features){
 library(ggplot2)
 library(ggpubr)
 features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
-compa = list(c('I5', 'X2'), c('I5', 'X4'), c('I5', 'F2'), c('I5', 'F4'), c('I6', 'X1'), c('I6', 'X3'), c('I6', 'F1'), c('I6', 'F3'))
+compa = list(c('I5', 'X2'), c('X2', 'X4'), c('X2', 'F2'), c('X4', 'F4'), c('I6', 'X1'), c('X1', 'X3'), c('X1', 'F1'), c('X3', 'F3'))
 for (f in features){
   all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0))
   if (f == 'his'){
@@ -244,7 +244,7 @@ for (f in features){
 library(ggplot2)
 library(ggpubr)
 features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
-arch = c("I5", 'X2', "I6", 'X1')
+arch = c("I5", 'X2', 'X4', 'F2', 'F4', 'I6', 'X1', 'X3', 'F1', 'F3')
 
 all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0))
 for (a in arch){
