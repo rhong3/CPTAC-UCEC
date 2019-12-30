@@ -2,13 +2,13 @@
 ## visualize the manifold
 
 # Old: I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('X1CNVH','X2CNVH','X3CNVH','X4CNVH','F1CNVH','F2CNVH','F3CNVH','F4CNVH')
+inlist=c('F4MSIst')
 
 for(xx in inlist){
   load_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
-  out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N_for_figure.pdf',sep='')
+  out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/Figure.pdf',sep='')
   bins=50
-  POS_score=c('POS_score')
+  POS_score=c('MSI.H_score')
   MDP = 0.5 # 0.5 for binary; 1/length(POS_score))
 
   dat=read.table(load_file, header=T,sep=',')

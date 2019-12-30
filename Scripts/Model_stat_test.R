@@ -289,8 +289,8 @@ for (a in arch){
 colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature")
 write.csv(all, file = "~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv", row.names=FALSE)
 
-wa = 'I6'
-wb = 'X1'
+wa = 'X4'
+wb = 'F4'
 all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
 # all_sub = all_sub[all_sub$Feature %in% c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'SL', 'CNVH'), ]
 
