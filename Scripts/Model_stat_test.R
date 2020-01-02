@@ -289,23 +289,35 @@ for (a in arch){
 colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature")
 write.csv(all, file = "~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv", row.names=FALSE)
 
-wa = 'X4'
-wb = 'F4'
-all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
-# all_sub = all_sub[all_sub$Feature %in% c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'SL', 'CNVH'), ]
+library(ggplot2)
+library(ggpubr)
+all = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
+all$Feature <- gsub('his', 'Histology', all$Feature)
+all$Feature <- gsub('SL', 'CNV-H (Endometrioid)', all$Feature)
+all$Feature <- gsub('CNVH', 'CNV-H', all$Feature)
+all$Feature <- gsub('MSIst', 'MSI-high', all$Feature)
 
-pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
-               color = "black", fill = "Architecture", palette = "grey")+ 
-  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)
-pl = ggboxplot(all_sub, x = "Feature", y = "Tile_AUC",
-               color = "black", fill = "Architecture", palette = "grey")+ 
-  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-  stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)
+pair = list(c('I6', 'X1'), c('I5', 'X2'), c('X1', 'X3'), c('X2', 'X4'), c('X1', 'F1'), c('X2', 'F2'), c('X3', 'F3'), c('X4', 'F4'))
 
-pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, ".pdf", sep=''),
-    width=28,height=10)
-grid.arrange(pp,pl,nrow=2, ncol=1)
-dev.off()
-
- 
+for (pwa in pair){
+  wa = pwa[1]
+  wb = pwa[2]
+  all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
+  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  
+  pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
+                 color = "black", fill = "Architecture", palette = "grey")+ 
+    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  pl = ggboxplot(all_sub, x = "Feature", y = "Tile_AUC",
+                 color = "black", fill = "Architecture", palette = "grey")+ 
+    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, "_lite.pdf", sep=''),
+      width=10,height=10)
+  grid.arrange(pp,pl,nrow=2, ncol=1)
+  dev.off()
+} 
