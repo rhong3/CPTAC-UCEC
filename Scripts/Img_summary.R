@@ -21,19 +21,16 @@ patient = patient[!(patient$Feature %in% sss), ]
 spp = read.csv('~/documents/CPTAC-UCEC/patient_slides_count.csv')
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/slides_per_patient.pdf", sep=''),
-    width=5,height=5)
+    width=6.5,height=5)
 
 pie = data.frame(group=c('1 slide','2 slides','3 slides'), value=c(length(spp[spp$num_of_slides==1,]$patient),length(spp[spp$num_of_slides==2,]$patient),length(spp[spp$num_of_slides==3,]$patient)))
 p = ggplot(pie, aes(x="", y=value, fill=group)) +
-  geom_bar(stat="identity", width=1)+ geom_text(aes(label = value)) + scale_fill_manual(values=c("#55DDE0", "#33658A", "#999999"))  +
+  geom_bar(stat="identity", width=1) + scale_fill_manual(values=c("#55DDE0", "#33658A", "#999999"))  +
   coord_polar("y", start=0) + labs(x = NULL, y = NULL, fill = NULL)+ theme_classic() + theme(axis.line = element_blank(),
                                                                                                                            axis.text = element_blank(),
                                                                                                                            axis.ticks = element_blank()
                                                                                                                            )
-p
 
-p<-ggplot(spp, aes(x=num_of_slides)) + geom_histogram(color='grey', binwidth=1)+theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                                                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
