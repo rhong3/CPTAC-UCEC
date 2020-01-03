@@ -52,27 +52,37 @@ OUTPUT_hm = OUTPUT
 OUTPUT = round(OUTPUT, digits = 2)
 write.csv(OUTPUT, '~/Documents/CPTAC-UCEC/YuleY_similarities.csv', row.names=TRUE)
 
-colnames(OUTPUT_hm) = gsub('histology','his', colnames(OUTPUT_hm))
-rownames(OUTPUT_hm) = gsub('histology','his', rownames(OUTPUT_hm))
-colnames(OUTPUT_hm) = gsub('subtype','ST', colnames(OUTPUT_hm))
-rownames(OUTPUT_hm) = gsub('subtype','ST', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('histology_','', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('histology_','', rownames(OUTPUT_hm))
+# colnames(OUTPUT_hm) = gsub('subtype','ST', colnames(OUTPUT_hm))
+# rownames(OUTPUT_hm) = gsub('subtype','ST', rownames(OUTPUT_hm))
 colnames(OUTPUT_hm) = gsub('MSIst_','', colnames(OUTPUT_hm))
 rownames(OUTPUT_hm) = gsub('MSIst_','', rownames(OUTPUT_hm))
-colnames(OUTPUT_hm) = gsub('Endometrioid','Endo', colnames(OUTPUT_hm))
-rownames(OUTPUT_hm) = gsub('Endometrioid','Endo', rownames(OUTPUT_hm))
-colnames(OUTPUT_hm) = gsub('Serous.like','SL', colnames(OUTPUT_hm))
-rownames(OUTPUT_hm) = gsub('Serous.like','SL', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('MSI.H','MSI-H', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('MSI.H','MSI-H', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('MSI.H','MSI-H', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('MSI.H','MSI-H', rownames(OUTPUT_hm))
+# colnames(OUTPUT_hm) = gsub('Endometrioid','Endo', colnames(OUTPUT_hm))
+# rownames(OUTPUT_hm) = gsub('Endometrioid','Endo', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('subtype_Serous.like','CNV-H', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('subtype_Serous.like','CNV-H', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('subtype_Endometrioid','CNV-L', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('subtype_Endometrioid','CNV-L', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('subtype_MSI','MSI', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('subtype_MSI','MSI', rownames(OUTPUT_hm))
+colnames(OUTPUT_hm) = gsub('subtype_POLE','POLE', colnames(OUTPUT_hm))
+rownames(OUTPUT_hm) = gsub('subtype_POLE','POLE', rownames(OUTPUT_hm))
 
 OUTPUT_hm_full = OUTPUT_hm
 
-OUTPUT_hm_inter = OUTPUT_hm[1:18, 19:26]
+OUTPUT_hm_inter = OUTPUT_hm[19:24, 1:18]
 
 OUTPUT_hm_gene = OUTPUT_hm[1:18, 1:18]
 
 
 out_fig='~/Documents/CPTAC-UCEC/Inter_YuleY_similarities.pdf'
 pdf(file=out_fig,
-    width=8.5,height=7)
+    width=12,height=4.5)
 myBreaks <- c(seq(min(OUTPUT_hm), 0, length.out=ceiling(100/2) + 1), 
               seq(max(OUTPUT_hm)/100, max(OUTPUT_hm), length.out=floor(100/2)))
 pheatmap(OUTPUT_hm_inter, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", breaks = myBreaks)
@@ -81,6 +91,7 @@ dev.off()
 nm = rownames(OUTPUT_hm_inter)
 col_fun = circlize::colorRamp2(c(-1, 0, 1), c( "#4575B4", "#ffffff", "#D73027"))
 # `col = col_fun` here is used to generate the legend
+dev.off()
 
 out_fig='~/Documents/CPTAC-UCEC/Inter_YuleY_similarities_COMPLEX.pdf'
 pdf(file=out_fig,

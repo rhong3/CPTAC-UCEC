@@ -289,6 +289,7 @@ for (a in arch){
 colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature")
 write.csv(all, file = "~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv", row.names=FALSE)
 
+# For figure
 library(ggplot2)
 library(ggpubr)
 all = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
@@ -317,7 +318,7 @@ for (pwa in pair){
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
   pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, "_lite.pdf", sep=''),
-      width=10,height=10)
-  grid.arrange(pp,pl,nrow=2, ncol=1)
+      width=20,height=5)
+  grid.arrange(pp,pl,nrow=1, ncol=2)
   dev.off()
 } 

@@ -9,14 +9,20 @@ patient_ct = read.csv('~/documents/CPTAC-UCEC/Patient_summary.csv', row.names = 
 patient_ct = data.frame(t(patient_ct[c(1,2, 6), ]))
 patient_ct<- patient_ct %>% rownames_to_column("Feature")
 ppos = patient_ct[,c(1,2)]
-ppos['label'] = "POS"
+ppos['label'] = "Positive"
 colnames(ppos) = c('Feature', 'Count', 'Label')
 pneg = patient_ct[,c(1,3)]
-pneg['label'] = "NEG"
+pneg['label'] = "Negative"
 colnames(pneg) = c('Feature', 'Count', 'Label')
 patient = rbind(pneg, ppos)
-sss =c('ARID5B', 'EGFR', 'ERBB2', 'FAT4', 'MLH1', 'MSIst_MSS', 'PIK3R2')
+sss =c('ARID5B', 'EGFR', 'ERBB2', 'FAT4', 'MLH1', 'MSIst_MSS', 'PIK3R2', 'MSIst_MSI.H', 'histology_Mixed')
 patient = patient[!(patient$Feature %in% sss), ]
+patient$Feature = gsub('histology_','', patient$Feature)
+patient$Feature = gsub('subtype_Endometrioid','CNV-L', patient$Feature)
+patient$Feature = gsub('subtype_','', patient$Feature)
+patient$Feature = gsub('Serous.like','CNV-H', patient$Feature)
+
+
 
 spp = read.csv('~/documents/CPTAC-UCEC/patient_slides_count.csv')
 
@@ -74,10 +80,10 @@ grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/Patient_count.pdf", sep=''),
-    width=5,height=3)
-p = ggplot(data=patient, aes(x=Feature, y=Count, fill=Label)) +
+    width=10,height=6)
+p = ggplot(data=patient, aes(x = reorder(Feature, -Count), y=Count, fill=Label)) +
   geom_bar(stat="identity")+ scale_fill_brewer(palette="Greys") +theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 45, hjust = 1))
+                                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, hjust = 1))
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
