@@ -87,3 +87,4 @@ p = ggplot(data=patient, aes(x = reorder(Feature, -Count), y=Count, fill=Label))
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
+
