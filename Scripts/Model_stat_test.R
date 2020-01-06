@@ -322,3 +322,72 @@ for (pwa in pair){
   grid.arrange(pp,pl,nrow=1, ncol=2)
   dev.off()
 } 
+
+
+# For figure barplots
+data_summary <- function(data, varname, groupnames){
+  require(plyr)
+  summary_func <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+  return(data_sum)
+}
+
+library(ggplot2)
+library(ggpubr)
+
+all = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
+all$Feature <- gsub('his', 'Histology', all$Feature)
+all$Feature <- gsub('SL', 'CNV-H (Endometrioid)', all$Feature)
+all$Feature <- gsub('CNVH', 'CNV-H', all$Feature)
+all$Feature <- gsub('MSIst', 'MSI-high', all$Feature)
+all$Architecture = gsub("F1", "Z1", all$Architecture)
+all$Architecture = gsub("F2", "Z2", all$Architecture)
+all$Architecture = gsub("F3", "Z3", all$Architecture)
+all$Architecture = gsub("F4", "Z4", all$Architecture)
+
+pair = list(c('I6', 'X1'), c('I5', 'X2'), c('X1', 'X3'), c('X2', 'X4'), c('X1', 'Z1'), c('X2', 'Z2'), c('X3', 'Z3'), c('X4', 'Z4'))
+
+for (pwa in pair){
+  wa = pwa[1]
+  wb = pwa[2]
+  all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
+  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  all_sub.x = data_summary(all_sub, varname="Patient_AUC", 
+                         groupnames=c("Architecture", "Feature"))
+  all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
+                           groupnames=c("Architecture", "Feature"))
+  
+  pp<- ggplot(all_sub.x, aes(x=Feature, y=Patient_AUC, fill=Architecture)) + 
+    geom_bar(stat="identity", color="black",
+             position=position_dodge()) +
+    scale_fill_manual(values=c("#D3D3D3", "#808080")) +
+    geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
+                  position=position_dodge(.9)) +
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "top")
+  
+  
+  pl<- ggplot(all_sub.y, aes(x=Feature, y=Tile_AUC, fill=Architecture)) + 
+    geom_bar(stat="identity", color="black",
+             position=position_dodge()) +
+    scale_fill_manual(values=c("#D3D3D3", "#808080")) +
+    geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
+                  position=position_dodge(.9)) +
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "top")
+  
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, "_bar_lite.pdf", sep=''),
+      width=20,height=5)
+  grid.arrange(pp,pl,nrow=1, ncol=2)
+  dev.off()
+} 
+
