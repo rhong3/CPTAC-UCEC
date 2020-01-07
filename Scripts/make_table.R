@@ -60,11 +60,19 @@ df$Feature = gsub("SL", "CNV-H from endometrioid", df$Feature)
 df$Feature = gsub("CNVH", "CNV-H (Serous-like) binary", df$Feature)
 df$Architecture = gsub("I5", "IR1", df$Architecture)
 df$Architecture = gsub("I6", "IR2", df$Architecture)
+df$Architecture = gsub("X1", "P2", df$Architecture)
+df$Architecture = gsub("X2", "P1", df$Architecture)
+df$Architecture = gsub("X3", "P4", df$Architecture)
+df$Architecture = gsub("X4", "P3", df$Architecture)
+df$Architecture = gsub("F1", "PC2", df$Architecture)
+df$Architecture = gsub("F2", "PC1", df$Architecture)
+df$Architecture = gsub("F3", "PC4", df$Architecture)
+df$Architecture = gsub("F4", "PC3", df$Architecture)
 df = df[,c(4,1,2,3)]
 colnames(df) = c('Feature', 'Architecture', 'Per-patient AUROC', 'Per-tile AUROC')
 # write.csv(df, "~/documents/CPTAC-UCEC/Results/NL5/Results_table.csv", row.names=FALSE)
 
-arch = c('I1', 'I2', 'I3', 'IR1', 'IR2', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
+arch = c('I1', 'I2', 'I3', 'IR1', 'IR2', 'P1', 'P2', 'P3', 'P4', 'PC1', 'PC2', 'PC3', 'PC4')
 outdf_patient = data.frame(matrix("", ncol = 13, nrow = 22))
 rownames(outdf_patient) = c("Histology", "CNV-H (Serous-like) binary", "CNV-H from endometrioid", "MSI-High", "ARID1A", "ATM",   
                             "BRCA2", "CTCF",  "CTNNB1", "FAT1",  "FBXW7", "FGFR2", "JAK1",  "KRAS",  
@@ -82,6 +90,7 @@ for (aa in arch){
   outdf_patient[aa] = sp[,3]
   outdf_tile[aa] = sp[,4]
 }
+
 write.csv(outdf_patient, "~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_patient.csv")
 write.csv(outdf_tile, "~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_tile.csv")
 
