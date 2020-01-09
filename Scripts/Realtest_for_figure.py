@@ -221,7 +221,7 @@ def cutter(img, outdirr, cutt):
                 pass
 
 
-def main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR):
+def main(dirr, imgfile, bs, md, modeltoload, meta_cut, pdmd, LOG_DIR, METAGRAPH_DIR):
     start_time = time.time()
     if pdmd == 'histology':
         pos_score = "Serous_score"
@@ -262,7 +262,7 @@ def main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR)
     fct = ft
 
     if not os.path.isfile(data_dir + '/level1/dict.csv'):
-        cutter(imgfile, meta, cut)
+        cutter(imgfile, meta_cut, cut)
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir, imgfile)
@@ -374,7 +374,7 @@ if __name__ == "__main__":
             mediumdir = "../Results/Realtest_figure/{}".format(aaa[0])
             dirr = row['sld']
             LOG_DIR = "../Results/Realtest_figure/{}/{}".format(aaa[0], dirr)
-            METAGRAPH_DIR = LOG_DIR
+            METAGRAPH_DIR = "../Results/{}".format(meta)
             data_dir = LOG_DIR
             out_dir = "../Results/Realtest_figure/{}/{}/out".format(aaa[0], dirr)
             for DIR in (bigdir, mediumdir, LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
