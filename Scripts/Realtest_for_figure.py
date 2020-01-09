@@ -374,7 +374,7 @@ if __name__ == "__main__":
             mediumdir = "../Results/Realtest_figure/{}".format(aaa[0])
             dirr = row['sld']
             LOG_DIR = "../Results/Realtest_figure/{}/{}".format(aaa[0], dirr)
-            METAGRAPH_DIR = "../Results/Realtest_figure/{}/{}".format(aaa[0], meta)
+            METAGRAPH_DIR = LOG_DIR
             data_dir = LOG_DIR
             out_dir = "../Results/Realtest_figure/{}/{}/out".format(aaa[0], dirr)
             for DIR in (bigdir, mediumdir, LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
