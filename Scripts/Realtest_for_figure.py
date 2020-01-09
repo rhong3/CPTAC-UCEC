@@ -19,19 +19,6 @@ import staintools
 import re
 from openslide import OpenSlide
 
-
-start_time = time.time()
-
-dirr = sys.argv[1]  # name of output directory
-imgfile = sys.argv[2]  # input scn/svs name (eg. TCGA/XXX.scn)
-bs = sys.argv[3]  # batch size
-bs = int(bs)
-md = sys.argv[4]  # loaded model's architecture
-modeltoload = sys.argv[5]  # trained model to be loaded
-meta = sys.argv[6]  # full path to the trained model to be loaded
-pdmd = sys.argv[7]  # feature to predict
-
-
 def tile_ids_in(root_dir, level=1):
     ids = []
     try:
@@ -164,55 +151,11 @@ def loaderI(totlist_dir, imgg):
     writer.close()
 
 
-if 'I' in md:
-    import cnn4 as cnn
-    import data_input2 as data_input
-    level = 1
-    loader = loaderI
-    cut = 2
-else:
-    import cnn5 as cnn
-    import data_input3 as data_input
-    level = None
-    loader = loaderX
-    cut = 4
-
-sup = False
-
-if pdmd == 'subtype':
-    classes = 4
-else:
-    classes = 2
-if pdmd == 'histology':
-    pos_score = "Serous_score"
-    neg_score = "Endometrioid_score"
-elif pdmd == 'MSIst':
-    pos_score = "MSI-H_score"
-    neg_score = "MSS_score"
-else:
-    pos_score = "POS_score"
-    neg_score = "NEG_score"
-
-print('Input config:')
-print(dirr, imgfile, bs, md, pdmd, sup, modeltoload, meta)
-
-
-# input image dimension
-INPUT_DIM = [bs, 299, 299, 3]
-# hyper parameters
-HYPERPARAMS = {
-    "batch_size": bs,
-    "dropout": 0.3,
-    "learning_rate": 1E-4,
-    "classes": classes,
-    "sup": sup
-}
-
-# paths to directories
-LOG_DIR = "../Results/{}".format(dirr)
-METAGRAPH_DIR = "../Results/{}".format(meta)
-data_dir = "../Results/{}".format(dirr)
-out_dir = "../Results/{}/out".format(dirr)
+import cnn5 as cnn
+import data_input3 as data_input
+level = None
+loader = loaderX
+cut = 4
 
 
 # load tfrecords and prepare datasets
@@ -224,7 +167,17 @@ def tfreloader(bs, cls, ct):
 
 
 # main function for real test image prediction
-def test(bs, cls, to_reload):
+def test(bs, cls, to_reload, LOG_DIR, METAGRAPH_DIR):
+    # input image dimension
+    INPUT_DIM = [bs, 299, 299, 3]
+    # hyper parameters
+    HYPERPARAMS = {
+        "batch_size": bs,
+        "dropout": 0.3,
+        "learning_rate": 1E-4,
+        "classes": 2,
+        "sup": False
+    }
     m = cnn.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR, model=md)
 
     print("Loaded! Ready for test!")
@@ -268,7 +221,17 @@ def cutter(img, outdirr, cutt):
                 pass
 
 
-if __name__ == "__main__":
+def main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR):
+    start_time = time.time()
+    if pdmd == 'histology':
+        pos_score = "Serous_score"
+        neg_score = "Endometrioid_score"
+    elif pdmd == 'MSIst':
+        pos_score = "MSI-H_score"
+        neg_score = "MSS_score"
+    else:
+        pos_score = "POS_score"
+        neg_score = "NEG_score"
     # make directories if not exist
     for DIR in (LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
         try:
@@ -303,7 +266,7 @@ if __name__ == "__main__":
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir, imgfile)
-    test(bs, classes, to_reload=modeltoload)
+    test(bs, 2, modeltoload, LOG_DIR, METAGRAPH_DIR)
     slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
     # load dictionary of predictions on tiles
     teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
@@ -377,3 +340,50 @@ if __name__ == "__main__":
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s seconds ---" % (time.time() - start_time))
+
+
+if __name__ == "__main__":
+    imgdict = pd.read_csv("../Results/slide_dim.csv", header=0)
+
+    tasks = [["his", "X1"], ["PTEN", "X1"], ["TP53", "X1"], ["MSIst", "X2"],
+             ["SL", "X2"], ["ZFHX3", "X2"], ["CNVH", "X3"], ["FAT1", "X4"]]
+
+    for aaa in tasks:
+        bs = 24
+        if aaa[0] == "his":
+            pdmd = "histology"
+        elif aaa[0] == "SL" or aaa[0] == "CNVH":
+            pdmd = "Serous-like"
+        else:
+            pdmd = aaa[0]
+        md = aaa[1]
+        modeltoload = "{}_dropout_0.3".format(md)
+        meta = "NL5/{}{}".format(md, aaa[0])
+        result = pd.read_csv("../Results/{}/out/Test_slide.csv".format(meta), header=0)
+        result = result.loc[result['True_label'] != "MSS"]
+        result = result.loc[result['True_label'] != "negative"]
+        result = result.loc[result['True_label'] != "Endometrioid"]
+        result = result[result['slide'].str.contains("TCGA")]
+        result = result.loc[result['True_label'] == result['Prediction']]
+        todo = result["slide"].tolist()
+        todotask = imgdict[imgdict['dir'].isin(todo)]
+        for idx, row in todotask.iterrows():
+            imgfile = "TCGA/{}".format(row['id'])
+            # paths to directories
+            bigdir = "../Results/Realtest_figure"
+            mediumdir = "../Results/Realtest_figure/{}".format(aaa[0])
+            dirr = row['sld']
+            LOG_DIR = "../Results/Realtest_figure/{}/{}".format(aaa[0], dirr)
+            METAGRAPH_DIR = "../Results/Realtest_figure/{}/{}".format(aaa[0], meta)
+            data_dir = LOG_DIR
+            out_dir = "../Results/Realtest_figure/{}/{}/out".format(aaa[0], dirr)
+            for DIR in (bigdir, mediumdir, LOG_DIR, METAGRAPH_DIR, data_dir, out_dir):
+                try:
+                    os.mkdir(DIR)
+                except FileExistsError:
+                    pass
+            main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR)
+
+
+
+
