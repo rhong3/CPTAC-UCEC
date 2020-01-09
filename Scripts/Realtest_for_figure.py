@@ -262,7 +262,7 @@ def main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR)
     fct = ft
 
     if not os.path.isfile(data_dir + '/level1/dict.csv'):
-        cutter(imgfile, dirr, cut)
+        cutter(imgfile, meta, cut)
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir, imgfile)
@@ -382,7 +382,8 @@ if __name__ == "__main__":
                     os.mkdir(DIR)
                 except FileExistsError:
                     pass
-            main(dirr, imgfile, bs, md, modeltoload, meta, pdmd, LOG_DIR, METAGRAPH_DIR)
+            meta_cutter = "Realtest_figure/{}/{}".format(aaa[0], dirr)
+            main(dirr, imgfile, bs, md, modeltoload, meta_cutter, pdmd, LOG_DIR, METAGRAPH_DIR)
 
 
 
