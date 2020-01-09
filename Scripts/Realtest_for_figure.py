@@ -182,7 +182,7 @@ def test(bs, cls, to_reload, LOG_DIR, METAGRAPH_DIR):
 
     print("Loaded! Ready for test!")
     HE = tfreloader(bs, cls, None)
-    m.inference(HE, dirr, Not_Realtest=False, bs=bs, pmd=pdmd)
+    m.inference(HE, meta_cutter, Not_Realtest=False, bs=bs, pmd=pdmd)
 
 
 def cutter(img, outdirr, cutt):
