@@ -368,12 +368,12 @@ if __name__ == "__main__":
             result = result.loc[result['True_label'] != "negative"]
         result = result.loc[result['True_label'] != "Endometrioid"]
         result = result.loc[result['slide'] != "TCGA-B5-A0K8"]
-        result = result[result['slide'].str.contains("TCGA")]
+        result = result[~result['slide'].str.contains("TCGA")]
         result = result.loc[result['True_label'] == result['Prediction']]
         todo = result["slide"].tolist()
         todotask = imgdict[imgdict['dir'].isin(todo)]
         for idx, row in todotask.iterrows():
-            imgfile = "TCGA/{}".format(row['id'])
+            imgfile = "CPTAC/{}".format(row['id'])
             # paths to directories
             bigdir = "../Results/Realtest_figure"
             mediumdir = "../Results/Realtest_figure/{}".format(aaa[0])
