@@ -170,15 +170,8 @@ def tfreloader(bs, cls, ct):
 def test(bs, cls, to_reload, LOG_DIR, METAGRAPH_DIR):
     # input image dimension
     INPUT_DIM = [bs, 299, 299, 3]
-    # hyper parameters
-    HYPERPARAMS = {
-        "batch_size": bs,
-        "dropout": 0.3,
-        "learning_rate": 1E-4,
-        "classes": 2,
-        "sup": False
-    }
-    m = cnn.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR, model=md)
+
+    m = cnn.INCEPTION(input_dim=INPUT_DIM, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR, model=md)
 
     print("Loaded! Ready for test!")
     HE = tfreloader(bs, cls, None)
@@ -266,80 +259,81 @@ def main(dirr, imgfile, bs, md, modeltoload, meta_cut, pdmd, LOG_DIR, METAGRAPH_
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir, imgfile)
-    test(bs, 2, modeltoload, LOG_DIR, METAGRAPH_DIR)
-    slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
-    # load dictionary of predictions on tiles
-    teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
-    # join 2 dictionaries
-    joined = pd.merge(slist, teresult, how='inner', on=['Num'])
-    joined = joined.drop(columns=['Num'])
-    tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
-    tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
-    joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
+    if not os.path.isfile(data_dir + '/out/Overlay.png'):
+        test(bs, 2, modeltoload, LOG_DIR, METAGRAPH_DIR)
+        slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
+        # load dictionary of predictions on tiles
+        teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
+        # join 2 dictionaries
+        joined = pd.merge(slist, teresult, how='inner', on=['Num'])
+        joined = joined.drop(columns=['Num'])
+        tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
+        tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
+        joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
-    if joined_dict[pos_score].mean() > 0.5:
-        print("Positive! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
-    else:
-        print("Negative! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
-    # save joined dictionary
-    joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
-
-    # output heat map of pos and neg.
-    # initialize a graph and for each RGB channel
-    opt = np.full((n_x, n_y), 0)
-    hm_R = np.full((n_x, n_y), 0)
-    hm_G = np.full((n_x, n_y), 0)
-    hm_B = np.full((n_x, n_y), 0)
-
-    # Positive is labeled red in output heat map
-    for index, row in joined_dict.iterrows():
-        opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
-        if row[pos_score] >= 0.5:
-            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
-            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
-            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+        if joined_dict[pos_score].mean() > 0.5:
+            print("Positive! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
         else:
-            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
-            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
-            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
+            print("Negative! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
+        # save joined dictionary
+        joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
 
-    # expand 5 times
-    opt = opt.repeat(50, axis=0).repeat(50, axis=1)
+        # output heat map of pos and neg.
+        # initialize a graph and for each RGB channel
+        opt = np.full((n_x, n_y), 0)
+        hm_R = np.full((n_x, n_y), 0)
+        hm_G = np.full((n_x, n_y), 0)
+        hm_B = np.full((n_x, n_y), 0)
 
-    # small-scaled original image
-    ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
-    ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
-    tq = ori_img[:, :, 0]
-    ori_img[:, :, 0] = ori_img[:, :, 2]
-    ori_img[:, :, 2] = tq
-    cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
+        # Positive is labeled red in output heat map
+        for index, row in joined_dict.iterrows():
+            opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
+            if row[pos_score] >= 0.5:
+                hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
+                hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+                hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+            else:
+                hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
+                hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
+                hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
 
-    # binary output image
-    topt = np.transpose(opt)
-    opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
-    opt[:, :, 0] = topt
-    opt[:, :, 1] = topt
-    opt[:, :, 2] = topt
-    cv2.imwrite(out_dir + '/Mask.png', opt * 255)
+        # expand 5 times
+        opt = opt.repeat(50, axis=0).repeat(50, axis=1)
 
-    # output heatmap
-    hm_R = np.transpose(hm_R)
-    hm_G = np.transpose(hm_G)
-    hm_B = np.transpose(hm_B)
-    hm_R = hm_R.repeat(50, axis=0).repeat(50, axis=1)
-    hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
-    hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
-    hm = np.dstack([hm_B, hm_G, hm_R])
-    cv2.imwrite(out_dir + '/HM.png', hm)
+        # small-scaled original image
+        ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
+        ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
+        tq = ori_img[:, :, 0]
+        ori_img[:, :, 0] = ori_img[:, :, 2]
+        ori_img[:, :, 2] = tq
+        cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
 
-    # superimpose heatmap on scaled original image
-    overlay = ori_img * 0.5 + hm * 0.5
-    cv2.imwrite(out_dir + '/Overlay.png', overlay)
+        # binary output image
+        topt = np.transpose(opt)
+        opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
+        opt[:, :, 0] = topt
+        opt[:, :, 1] = topt
+        opt[:, :, 2] = topt
+        cv2.imwrite(out_dir + '/Mask.png', opt * 255)
 
-    # Time measure tool
-    start_time = time.time()
-    print("--- %s seconds ---" % (time.time() - start_time))
-    print("--- %s seconds ---" % (time.time() - start_time))
+        # output heatmap
+        hm_R = np.transpose(hm_R)
+        hm_G = np.transpose(hm_G)
+        hm_B = np.transpose(hm_B)
+        hm_R = hm_R.repeat(50, axis=0).repeat(50, axis=1)
+        hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
+        hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
+        hm = np.dstack([hm_B, hm_G, hm_R])
+        cv2.imwrite(out_dir + '/HM.png', hm)
+
+        # superimpose heatmap on scaled original image
+        overlay = ori_img * 0.5 + hm * 0.5
+        cv2.imwrite(out_dir + '/Overlay.png', overlay)
+
+    # # Time measure tool
+    # start_time = time.time()
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    # print("--- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == "__main__":
@@ -386,6 +380,7 @@ if __name__ == "__main__":
                 except FileExistsError:
                     pass
             meta_cutter = "Realtest_figure/{}/{}".format(aaa[0], dirr)
+            print(meta_cutter)
             main(dirr, imgfile, bs, md, modeltoload, meta_cutter, pdmd, LOG_DIR, METAGRAPH_DIR)
 
 
