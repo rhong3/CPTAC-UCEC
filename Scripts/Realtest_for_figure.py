@@ -266,79 +266,79 @@ def main(dirr, imgfile, bs, md, modeltoload, meta_cut, pdmd, LOG_DIR, METAGRAPH_
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         loader(data_dir, imgfile)
-    # test(bs, 2, modeltoload, LOG_DIR, METAGRAPH_DIR)
-    # slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
-    # # load dictionary of predictions on tiles
-    # teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
-    # # join 2 dictionaries
-    # joined = pd.merge(slist, teresult, how='inner', on=['Num'])
-    # joined = joined.drop(columns=['Num'])
-    # tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
-    # tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
-    # joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
-    #
-    # if joined_dict[pos_score].mean() > 0.5:
-    #     print("Positive! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
-    # else:
-    #     print("Negative! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
-    # # save joined dictionary
-    # joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
-    #
-    # # output heat map of pos and neg.
-    # # initialize a graph and for each RGB channel
-    # opt = np.full((n_x, n_y), 0)
-    # hm_R = np.full((n_x, n_y), 0)
-    # hm_G = np.full((n_x, n_y), 0)
-    # hm_B = np.full((n_x, n_y), 0)
-    #
-    # # Positive is labeled red in output heat map
-    # for index, row in joined_dict.iterrows():
-    #     opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
-    #     if row[pos_score] >= 0.5:
-    #         hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
-    #         hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
-    #         hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
-    #     else:
-    #         hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
-    #         hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
-    #         hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
-    #
-    # # expand 5 times
-    # opt = opt.repeat(50, axis=0).repeat(50, axis=1)
-    #
-    # # small-scaled original image
-    # ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
-    # ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
-    # tq = ori_img[:, :, 0]
-    # ori_img[:, :, 0] = ori_img[:, :, 2]
-    # ori_img[:, :, 2] = tq
-    # cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
-    #
-    # # binary output image
-    # topt = np.transpose(opt)
-    # opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
-    # opt[:, :, 0] = topt
-    # opt[:, :, 1] = topt
-    # opt[:, :, 2] = topt
-    # cv2.imwrite(out_dir + '/Mask.png', opt * 255)
-    #
-    # # output heatmap
-    # hm_R = np.transpose(hm_R)
-    # hm_G = np.transpose(hm_G)
-    # hm_B = np.transpose(hm_B)
-    # hm_R = hm_R.repeat(50, axis=0).repeat(50, axis=1)
-    # hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
-    # hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
-    # hm = np.dstack([hm_B, hm_G, hm_R])
-    # cv2.imwrite(out_dir + '/HM.png', hm)
-    #
-    # # superimpose heatmap on scaled original image
-    # overlay = ori_img * 0.5 + hm * 0.5
-    # cv2.imwrite(out_dir + '/Overlay.png', overlay)
+    test(bs, 2, modeltoload, LOG_DIR, METAGRAPH_DIR)
+    slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
+    # load dictionary of predictions on tiles
+    teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
+    # join 2 dictionaries
+    joined = pd.merge(slist, teresult, how='inner', on=['Num'])
+    joined = joined.drop(columns=['Num'])
+    tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
+    tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
+    joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
 
-    # # Time measure tool
-    # start_time = time.time()
-    # print("--- %s seconds ---" % (time.time() - start_time))
+    if joined_dict[pos_score].mean() > 0.5:
+        print("Positive! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
+    else:
+        print("Negative! Prediction score = " + str(joined_dict[pos_score].mean().round(5)))
+    # save joined dictionary
+    joined_dict.to_csv(out_dir + '/finaldict.csv', index=False)
+
+    # output heat map of pos and neg.
+    # initialize a graph and for each RGB channel
+    opt = np.full((n_x, n_y), 0)
+    hm_R = np.full((n_x, n_y), 0)
+    hm_G = np.full((n_x, n_y), 0)
+    hm_B = np.full((n_x, n_y), 0)
+
+    # Positive is labeled red in output heat map
+    for index, row in joined_dict.iterrows():
+        opt[int(row["X_pos"]), int(row["Y_pos"])] = 255
+        if row[pos_score] >= 0.5:
+            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = 255
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[pos_score]-0.5)*2)*255)
+        else:
+            hm_B[int(row["X_pos"]), int(row["Y_pos"])] = 255
+            hm_G[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
+            hm_R[int(row["X_pos"]), int(row["Y_pos"])] = int((1-(row[neg_score]-0.5)*2)*255)
+
+    # expand 5 times
+    opt = opt.repeat(50, axis=0).repeat(50, axis=1)
+
+    # small-scaled original image
+    ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
+    ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
+    tq = ori_img[:, :, 0]
+    ori_img[:, :, 0] = ori_img[:, :, 2]
+    ori_img[:, :, 2] = tq
+    cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
+
+    # binary output image
+    topt = np.transpose(opt)
+    opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
+    opt[:, :, 0] = topt
+    opt[:, :, 1] = topt
+    opt[:, :, 2] = topt
+    cv2.imwrite(out_dir + '/Mask.png', opt * 255)
+
+    # output heatmap
+    hm_R = np.transpose(hm_R)
+    hm_G = np.transpose(hm_G)
+    hm_B = np.transpose(hm_B)
+    hm_R = hm_R.repeat(50, axis=0).repeat(50, axis=1)
+    hm_G = hm_G.repeat(50, axis=0).repeat(50, axis=1)
+    hm_B = hm_B.repeat(50, axis=0).repeat(50, axis=1)
+    hm = np.dstack([hm_B, hm_G, hm_R])
+    cv2.imwrite(out_dir + '/HM.png', hm)
+
+    # superimpose heatmap on scaled original image
+    overlay = ori_img * 0.5 + hm * 0.5
+    cv2.imwrite(out_dir + '/Overlay.png', overlay)
+
+    # Time measure tool
+    start_time = time.time()
+    print("--- %s seconds ---" % (time.time() - start_time))
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
