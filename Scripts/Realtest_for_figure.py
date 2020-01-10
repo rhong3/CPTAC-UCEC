@@ -170,8 +170,15 @@ def tfreloader(bs, cls, ct):
 def test(bs, cls, to_reload, LOG_DIR, METAGRAPH_DIR):
     # input image dimension
     INPUT_DIM = [bs, 299, 299, 3]
-
-    m = cnn.INCEPTION(input_dim=INPUT_DIM, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR, model=md)
+    # hyper parameters
+    HYPERPARAMS = {
+        "batch_size": bs,
+        "dropout": 0.3,
+        "learning_rate": 1E-4,
+        "classes": 2,
+        "sup": False
+    }
+    m = cnn.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=to_reload, log_dir=LOG_DIR, meta_dir=METAGRAPH_DIR, model=md)
 
     print("Loaded! Ready for test!")
     HE = tfreloader(bs, cls, None)
@@ -360,6 +367,7 @@ if __name__ == "__main__":
         else:
             result = result.loc[result['True_label'] != "negative"]
         result = result.loc[result['True_label'] != "Endometrioid"]
+        result = result.loc[result['slide'] != "TCGA-B5-A0K8"]
         result = result[result['slide'].str.contains("TCGA")]
         result = result.loc[result['True_label'] == result['Prediction']]
         todo = result["slide"].tolist()

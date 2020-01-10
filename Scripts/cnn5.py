@@ -21,7 +21,7 @@ class INCEPTION:
         "batch_size": 24,
         "dropout": 0.3,
         "learning_rate": 1E-3,
-        "classes": 2,
+        "classes": 4,
         "sup": False
     }
 
