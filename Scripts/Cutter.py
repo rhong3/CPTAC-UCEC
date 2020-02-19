@@ -64,7 +64,6 @@ def cut():
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        # if i[1] in CPTACcc:
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
@@ -102,8 +101,6 @@ def cut():
         matchrow = ref.loc[ref['name'] == i[1]]
         if matchrow.empty:
             continue
-        # if i[1] in ['TCGA-A5-A0GG', 'TCGA-D1-A179','TCGA-D1-A175','TCGA-D1-A162',
-        #             'TCGA-BS-A0U9', 'TCGA-BG-A2AD', 'TCGA-BG-A0MH']:
         try:
             os.mkdir("../tiles/{}".format(i[1]))
         except(FileExistsError):
@@ -135,8 +132,6 @@ def cut():
 
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)
-        # else:
-        #     print("pass: {}".format(str(i)))
 
     print("--- %s seconds ---" % (time.time() - start_time))
     subfolders = [f.name for f in os.scandir('../tiles/') if f.is_dir()]
