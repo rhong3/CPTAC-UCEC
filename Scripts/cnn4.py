@@ -199,8 +199,11 @@ class INCEPTION:
 
         tf.summary.tensor_summary("{}_pred".format(model), pred)
 
-        # opt = tf.optimizers.Adam(learning_rate=self.learning_rate) ---------TF2.0
-        opt = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
+        # optimizer based on TensorFlow version
+        if int(str(tf.__version__).split('.', 3)[0]) == 2:
+            opt = tf.optimizers.Adam(learning_rate=self.learning_rate)
+        else:
+            opt = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
         train_op = opt.minimize(loss=pred_cost, global_step=global_step)
 
         merged_summary = tf.summary.merge_all()
