@@ -19,6 +19,7 @@ import staintools
 import re
 from openslide import OpenSlide
 
+
 def tile_ids_in(root_dir, level=1):
     ids = []
     try:
