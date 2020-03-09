@@ -62,7 +62,7 @@ def balance(pdls, cls):
 
 
 # Get all svs images with its label as one file; level is the tile resolution level
-def big_image_sum(pmd, path='../tiles/', ref_file='../dummy_His_MUT_joined.csv'):
+def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joined.csv'):
     if not os.path.isdir(path):
         os.mkdir(path)
         import Cutter
