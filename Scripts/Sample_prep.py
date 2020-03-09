@@ -259,7 +259,7 @@ def set_sep_idp(alll, path, cls, level=None, cut=0.1, batchsize=64):
 
 # seperate into training and testing; each type is the same separation ratio on big images
 # test and train csv files contain tiles' path.
-def set_sep(alll, path, cls, level=None, cut=0.2, batchsize=64):
+def set_sep(alll, path, cls, level=None, cut=0.3, batchsize=64):
     trlist = []
     telist = []
     valist = []
