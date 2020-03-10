@@ -12,10 +12,9 @@ from keras.layers.core import Dense, Dropout, Flatten, Activation, Lambda
 from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import concatenate, add
 from keras.regularizers import l2
-import numpy as np
 
 
-def resnet_v2_stem(input):
+def resnet_v2_stem(input, train=True):
     '''The stem of the pure Inception-v4 and Inception-ResNet-v2 networks. This is input part of those networks.'''
 
     # Input shape is 299 * 299 * 3 (Tensorflow dimension ordering)
@@ -44,13 +43,13 @@ def resnet_v2_stem(input):
 
     x = concatenate([x1, x2], axis=3)  # 35 * 35 * 384
 
-    x = BatchNormalization(axis=3)(x)
+    x = BatchNormalization(axis=3)(x, training=train)
     x = Activation("relu")(x)
 
     return x
 
 
-def inception_resnet_v2_A(input, scale_residual=True):
+def inception_resnet_v2_A(input, scale_residual=True, train=True):
     '''Architecture of Inception_ResNet_A block which is a 35 * 35 grid module.'''
 
     ar1 = Conv2D(32, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
@@ -68,13 +67,13 @@ def inception_resnet_v2_A(input, scale_residual=True):
     if scale_residual: ar = Lambda(lambda a: a * 0.1)(ar)
 
     output = add([input, ar])
-    output = BatchNormalization(axis=3)(output)
+    output = BatchNormalization(axis=3)(output, training=train)
     output = Activation("relu")(output)
 
     return output
 
 
-def inception_resnet_v2_B(input, scale_residual=True):
+def inception_resnet_v2_B(input, scale_residual=True, train=True):
     '''Architecture of Inception_ResNet_B block which is a 17 * 17 grid module.'''
 
     br1 = Conv2D(192, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
@@ -89,13 +88,13 @@ def inception_resnet_v2_B(input, scale_residual=True):
     if scale_residual: br = Lambda(lambda b: b * 0.1)(br)
 
     output = add([input, br])
-    output = BatchNormalization(axis=3)(output)
+    output = BatchNormalization(axis=3)(output, training=train)
     output = Activation("relu")(output)
 
     return output
 
 
-def inception_resnet_v2_C(input, scale_residual=True):
+def inception_resnet_v2_C(input, scale_residual=True, train=True):
     '''Architecture of Inception_ResNet_C block which is a 8 * 8 grid module.'''
 
     cr1 = Conv2D(192, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(input)
@@ -110,13 +109,13 @@ def inception_resnet_v2_C(input, scale_residual=True):
     if scale_residual: cr = Lambda(lambda c: c * 0.1)(cr)
 
     output = add([input, cr])
-    output = BatchNormalization(axis=3)(output)
+    output = BatchNormalization(axis=3)(output, training=train)
     output = Activation("relu")(output)
 
     return output
 
 
-def reduction_resnet_A(input, k=192, l=224, m=256, n=384):
+def reduction_resnet_A(input, k=192, l=224, m=256, n=384, train=True):
     '''Architecture of a 35 * 35 to 17 * 17 Reduction_ResNet_A block. It is used by both v1 and v2 Inception-ResNets.'''
 
     rar1 = MaxPooling2D((3, 3), strides=(2, 2))(input)
@@ -128,13 +127,13 @@ def reduction_resnet_A(input, k=192, l=224, m=256, n=384):
     rar3 = Conv2D(m, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
 
     merged = concatenate([rar1, rar2, rar3], axis=3)
-    rar = BatchNormalization(axis=3)(merged)
+    rar = BatchNormalization(axis=3)(merged, training=train)
     rar = Activation("relu")(rar)
 
     return rar
 
 
-def reduction_resnet_v2_B(input):
+def reduction_resnet_v2_B(input, train=True):
     '''Architecture of a 17 * 17 to 8 * 8 Reduction_ResNet_B block.'''
 
     rbr1 = MaxPooling2D((3, 3), strides=(2, 2), padding="valid")(input)
@@ -150,27 +149,27 @@ def reduction_resnet_v2_B(input):
     rbr4 = Conv2D(320, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
 
     merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=3)
-    rbr = BatchNormalization(axis=3)(merged)
+    rbr = BatchNormalization(axis=3)(merged, training=train)
     rbr = Activation("relu")(rbr)
 
     return rbr
 
 
-def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, supermd=False):
+def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
     # Input shape is 299 * 299 * 3
-    x = resnet_v2_stem(input)  # Output: 35 * 35 * 256
+    x = resnet_v2_stem(input, train=is_training)  # Output: 35 * 35 * 256
 
     # 5 x Inception A
     for i in range(5):
-        x = inception_resnet_v2_A(x)
+        x = inception_resnet_v2_A(x, train=is_training)
         # Output: 35 * 35 * 256
 
     # Reduction A
-    x = reduction_resnet_A(x, k=256, l=256, m=384, n=384)  # Output: 17 * 17 * 896
+    x = reduction_resnet_A(x, k=256, l=256, m=384, n=384, train=is_training)  # Output: 17 * 17 * 896
 
     # 10 x Inception B
     for i in range(10):
-        x = inception_resnet_v2_B(x)
+        x = inception_resnet_v2_B(x, train=is_training)
         # Output: 17 * 17 * 896
 
     # auxiliary
@@ -181,7 +180,7 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     loss2_conv_b = Conv2D(768, (5, 5), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(
         loss2_conv_a)
 
-    loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b)
+    loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b, training=is_training)
 
     loss2_conv_b = Activation('relu')(loss2_conv_b)
 
@@ -194,11 +193,11 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
 
     # Reduction B
-    x = reduction_resnet_v2_B(x)  # Output: 8 * 8 * 1792
+    x = reduction_resnet_v2_B(x, train=is_training)  # Output: 8 * 8 * 1792
 
     # 5 x Inception C
     for i in range(5):
-        x = inception_resnet_v2_C(x)
+        x = inception_resnet_v2_C(x, train=is_training)
         # Output: 8 * 8 * 1792
 
     x = Conv2D(896, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)
@@ -210,9 +209,9 @@ def X3(inputa, inputb, inputc, demographics=None,
                dropout=0.8, num_cls=1000, is_train=True, scope='X3', supermd=False):
     with tf.variable_scope(scope, 'X3', [inputa, inputb, inputc]):
 
-        xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
-        xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
-        xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
+        xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
+        xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
+        xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train)
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
 
