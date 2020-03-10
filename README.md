@@ -27,10 +27,10 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v1
  - InceptionV5.py: InceptionResnetV1 architecture
  - InceptionV6.py: InceptionResnetV2 architecture
  - ResNet.py: ResNet architecture
- - XeptionV1.py: X1 architecture
- - XeptionV2.py: X2 architecture
- - XeptionV3.py: X3 architecture
- - XeptionV4.py: X4 architecture
+ - X1.py: Panoptes2 architecture
+ - X2.py: Panoptes1 architecture
+ - X3.py: Panoptes4 architecture
+ - X4.py: Panoptes3 architecture
  - Label_prep2.py: Label preparation
  - RGB_profiler.py: Get RGB summary of tiles in cohort. 
  - RealtestV4.py: Deployment code for trained models

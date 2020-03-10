@@ -1,5 +1,5 @@
 """
-XeptionV1 for TF2.0
+XeptionV3 for TF2.0
 
 Created on 04/17/2019
 
@@ -206,15 +206,17 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     return x, loss2_classifier
 
 
-def XecptionV1(inputa, inputb, inputc, demographics=None,
-               dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV1', supermd=False):
-    with tf.variable_scope(scope, 'XecptionV1', [inputa, inputb, inputc]):
+def X3(inputa, inputb, inputc, demographics=None,
+               dropout=0.8, num_cls=1000, is_train=True, scope='X3', supermd=False):
+    with tf.variable_scope(scope, 'X3', [inputa, inputb, inputc]):
 
         xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
         xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
         xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
+
+        x = Conv2D(2688, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)
 
         net = x
 
@@ -244,3 +246,4 @@ def XecptionV1(inputa, inputb, inputc, demographics=None,
                          lambda: loss3_classifier)
 
         return logits, net, tf.convert_to_tensor(w_variables)
+

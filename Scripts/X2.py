@@ -1,7 +1,7 @@
 """
 XeptionV2 for TF2.0
 
-Created on 06/08/2019
+Created on 04/17/2019
 
 @author: RH
 """
@@ -140,7 +140,6 @@ def reduction_resnet_v1_B(input):
 
     return rbr
 
-
 def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, supermd=False):
     # Input shape is 299 * 299 * 3
     x = resnet_v1_stem(input)  # Output: 35 * 35 * 256
@@ -175,6 +174,7 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     loss2_drop_fc = Dropout(dropout_keep_prob)(loss2_fc, training=is_training)
 
     loss2_classifier = Dense(num_classes, name='loss2/classifier', kernel_regularizer=l2(0.0002))(loss2_drop_fc)
+
     # Reduction B
     x = reduction_resnet_v1_B(x)  # Output: 8 * 8 * 1792
 
@@ -188,16 +188,14 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True, sup
     return x, loss2_classifier
 
 
-def XecptionV4(inputa, inputb, inputc, demographics=None,
-               dropout=0.8, num_cls=1000, is_train=True, scope='XecptionV4', supermd=False):
-    with tf.variable_scope(scope, 'XecptionV4', [inputa, inputb, inputc]):
+def X2(inputa, inputb, inputc, demographics=None,
+               dropout=0.8, num_cls=1000, is_train=True, scope='X2', supermd=False):
+    with tf.variable_scope(scope, 'X2', [inputa, inputb, inputc]):
         xa, auxa = Branch(inputa, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
         xb, auxb = Branch(inputb, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
         xc, auxc = Branch(inputc, dropout_keep_prob=dropout, num_classes=num_cls, is_training=is_train, supermd=supermd)
 
         x = concatenate([xa, xb, xc], axis=3) # Output: 8 * 8 * 2688
-
-        x = Conv2D(2688, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)
 
         net = x
 
