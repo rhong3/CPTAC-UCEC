@@ -8,12 +8,11 @@ Created on 11/15/2019
 import pandas as pd
 import numpy as np
 
-flist = ['his', 'MSIst', 'ST', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FAT1', 'FBXW7', 'FGFR2', 'JAK1', 'KRAS',
-         'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'PTEN', 'RPL22', 'SL', 'ZFHX3', 'CNVH']
+flist = ['ATM-S1981', 'ATR-T1989', 'LINE1_ORF1p', 'NBN-S343', 'RAD50-S635']
 for i in flist:
-    tr = pd.read_csv('../Results/NL5/I1{}/data/tr_sample.csv'.format(i), header=0)
-    te = pd.read_csv('../Results/NL5/I1{}/data/te_sample.csv'.format(i), header=0)
-    va = pd.read_csv('../Results/NL5/I1{}/data/va_sample.csv'.format(i), header=0)
+    tr = pd.read_csv('../Results/X1{}/data/tr_sample.csv'.format(i), header=0)
+    te = pd.read_csv('../Results/X1{}/data/te_sample.csv'.format(i), header=0)
+    va = pd.read_csv('../Results/X1{}/data/va_sample.csv'.format(i), header=0)
     trunq = list(tr.slide.unique())
     teunq = list(te.slide.unique())
     vaunq = list(va.slide.unique())
