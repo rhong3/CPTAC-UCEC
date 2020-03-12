@@ -6,7 +6,6 @@ Created on 11/15/2019
 @author: RH
 """
 import pandas as pd
-import numpy as np
 
 flist = ['ATM-S1981', 'ATR-T1989', 'LINE1_ORF1p', 'NBN-S343', 'RAD50-S635']
 for i in flist:
