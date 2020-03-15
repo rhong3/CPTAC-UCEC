@@ -90,7 +90,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='GoogleNet', supermd=sup)
+                                                   scope='GoogleNet')
             print('Using Inception-V1')
         elif model == 'I2':
             import InceptionV2
@@ -98,7 +98,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV2', supermd=sup)
+                                                   scope='InceptionV2')
             print('Using Inception-V2')
         elif model == 'I3':
             import InceptionV3
@@ -106,7 +106,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV3', supermd=sup)
+                                                   scope='InceptionV3')
             print('Using Inception-V3')
         elif model == 'I4':
             import InceptionV4
@@ -114,7 +114,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionV4', supermd=sup)
+                                                   scope='InceptionV4')
             print('Using Inception-V4')
         elif model == 'I5':
             import InceptionV5
@@ -122,7 +122,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionResV1', supermd=sup)
+                                                   scope='InceptionResV1')
             print('Using Inception-Resnet-V1')
         elif model == 'I6':
             import InceptionV6
@@ -130,7 +130,7 @@ class INCEPTION:
                                                    num_classes=classes,
                                                    is_training=is_train,
                                                    dropout_keep_prob=dropout,
-                                                   scope='InceptionResV2', supermd=sup)
+                                                   scope='InceptionResV2')
             print('Using Inception-Resnet-V2')
         elif model == 'R18':
             import ResNet
