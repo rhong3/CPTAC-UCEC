@@ -1,21 +1,9 @@
 # preprocessing
 ```{r}
 lbtb <- read.csv("~/Documents/CPTAC-UCEC/dummy_His_MUT_joined.csv")
-lbtb = na.omit(lbtb)
+
 MSIlb = as.numeric(lbtb$MSIst_MSI.H)
-SLlb = as.numeric(lbtb$subtype_Serous.like)
-Hislb = as.numeric(lbtb$histology_Serous)
-                  
-MUT = lbtb[,2:25]
-MUT = subset(MUT, select = -c(MLH1, ERBB2, EGFR, PIK3R2, FAT4, ARID5B))
-dat = MUT
-dat$label = MSIlb
-
-smp_size <- floor(0.8 * nrow(dat))
-index <- sample(seq_len(nrow(dat)),size=smp_size)
-train <- dat[index, ]
-test <- dat[-index, ]
-
+MU
 
 ```
 
@@ -26,16 +14,16 @@ library(lars)
 library(glmnet)
 library(caret)
 
-cv.out =cv.glmnet(as.matrix(train[,1:18]), as.matrix(train$label),alpha =1,nfolds=10)
+cv.out =cv.glmnet(as.matrix(train[,1:136]), as.matrix(train$label),alpha =1,nfolds=10)
 plot(cv.out)
 cv.out$lambda.min
 ```
 
 ```{r}
 # Fitting
-model =glmnet(as.matrix(train[,1:18]),as.matrix(train$label),alpha=1,lambda=c(cv.out$lambda.min))
+model =glmnet(as.matrix(train[,1:136]),as.matrix(train$label),alpha=1,lambda=c(0.08226194))
 # Predict results
-results_prob <- predict(model, as.matrix(subset(test,select=c(1:18))),type='response')
+results_prob <- predict(model, as.matrix(subset(test,select=c(1:136))),type='response')
 # Actual answers
 answers <- factor(test$label, levels=c(0,1))
 results <- round(results_prob)
@@ -85,7 +73,7 @@ main="Response")
 
 ```{r}
 # Predict results
-results_prob <- predict(binary.model, test[,1:18], type='class')
+results_prob <- predict(binary.model, test[,1:136], type='class')
 # Actual answers
 answers <- factor(test$label, levels=c(0,1))
 results <- factor(results_prob, levels=c(0,1))
@@ -122,7 +110,7 @@ library(caret)
 
 rf.model <- randomForest(label ~ ., data=train,mtry=4,importance=T)
 # Predict results
-results_prob <- predict(rf.model, newdata = test[,1:18], type='class')
+results_prob <- predict(rf.model, newdata = test[,1:136], type='class')
 # Actual answers
 answers <- factor(test$label, levels=c(0,1))
 results <- round(results_prob)
@@ -160,9 +148,9 @@ library(gbm)
 library(rpart.plot)
 library(caret)
 
-gbm.model <- gbm(label ~ ., data=train,distribution = "gaussian", interaction.depth =4,n.trees =300,shrinkage = 0.1,n.cores=2)
+gbm.model <- gbm(label ~ ., data=train,distribution = "gaussian", interaction.depth =4,n.trees =30000,shrinkage = 0.1,n.cores=2)
 # Predict results
-results_prob <- predict(gbm.model, newdata = test[,1:18], type="response",n.trees =300)
+results_prob <- predict(gbm.model, newdata = test[,1:136], type="response",n.trees =30000)
 
 # Actual answers
 answers <- factor(test$label, levels=c(0,1))
@@ -201,7 +189,7 @@ library(caret)
 
 svm.model <- svm(label ~ ., data=train, type='C-classification', kernel='linear')
 # Predict results
-results_prob <- predict(svm.model, newdata = test[,1:18], type="C-classification")
+results_prob <- predict(svm.model, newdata = test[,1:136], type="C-classification")
 # Actual answers
 answers <- factor(test$label, levels=c(0,1))
 
