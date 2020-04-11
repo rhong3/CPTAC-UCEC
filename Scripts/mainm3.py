@@ -156,7 +156,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
         print("Loaded! Ready for test!")
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(THE, dirr, testset=testset, pmd=pdmd)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd, bs=bs)
         else:
             print("Not enough testing images!")
 
@@ -173,7 +173,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(THE, dirr, testset=testset, pmd=pdmd)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd, bs=bs)
         else:
             print("Not enough testing images!")
 
@@ -189,7 +189,7 @@ def main(trc, tec, vac, cls, weight, testset=None, to_reload=None, test=None):
             m.train(HE, VHE, trc, bs, pmd=pdmd, dirr=dirr, max_iter=itt, save=True, outdir=METAGRAPH_DIR)
         if tec >= bs:
             THE = tfreloader('test', 1, bs, cls, trc, tec, vac)
-            m.inference(THE, dirr, testset=testset, pmd=pdmd)
+            m.inference(THE, dirr, testset=testset, pmd=pdmd, bs=bs)
         else:
             print("Not enough testing images!")
 
