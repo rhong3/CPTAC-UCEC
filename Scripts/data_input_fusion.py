@@ -129,8 +129,6 @@ class DataSet(object):
                 batched_dataset = dataset.batch(batch_size, drop_remainder=False)
                 batched_dataset = batched_dataset.map(self.decode)
                 batched_dataset = batched_dataset.map(self.onehot_only)
-            iterator = batched_dataset.make_initializable_iterator()
-            return iterator, self._filename, filenames
         else:
             batched_dataset = dataset.batch(batch_size, drop_remainder=False)
             batched_dataset = batched_dataset.map(self.Real_decode)
