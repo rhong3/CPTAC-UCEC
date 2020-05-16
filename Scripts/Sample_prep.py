@@ -145,7 +145,7 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
     elif pmd == 'histology':
         split = pd.read_csv('../split/his.csv', header=0)
     elif pmd == 'Serous-like':
-        split = pd.read_csv('../split/SL.csv', header=0)
+        split = pd.read_csv('../split/CNVH.csv', header=0)
     else:
         split = pd.read_csv('../split/{}.csv'.format(pmd), header=0)
     train = split.loc[split['set'] == 'train']['slide'].tolist()
