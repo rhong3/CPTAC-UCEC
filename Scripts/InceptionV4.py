@@ -43,7 +43,7 @@ def resnet_v2_stem(input, train=True):
 
     x = concatenate([x1, x2], axis=3)  # 35 * 35 * 384
 
-    x = BatchNormalization(axis=3)(x, training=train)
+    x = BatchNormalization(axis=3)(x)
     x = Activation("relu")(x)
 
     return x
@@ -65,7 +65,7 @@ def inception_A(input, train=True):
 
     ar = Conv2D(384, (1, 1), kernel_regularizer=l2(0.0002), activation="linear", padding="same")(merged)
 
-    output = BatchNormalization(axis=3)(ar, training=train)
+    output = BatchNormalization(axis=3)(ar)
     output = Activation("relu")(output)
 
     return output
@@ -84,7 +84,7 @@ def inception_B(input, train=True):
 
     br = Conv2D(1152, (1, 1), kernel_regularizer=l2(0.0002), activation="linear", padding="same")(merged)
 
-    output = BatchNormalization(axis=3)(br, training=train)
+    output = BatchNormalization(axis=3)(br)
     output = Activation("relu")(output)
 
     return output
@@ -103,7 +103,7 @@ def inception_C(input, train=True):
 
     cr = Conv2D(2144, (1, 1), kernel_regularizer=l2(0.0002), activation="linear", padding="same")(merged)
 
-    output = BatchNormalization(axis=3)(cr, training=train)
+    output = BatchNormalization(axis=3)(cr)
     output = Activation("relu")(output)
 
     return output
@@ -121,7 +121,7 @@ def reduction_A(input, k=192, l=224, m=256, n=384, train=True):
     rar3 = Conv2D(m, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
 
     merged = concatenate([rar1, rar2, rar3], axis=3)
-    rar = BatchNormalization(axis=3)(merged, training=train)
+    rar = BatchNormalization(axis=3)(merged)
     rar = Activation("relu")(rar)
 
     return rar
@@ -143,7 +143,7 @@ def reduction_B(input, train=True):
     rbr4 = Conv2D(320, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
 
     merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=3)
-    rbr = BatchNormalization(axis=3)(merged, training=train)
+    rbr = BatchNormalization(axis=3)(merged)
     rbr = Activation("relu")(rbr)
 
     return rbr
@@ -176,7 +176,7 @@ def inceptionv4(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True
         loss2_conv_b = Conv2D(768, (5, 5), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(
             loss2_conv_a)
 
-        loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b, training=is_training)
+        loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b)
 
         loss2_conv_b = Activation('relu')(loss2_conv_b)
 
