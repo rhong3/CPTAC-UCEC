@@ -28,7 +28,7 @@ def resnet_v1_stem(input, train=True):
     x = Conv2D(192, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(x)  # 71 * 71 * 192
     x = Conv2D(256, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2), padding="same")(x)  # 35 * 35 * 256
 
-    x = BatchNormalization(axis=3)(x, training=train)
+    x = BatchNormalization(axis=3)(x)
     x = Activation("relu")(x)
 
     return x
@@ -52,7 +52,7 @@ def inception_resnet_v1_A(input, scale_residual=True, train=True):
     if scale_residual: ar = Lambda(lambda a: a * 0.1)(ar)
 
     output = add([input, ar])
-    output = BatchNormalization(axis=3)(output, training=train)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -73,7 +73,7 @@ def inception_resnet_v1_B(input, scale_residual=True, train=True):
     if scale_residual: br = Lambda(lambda b: b * 0.1)(br)
 
     output = add([input, br])
-    output = BatchNormalization(axis=3)(output, training=train)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -94,7 +94,7 @@ def inception_resnet_v1_C(input, scale_residual=True, train=True):
     if scale_residual: cr = Lambda(lambda c: c * 0.1)(cr)
 
     output = add([input, cr])
-    output = BatchNormalization(axis=3)(output, training=train)
+    output = BatchNormalization(axis=3)(output)
     output = Activation("relu")(output)
 
     return output
@@ -112,7 +112,7 @@ def reduction_resnet_A(input, k=192, l=224, m=256, n=384, train=True):
     rar3 = Conv2D(m, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rar3)
 
     merged = concatenate([rar1, rar2, rar3], axis=3)
-    rar = BatchNormalization(axis=3)(merged, training=train)
+    rar = BatchNormalization(axis=3)(merged)
     rar = Activation("relu")(rar)
 
     return rar
@@ -134,7 +134,7 @@ def reduction_resnet_v1_B(input, train=True):
     rbr4 = Conv2D(256, (3, 3), kernel_regularizer=l2(0.0002), activation="relu", strides=(2, 2))(rbr4)
 
     merged = concatenate([rbr1, rbr2, rbr3, rbr4], axis=3)
-    rbr = BatchNormalization(axis=3)(merged, training=train)
+    rbr = BatchNormalization(axis=3)(merged)
     rbr = Activation("relu")(rbr)
 
     return rbr
@@ -163,7 +163,7 @@ def Branch(input, dropout_keep_prob=0.8, num_classes=1000, is_training=True):
     loss2_conv_a = Conv2D(128, (1, 1), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_ave_pool)
     loss2_conv_b = Conv2D(768, (5, 5), kernel_regularizer=l2(0.0002), activation="relu", padding="same")(loss2_conv_a)
 
-    loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b, training=is_training)
+    loss2_conv_b = BatchNormalization(axis=3)(loss2_conv_b)
 
     loss2_conv_b = Activation('relu')(loss2_conv_b)
 
