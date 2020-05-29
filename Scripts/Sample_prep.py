@@ -70,7 +70,7 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joine
     allimg = image_ids_in(path)
     ref = pd.read_csv(ref_file, header=0)
     big_images = []
-    for level in range(3):
+    for level in range(4):
         level = str(level)
         if pmd == 'subtype':
             MSIimg = intersection(ref.loc[ref['subtype_MSI'] == 1]['name'].tolist(), allimg)
@@ -145,7 +145,7 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
     elif pmd == 'histology':
         split = pd.read_csv('../split/his.csv', header=0)
     elif pmd == 'Serous-like':
-        split = pd.read_csv('../split/CNVH.csv', header=0)
+        split = pd.read_csv('../split/SL.csv', header=0)
     else:
         split = pd.read_csv('../split/{}.csv'.format(pmd), header=0)
     train = split.loc[split['set'] == 'train']['slide'].tolist()
@@ -157,6 +157,7 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
     valist = []
 
     subset = alll
+
     valist.append(subset[subset['slide'].isin(validation)])
     telist.append(subset[subset['slide'].isin(test)])
     trlist.append(subset[subset['slide'].isin(train)])
