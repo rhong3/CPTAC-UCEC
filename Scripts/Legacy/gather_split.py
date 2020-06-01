@@ -7,7 +7,7 @@ Created on 11/15/2019
 """
 import pandas as pd
 
-flist = ['CCND1', 'CCNE1', 'CCNA2', 'CCNB1']
+flist = ['CCND1', 'CCNE1', 'CCNA2', 'CCNB1', 'ATM-S1981', 'ATR-T1989', 'LINE1_ORF1p', 'NBN-S343', 'RAD50-S635']
 for i in flist:
     tr = pd.read_csv('../Results/X1{}/data/tr_sample.csv'.format(i), header=0)
     te = pd.read_csv('../Results/X1{}/data/te_sample.csv'.format(i), header=0)
