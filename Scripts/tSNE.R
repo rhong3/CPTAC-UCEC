@@ -10,13 +10,13 @@
 # POS_score=args[6]
 
 # Old: I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('X1CNVH','X2CNVH','X3CNVH','X4CNVH','F1CNVH','F2CNVH','F3CNVH','F4CNVH')
+inlist=c('I6PTEN','I2PTEN','I1PTEN', 'I2TP53', 'I6TP53', 'I5TP53', 'I1TP53', 'I6ZFHX3', 'I5ZFHX3')
 
 for(xx in inlist){
-  input_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
-  output_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
-  sampled_file=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_sampled.csv',sep='')
-  out_fig=paste('/Users/rh2740/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
+  input_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/For_tSNE.csv',sep='')
+  output_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/tSNE_P_N.csv',sep='')
+  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/tSNE_sampled.csv',sep='')
+  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/P_N.pdf',sep='')
   start=12
   bins=50
   POS_score=c('POS_score')
@@ -29,6 +29,7 @@ for(xx in inlist){
   # N = ori_dat[which(ori_dat$Prediction==0),]
   # N = ori_dat[sample(nrow(N), 20000), ]
   # sp_ori_dat = rbind(P, N)
+  # SAMPLE 20000 FOR LEVEL 1 & 2; NO SAMPLE FOR LEVEL
   sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
   write.table(sp_ori_dat, file=sampled_file, row.names = F, sep=',')
   # sp_ori_dat=ori_dat
@@ -58,33 +59,41 @@ for(xx in inlist){
   pblist <- list()
   for(i in 1:length(POS_score)){
     palist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2',col=POS_score[i]))+
-      scale_color_gradient2(high='darkorange',mid='white',low='steelblue',midpoint=0.5)+
-      geom_point(alpha=0.2)+
-      #theme(legend.position='bottom')+
+      scale_color_gradient2(high='red',mid='gray',low='steelblue',midpoint=MDP)+
+      geom_point(alpha=1, size=1)+ scale_shape(solid = TRUE)+
       xlim(-60,60)+
-      ylim(-60,60)
+      ylim(-60,60)+
+      theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                         panel.grid.minor = element_blank(), 
+                         axis.line = element_line(colour = "black"), legend.position='bottom')
     
     pblist[[i]]=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
       geom_point(aes(col=True_label),alpha=0.2)+
       # scale_color_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73",
       #                               "#F0E442", "#0072B2", "#D55E00", "#CC79A7"))+
       scale_color_manual(values = c("gray70", "red"))+
-      #theme(legend.position='bottom')+
       xlim(-60,60)+
-      ylim(-60,60)
+      ylim(-60,60)+
+      theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                         panel.grid.minor = element_blank(), 
+                         axis.line = element_line(colour = "black"), legend.position='bottom')
   }
   
   p3=ggplot(data=dat,aes_string(x='tsne1',y='tsne2'))+
     geom_point(aes(col=slide),alpha=0.2)+
-    theme(legend.position='none')+
     xlim(-60,60)+
-    ylim(-60,60)
+    ylim(-60,60)+ 
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                       panel.grid.minor = element_blank(), 
+                       axis.line = element_line(colour = "black"), legend.position='none')
   
   p4=ggplot(data=subset(dat,True_label==TLB),aes_string(x='tsne1',y='tsne2'))+
     geom_point(aes(col=slide),alpha=0.2)+
-    theme(legend.position='none')+
     xlim(-60,60)+
-    ylim(-60,60)
+    ylim(-60,60)+
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                       panel.grid.minor = element_blank(), 
+                       axis.line = element_line(colour = "black"), legend.position='none')
   
   pdf(file=out_fig,
       width=14,height=7)
