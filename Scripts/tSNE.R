@@ -9,19 +9,19 @@
 # bins=args[5]
 # POS_score=args[6]
 
-# Old: I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('I6PTEN','I2PTEN','I1PTEN', 'I2TP53', 'I6TP53', 'I5TP53', 'I1TP53', 'I6ZFHX3', 'I5ZFHX3')
+# I START AT 9, X START AT 12; ST start I at 11, X at 14
+inlist=c('I5SL', 'I6SL', 'I2SL', 'I5CNVH', 'I6CNVH', 'I2CNVH', 'I1CNVH')
 
 for(xx in inlist){
-  input_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/For_tSNE.csv',sep='')
-  output_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/tSNE_P_N.csv',sep='')
-  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/tSNE_sampled.csv',sep='')
-  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL8/',xx,'/out/P_N.pdf',sep='')
-  start=12
+  input_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/For_tSNE.csv',sep='')
+  output_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/tSNE_P_N.csv',sep='')
+  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/tSNE_sampled.csv',sep='')
+  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/P_N.pdf',sep='')
+  start=9
   bins=50
   POS_score=c('POS_score')
   TLB = 1 # ST is 2, others 1
-  MDP = 0.5 # 0.5 for binary; 1/length(POS_score))
+  MDP = 0.5 # 0.5 for binary; 1/length(POS_score)
   
   library(Rtsne)
   ori_dat = read.table(file=input_file,header=T,sep=',')
@@ -29,8 +29,9 @@ for(xx in inlist){
   # N = ori_dat[which(ori_dat$Prediction==0),]
   # N = ori_dat[sample(nrow(N), 20000), ]
   # sp_ori_dat = rbind(P, N)
-  # SAMPLE 20000 FOR LEVEL 1 & 2; NO SAMPLE FOR LEVEL
-  sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
+  # SAMPLE 20000 FOR LEVEL 1 & 2; NO SAMPLE FOR LEVEL 3
+  # sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
+  sp_ori_dat=ori_dat
   write.table(sp_ori_dat, file=sampled_file, row.names = F, sep=',')
   # sp_ori_dat=ori_dat
   X = as.matrix(sp_ori_dat[,start:dim(sp_ori_dat)[2]])
