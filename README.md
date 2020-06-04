@@ -48,6 +48,7 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v2
  - mainm4.py: Main method for multi resolution model training/validation/testing
  - MW_test.R: Tile-level Wilcoxon tests and plotting
  - Model_stat_test.R: Patient-level Wilcoxon tests, t-tests, AUROC tests, and plotting.
+ - multi_stat_test.R: compare multi-resolution and single resolution models
  - ROC_figure.R: Example ROC plot for figures
  - Similarities.R: YuleY similarity calculations between features
  - Statistics_MSI.R: Statistical metrics for MSI predictions
