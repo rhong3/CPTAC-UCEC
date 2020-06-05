@@ -1,9 +1,10 @@
 # box plot Wilcoxon test (Fig.3 in Lung paper)
 # https://www.r-bloggers.com/add-p-values-and-significance-levels-to-ggplots/
+# "two.sided", "greater", "less"
 library(ggplot2)
 library(ggpubr)
 features = c('his', 'SL', 'CNVH', 'TP53', 'FAT1', 'MSIst', 'ZFHX3', 'PTEN', 'FGFR2', 'MTOR', 'CTCF', 'PIK3R1', 'PIK3CA', 'ARID1A', 'JAK1', 'CTNNB1', 'KRAS', 'FBXW7', 'RPL22', 'BRCA2')
-arch = c('I5', 'I6', 'X2', 'X1', 'X4', 'X3', 'F2', 'F1', 'F4', 'F3', 'I1', 'I2', 'I3')
+arch = c('I5', 'I6', 'I1', 'I2', 'I3')
 
 for (a in arch){
   tile_all = data.frame(Prediction_score= numeric(0), True_label= character(0), feature = character(0))
@@ -30,7 +31,7 @@ for (a in arch){
       mm = f
     }
     i = paste(a, f, sep="")
-    Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", i, "/out/Test_tile.csv", sep=''))
+    Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NL8/", i, "/out/Test_tile.csv", sep=''))
     Test_tile = Test_tile[, c(pos, "True_label")]
     Test_tile['feature'] = mm
     levels(Test_tile$True_label) <- c(levels(Test_tile$True_label), 'negative', 'positive')
@@ -42,11 +43,11 @@ for (a in arch){
 
   pp = ggboxplot(tile_all, x = "feature", y = "Prediction_score",
             color = "black", fill = "True_label", palette = "grey")+ 
-    stat_compare_means(method.args = list(alternative = "greater"), aes(group = True_label), label = "p.signif", label.y = 1.1) + 
-    stat_compare_means(method.args = list(alternative = "greater"), aes(group = True_label), label = "p.format", label.y = 1.15)+ 
+    stat_compare_means(method.args = list(alternative = "two.sided"), aes(group = True_label), label = "p.signif", label.y = 1.1) + 
+    stat_compare_means(method.args = list(alternative = "two.sided"), aes(group = True_label), label = "p.format", label.y = 1.15)+ 
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
-  pdf(file=paste("~/documents/CPTAC-UCEC/Results/Wilcoxon/1-tail/", a, ".pdf", sep=''),
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/Wilcoxon/NL8/2-tail/", a, ".pdf", sep=''),
       width=18.5,height=8)
   grid.arrange(pp,nrow=1)
   dev.off()
