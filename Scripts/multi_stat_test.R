@@ -2,6 +2,58 @@ library(readxl)
 library(pROC)
 library(ggplot2)
 library(ggpubr)
+library(icesTAF)
+
+# Create joint decision models
+features = c('SL', 'CNVH', 'his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2')
+arch = c("I1", "I2", "I3", "I5", 'I6')
+
+for (f in features){
+  if (f == 'his'){
+    pos = "Serous"
+    pos_score = "Serous_score"
+    neg = "Endometrioid"
+    neg_score = "Endometrioid_score"
+  } else if(f == 'MSIst'){
+    pos = "MSI-H"
+    pos_score = "MSI.H_score"
+    neg = "MSS"
+    neg_score = "MSS_score"
+  } else if(f == 'SL' | f == 'CNVH'){
+    pos = 'Serous-like'
+    pos_score = "POS_score"
+    neg = 'negative'
+    neg_score = "NEG_score"
+  } else{
+    pos = f
+    pos_score = "POS_score"
+    neg = 'negative'
+    neg_score = "NEG_score"
+  }
+  for (ar in arch){
+    mkdir(paste("~/documents/CPTAC-UCEC/Results/NLX/", ar, f, "/out/", sep=''))
+    NL5 = read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", ar, f,"/out/Test_slide.csv", sep=''))[,-c(2,5)]
+    NL8 = read.csv(paste("~/documents/CPTAC-UCEC/Results/NL8/", ar, f,"/out/Test_slide.csv", sep=''))[,-c(2,5)]
+    NL9 = read.csv(paste("~/documents/CPTAC-UCEC/Results/NL9/", ar, f,"/out/Test_slide.csv", sep=''))[,-c(2,5)]
+    NLX = merge(merge(NL5,NL8, by = c('slide', 'True_label')), NL9, by = c('slide', 'True_label'))
+    NLX = na.omit(NLX)
+    NLX[pos_score] = round((NLX[,3]+NLX[,4]+NLX[,5])/3, 8)
+    NLX = NLX[,-c(3,4)]
+    NLX[neg_score] = 1-NLX[pos_score]
+    NLX['Prediction'] = (NLX[pos_score] > 0.5)
+    NLX$Prediction = gsub(TRUE, pos, NLX$Prediction)
+    NLX$Prediction = gsub(FALSE, neg, NLX$Prediction)
+    NLX = NLX[,c(1,4,3,2,5)]
+    write.csv(NLX, paste("~/documents/CPTAC-UCEC/Results/NLX/", ar, f, "/out/Test_slide.csv", sep=''), row.names=FALSE)
+    
+    NLXt = rbind(read.csv(paste("~/documents/CPTAC-UCEC/Results/NL5/", ar, f,"/out/Test_tile.csv", sep='')),
+                 read.csv(paste("~/documents/CPTAC-UCEC/Results/NL8/", ar, f,"/out/Test_tile.csv", sep='')),
+                 read.csv(paste("~/documents/CPTAC-UCEC/Results/NL9/", ar, f,"/out/Test_tile.csv", sep='')))
+    write.csv(NLXt, paste("~/documents/CPTAC-UCEC/Results/NLX/", ar, f, "/out/Test_tile.csv", sep=''), row.names=FALSE)
+    
+  }
+}
+
 
 # Multi-level vs. Panoptes tests
 # t-test task based sampling
@@ -10,11 +62,11 @@ library(ggpubr)
 features = c('SL', 'CNVH', 'his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2')
 arch = c("I5", 'I6')
 oldsampled = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
-oldsampled$Tile = 'NL5'
+oldsampled$Tile = "NL5"
 
 all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0))
 for (a in arch){
-  for (nl in c('NL8', 'NL9')){
+  for (nl in c('NL8', 'NL9', 'NLX')){
     for (f in features){
       if (f == 'his'){
         pos = "Serous_score"
@@ -78,6 +130,9 @@ for (pwa in pair){
   wb = pwa[2]
   all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
   all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  all_sub.a = all_sub[all_sub["Architecture"] == wa & all_sub['Tile'] == "NLX", ]
+  all_sub.b = all_sub[all_sub["Architecture"] == wb & all_sub['Tile'] == "NL5", ]
+  all_sub = rbind(all_sub.a, all_sub.b)
   
   pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
                  color = "black", fill = "Architecture", palette = "grey")+ 
@@ -130,6 +185,10 @@ for (pwa in pair){
   wb = pwa[2]
   all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
   all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  all_sub.a = all_sub[all_sub["Architecture"] == wa & all_sub['Tile'] == "NLX", ]
+  all_sub.b = all_sub[all_sub["Architecture"] == wb & all_sub['Tile'] == "NL5", ]
+  all_sub = rbind(all_sub.a, all_sub.b)
+  
   all_sub.x = data_summary(all_sub, varname="Patient_AUC", 
                            groupnames=c("Architecture", "Feature"))
   all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
@@ -249,12 +308,13 @@ data_summary <- function(data, varname, groupnames){
   }
   data_sum<-ddply(data, groupnames, .fun=summary_func,
                   varname)
-  data_sum <- rename(data_sum, c("mean" = varname))
   return(data_sum)
 }
 
+
 library(ggplot2)
 library(ggpubr)
+library(gridExtra)
 
 for (ar in c("I6", 'I5')){
   all = read.csv("~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv")
@@ -269,23 +329,27 @@ for (ar in c("I6", 'I5')){
   all$Tile <- gsub('NL5', '10X', all$Tile)
   all$Tile <- gsub('NL8', '5X', all$Tile)
   all$Tile <- gsub('NL9', '2.5X', all$Tile)
+  all$Tile <- gsub('NLX', 'Joint', all$Tile)
   all.1 = all[all['Tile'] == '2.5X', ]
   all.2 = all[all['Tile'] == '5X', ]
   all.3 = all[all['Tile'] == '10X', ]
-  all = rbind(all.1, all.2, all.3)
+  all.4 = all[all['Tile'] == 'Joint', ]
+  all = rbind(all.1, all.2, all.3, all.4)
   rownames(all) <- NULL
   all_sub = all[all['Architecture'] == ar, ]
   all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
 
   all_sub.x = data_summary(all_sub, varname="Patient_AUC", 
                            groupnames=c("Tile", "Feature"))
+  all_sub.x  <- rename(all_sub.x , replace = c("mean"="Patient_AUC"))
   all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
                            groupnames=c("Tile", "Feature"))
+  all_sub.y  <- rename(all_sub.y , replace = c("mean" = "Tile_AUC"))
   
   pp<- ggplot(all_sub.x, aes(x=Feature, y=Patient_AUC, fill=Tile, group=Tile)) + 
     geom_bar(stat="identity", color="black",
              position=position_dodge()) +
-    scale_fill_manual(values=c("#D3D3D3", "#808080", "#2A2A2A")) +
+    scale_fill_manual(values=c("#D3D3D3", "#939393", "#696969", "#2A2A2A")) +
     geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
                   position=position_dodge(.9)) + theme_bw()+ 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
@@ -295,7 +359,7 @@ for (ar in c("I6", 'I5')){
   pl<- ggplot(all_sub.y, aes(x=Feature, y=Tile_AUC, fill=Tile, group=Tile)) + 
     geom_bar(stat="identity", color="black",
              position=position_dodge()) +
-    scale_fill_manual(values=c("#D3D3D3", "#808080", "#2A2A2A")) +
+    scale_fill_manual(values=c("#D3D3D3", "#939393", "#696969", "#2A2A2A")) +
     geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
                   position=position_dodge(.9)) + theme_bw()+ 
     theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
