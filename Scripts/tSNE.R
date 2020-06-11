@@ -10,13 +10,13 @@
 # POS_score=args[6]
 
 # I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('I5PTEN', 'I6PTEN',  'I5TP53', 'I6TP53', 'I2TP53', 'I1TP53')
+inlist=c('I6ATM-S1981', 'I6ATR-T1989', 'I3CCNA2', 'I2CCNB1', 'I3CCNB1', 'I5CCNB1', 'I3CCND1', 'I6CCNE1', 'I6NBN-S343')
 
 for(xx in inlist){
-  input_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/For_tSNE.csv',sep='')
-  output_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/tSNE_P_N.csv',sep='')
-  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/tSNE_sampled.csv',sep='')
-  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL9/',xx,'/out/P_N.pdf',sep='')
+  input_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/For_tSNE.csv',sep='')
+  output_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/tSNE_P_N.csv',sep='')
+  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/tSNE_sampled.csv',sep='')
+  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/P_N.pdf',sep='')
   start=9
   bins=50
   POS_score=c('POS_score')
