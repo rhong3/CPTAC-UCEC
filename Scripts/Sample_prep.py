@@ -97,8 +97,8 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joine
             ref = ref.loc[ref['subtype_0NA'] == 0]
 
             ### special version
-            ref = ref.loc[ref['histology_Mixed'] == 0]
-            ref = ref.loc[ref['histology_Endometrioid'] == 1]
+            # ref = ref.loc[ref['histology_Mixed'] == 0]
+            # ref = ref.loc[ref['histology_Endometrioid'] == 1]
             ### special version
 
             negimg = intersection(ref.loc[ref['subtype_{}'.format(pmd)] == 0]['name'].tolist(), allimg)
@@ -145,7 +145,7 @@ def set_sep_secondary(alll, path, cls, pmd, level=None, batchsize=64):
     elif pmd == 'histology':
         split = pd.read_csv('../split/his.csv', header=0)
     elif pmd == 'Serous-like':
-        split = pd.read_csv('../split/SL.csv', header=0)
+        split = pd.read_csv('../split/CNVH.csv', header=0)
     else:
         split = pd.read_csv('../split/{}.csv'.format(pmd), header=0)
     train = split.loc[split['set'] == 'train']['slide'].tolist()
