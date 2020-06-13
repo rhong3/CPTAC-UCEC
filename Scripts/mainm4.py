@@ -134,6 +134,10 @@ except IndexError:
 
 try:
     sup = sys.argv[6]  # fusion mode
+    if sup == "True":
+        sup = True
+    else:
+        sup = False
 except IndexError:
     sup = False
 
