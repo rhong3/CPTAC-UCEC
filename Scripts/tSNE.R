@@ -10,14 +10,14 @@
 # POS_score=args[6]
 
 # I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('I6ATM-S1981', 'I6ATR-T1989', 'I3CCNA2', 'I2CCNB1', 'I3CCNB1', 'I5CCNB1', 'I3CCND1', 'I6CCNE1', 'I6NBN-S343')
+inlist=c('X1CCNA2', 'X2CCNA2', 'X3CCNA2', 'F1CCNA2', 'F2CCNA2', 'F3CCNA2', 'X1CCND1', 'X3CCND1', 'X4CCND1', 'F3CCND1', 'F4CCND1', 'X2LINE1_ORF1p', 'F1NBN-S343')
 
 for(xx in inlist){
   input_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/For_tSNE.csv',sep='')
   output_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/tSNE_P_N.csv',sep='')
   sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/tSNE_sampled.csv',sep='')
   out_fig=paste('~/documents/CPTAC-UCEC/Results/NL5/LINE1/',xx,'/out/P_N.pdf',sep='')
-  start=9
+  start=12
   bins=50
   POS_score=c('POS_score')
   TLB = 1 # ST is 2, others 1
