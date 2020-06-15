@@ -58,9 +58,9 @@ if __name__ == "__main__":
 
     for i in dirls:
         try:
-            ipdat = pd.read_csv('../Results/NL8/{}/out/{}.csv'.format(i, filename))
+            ipdat = pd.read_csv('../Results/NL5/LINE1/{}/out/{}.csv'.format(i, filename))
             imdat = sample(ipdat, pdmd, bin)
-            imdat.to_csv('../Results/NL8/{}/out/tsne_selected.csv'.format(i), index=False)
+            imdat.to_csv('../Results/NL5/LINE1/{}/out/tsne_selected.csv'.format(i), index=False)
             for j in range(3):
                 new_im = Image.new(mode='RGB', size=(size*(bin+1), size*(bin+1)), color='white')
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                     except FileNotFoundError:
                         print(impath)
                         pass
-                new_im.save(os.path.abspath('../Results/NL8/{}/out/{}_{}.jpeg'.format(i, outim, j)), "JPEG")
+                new_im.save(os.path.abspath('../Results/NL5/LINE1/{}/out/{}_{}.jpeg'.format(i, outim, j)), "JPEG")
                 print('{} done'.format(i))
         except FileNotFoundError:
             print('{} passed'.format(i))
