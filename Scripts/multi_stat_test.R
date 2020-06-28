@@ -374,6 +374,7 @@ for (ar in c("I6", 'I5')){
 
 # mixed vs. independent
 ## For figure
+all = read.csv("~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv")
 mixed = list(c('X1', 'his'), c('X2', 'SL'), c('X3', 'CNVH'), c('X1', 'TP53'), c('F1', 'FAT1'), c('I5', 'MSIst'), c('I5', 'ZFHX3'), c('I2', 'PTEN'), c('F3', 'FGFR2'),
                 c('X2', 'MTOR'), c('X3', 'CTCF'), c('I5', 'PIK3R1'), c('X3', 'PIK3CA'), c('I6', 'ARID1A'), c('F1', 'JAK1'), c('I6', 'CTNNB1'), c('F1', 'KRAS'), 
                 c('I3', 'FBXW7'), c('I3', 'RPL22'), c('I5', 'BRCA2'), c('I2', 'ATM'), c('X2', 'PPP2R1A'))
@@ -381,5 +382,134 @@ ind = list(c('F3', 'his'), c('F4', 'SL'), c('X4', 'CNVH'), c('I1', 'TP53'), c('I
            c('X1', 'MTOR'), c('F2', 'CTCF'), c('X4', 'PIK3R1'), c('I2', 'PIK3CA'), c('X2', 'ARID1A'), c('X3', 'JAK1'), c('I2', 'CTNNB1'), c('I1', 'KRAS'), 
            c('X3', 'FBXW7'), c('X2', 'RPL22'), c('X2', 'BRCA2'), c('X3', 'ATM'), c('I2', 'PPP2R1A'))
 
+colnames(all)[5] <- gsub('Tile', 'Split', colnames(all)[5])
+all = all[all$Split == 'NL5' | all$Split == 'NL6',]
+all$Split <- gsub('NL5', 'Mixed', all$Split)
+all$Split <- gsub('NL6', 'Independent', all$Split)
+forfig = data.frame(Patient_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0), Split=character(0))
+for (mxx in mixed){
+  ma = mxx[1]
+  mb = mxx[2]
+  slt = all[all$Architecture == ma & all$Feature == mb, ]
+  forfig = rbind(forfig, slt)
+}
+
+for (idd in ind){
+  ia = idd[1]
+  ib = idd[2]
+  slt = all[all$Architecture == ia & all$Feature == ib, ]
+  forfig = rbind(forfig, slt)
+}
+
+
+forfig$Feature <- gsub('his', 'Histology', forfig$Feature)
+forfig$Feature <- gsub('SL', 'CNV-H (Endometrioid)', forfig$Feature)
+forfig$Feature <- gsub('CNVH', 'CNV-H', forfig$Feature)
+forfig$Feature <- gsub('MSIst', 'MSI-high', forfig$Feature)
+
+
+
+pair = list(c('I6', 'X1'), c('I5', 'X2'))
+
+for (pwa in pair){
+  wa = pwa[1]
+  wb = pwa[2]
+  all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
+  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  
+  all_sub89 = all_sub[all_sub["Tile"] == 'NL9' & all_sub["Architecture"] == wa,]
+  all_sub5 = all_sub[all_sub["Tile"] == 'NL5' & all_sub["Architecture"] == wb,]
+  all_sub = rbind(all_sub89, all_sub5)
+  
+  all_sub.x = data_summary(all_sub, varname="Patient_AUC", 
+                           groupnames=c("Architecture", "Feature"))
+  all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
+                           groupnames=c("Architecture", "Feature"))
+  
+  pp<- ggplot(all_sub.x, aes(x=Feature, y=Patient_AUC, fill=Architecture)) + 
+    geom_bar(stat="identity", color="black",
+             position=position_dodge()) +
+    scale_fill_manual(values=c("#D3D3D3", "#808080")) +
+    geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
+                  position=position_dodge(.9)) +
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "top")
+  
+  
+  pl<- ggplot(all_sub.y, aes(x=Feature, y=Tile_AUC, fill=Architecture)) + 
+    geom_bar(stat="identity", color="black",
+             position=position_dodge()) +
+    scale_fill_manual(values=c("#D3D3D3", "#808080")) +
+    geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
+                  position=position_dodge(.9)) +
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "top")
+  
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test-multi/NL9/", wa, wb, "_bar_lite.pdf", sep=''),
+      width=20,height=5)
+  grid.arrange(pp,pl,nrow=1, ncol=2)
+  dev.off()
+} 
+
+
+
+
+
+
+bootstrapped = read.csv("~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv")
+
+features = c('SL', 'CNVH', 'his', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2')
+arch = c('I1', 'I2', 'I3', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
+all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0))
+for (a in arch){
+  for (nl in c('NL6')){
+    for (f in features){
+      
+      if (f == 'his'){
+        pos = "Serous_score"
+        lev = c('Endometrioid', 'Serous')  
+      } else if(f == 'MSIst'){
+        pos = "MSI.H_score"
+        lev = c('MSS', 'MSI-H')
+      } else if(f == 'SL' | f == 'CNVH'){
+        pos = "POS_score"
+        lev = c('negative', 'Serous-like')  
+      } else{
+        pos = "POS_score"
+        lev = c('negative', f)
+      }
+      i = paste(a, f, sep="")
+
+      Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", nl, "/", i, "/out/Test_slide.csv", sep=''))
+      Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/", nl, "/", i, "/out/Test_tile.csv", sep=''))
+      
+      Sprla = list()
+      Sprlb = list()
+      for (j in 1:50){
+        sampleddfa = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.8)),]
+        answersa <- factor(sampleddfa$True_label)
+        resultsa <- factor(sampleddfa$Prediction)
+        roca =  roc(answersa, sampleddfa[[pos]], levels=lev)
+        Sprla[j] = roca$auc
+        
+        sampleddfb = Test_tile[sample(nrow(Test_tile), round(nrow(Test_tile)*0.8)),]
+        answersb <- factor(sampleddfb$True_label)
+        resultsb <- factor(sampleddfb$Prediction)
+        rocb =  roc(answersb, sampleddfb[[pos]], levels=lev)
+        Sprlb[j] = rocb$auc
+      }
+      temp_all= data.frame(Slide_AUC=as.numeric(Sprla), Tile_AUC=as.numeric(Sprlb), Architecture=a, Feature=f, Tile=nl)
+      all = rbind(all, temp_all)
+    }
+  }
+}
+
+colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature", "Tile")
+bootstrapped = rbind(bootstrapped, all)
+write.csv(bootstrapped, file = "~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv", row.names=FALSE)
 
 
