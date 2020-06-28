@@ -372,4 +372,14 @@ for (ar in c("I6", 'I5')){
  
 }
 
+# mixed vs. independent
+## For figure
+mixed = list(c('X1', 'his'), c('X2', 'SL'), c('X3', 'CNVH'), c('X1', 'TP53'), c('F1', 'FAT1'), c('I5', 'MSIst'), c('I5', 'ZFHX3'), c('I2', 'PTEN'), c('F3', 'FGFR2'),
+                c('X2', 'MTOR'), c('X3', 'CTCF'), c('I5', 'PIK3R1'), c('X3', 'PIK3CA'), c('I6', 'ARID1A'), c('F1', 'JAK1'), c('I6', 'CTNNB1'), c('F1', 'KRAS'), 
+                c('I3', 'FBXW7'), c('I3', 'RPL22'), c('I5', 'BRCA2'), c('I2', 'ATM'), c('X2', 'PPP2R1A'))
+ind = list(c('F3', 'his'), c('F4', 'SL'), c('X4', 'CNVH'), c('I1', 'TP53'), c('I5', 'FAT1'), c('X4', 'MSIst'), c('I3', 'ZFHX3'), c('X3', 'PTEN'), c('F4', 'FGFR2'),
+           c('X1', 'MTOR'), c('F2', 'CTCF'), c('X4', 'PIK3R1'), c('I2', 'PIK3CA'), c('X2', 'ARID1A'), c('X3', 'JAK1'), c('I2', 'CTNNB1'), c('I1', 'KRAS'), 
+           c('X3', 'FBXW7'), c('X2', 'RPL22'), c('X2', 'BRCA2'), c('X3', 'ATM'), c('I2', 'PPP2R1A'))
+
+
 
