@@ -62,6 +62,7 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v2
  - tSNE.R: tSNE dimensional reduction for activation maps
  - tSNE_for_figure.R: High quality tSNE dimensional reduction for activation maps
  - label_pred.Rmd: Prediction using machine learning methods with non-image features
+ - SummaryTable.R: Summary table for the manuscript
  - tox.ini: Tox to check the coding manner 
  - Legacy: Deprecated codes
  
