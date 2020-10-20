@@ -19,7 +19,9 @@ case['FIGO'] = aaa[1]
 case['subtype'] = case['subtype'].replace({'MMR-D': 'MSI', 'CNH': 'CNV-H', 'CNL': 'CNV-L'})
 combined = batch.join(case.set_index('Patient_ID'), on='Patient_ID', how='left')
 combined = combined[['Patient_ID', 'Slide_ID', 'histology', 'subtype', 'FIGO', 'file']]
+combined = combined.dropna(subset=['histology', 'file'])
 combined.to_csv('../NYU/batch1_sum.csv', index=False)
+
 
 
 
