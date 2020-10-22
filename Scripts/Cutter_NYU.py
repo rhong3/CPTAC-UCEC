@@ -12,7 +12,7 @@ import os
 import shutil
 import pandas as pd
 matplotlib.use('Agg')
-import Slicer
+import Slicer_NYU as Slicer
 import staintools
 
 
@@ -21,8 +21,7 @@ def cut():
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
-    path = '../images/NYU/'
-    ref = pd.read_csv('../NYU/sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
+    ref = pd.read_csv('../NYU/batch1_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
 
