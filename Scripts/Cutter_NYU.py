@@ -52,7 +52,8 @@ def cut():
             try:
                 n_x, n_y, raw_img, ct = Slicer.tile(image_file='NYU/'+row['file'], outdir=otdir,
                                                                 level=level, std_img=std, dp=row['Slide_ID'], ft=tff)
-            except IndexError:
+            except Exception as e:
+                print(e)
                 pass
             if len(os.listdir(otdir)) < 2:
                 shutil.rmtree(otdir, ignore_errors=True)

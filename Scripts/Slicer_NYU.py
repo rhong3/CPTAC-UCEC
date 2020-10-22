@@ -19,7 +19,7 @@ from PIL import Image
 def bgcheck(img, ts):
     the_imagea = np.array(img)[:, :, :3]
     the_imagea = np.nan_to_num(the_imagea)
-    mask = (the_imagea[:, :, :3] > 175).astype(np.uint8)
+    mask = (the_imagea[:, :, :3] > 200).astype(np.uint8)
     maskb = (the_imagea[:, :, :3] < 50).astype(np.uint8)
     # greya = ((np.ptp(the_imagea[0])) < 100).astype(np.uint8)
     # greyb = ((np.ptp(the_imagea[1])) < 100).astype(np.uint8)
@@ -83,6 +83,8 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     slp = str(path_to_slide+image_file)
     print(slp)
     print(slide.level_dimensions)
+    print([int(slide.properties['openslide.bounds-x']), int(slide.properties['openslide.bounds-y'])])
+    print([int(slide.properties['openslide.bounds-width']), int(slide.properties['openslide.bounds-height'])])
 
     bounds_width = slide.level_dimensions[level][0]
     bounds_height = slide.level_dimensions[level][1]
