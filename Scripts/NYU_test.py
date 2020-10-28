@@ -6,13 +6,9 @@ Created on 10/28/2020
 @author: RH
 """
 import os
-import sys
 import argparse
-import numpy as np
 import tensorflow as tf
 import pandas as pd
-import cv2
-import time
 import cnn5
 import data_input_fusion
 import Sample_prep2
@@ -32,7 +28,7 @@ parser.add_argument('--reference', type=str, default='../NYU/label.csv', help='r
 opt = parser.parse_args()
 
 if opt.mode in ['F1', 'F2', 'F3', 'F4']:
-    sup=True
+    sup = True
 else:
     sup = False
 
