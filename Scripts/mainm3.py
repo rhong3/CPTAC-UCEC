@@ -107,7 +107,7 @@ def loader(totlist_dir, ds):
     imlist = slist['path'].values.tolist()
     lblist = slist['label'].values.tolist()
 
-    filename = data_dir + '/' + ds + '.tfrecords'
+    filename = totlist_dir + '/' + ds + '.tfrecords'
     writer = tf.python_io.TFRecordWriter(filename)
     for i in range(len(imlist)):
         if not i % 1000:

@@ -75,7 +75,7 @@ def loader(totlist_dir, ds):
     lblist = slist['label'].values.tolist()
     wtlist = slist['BMI'].values.tolist()
     aglist = slist['age'].values.tolist()
-    filename = data_dir + '/' + ds + '.tfrecords'
+    filename = totlist_dir + '/' + ds + '.tfrecords'
     writer = tf.python_io.TFRecordWriter(filename)
     for i in range(len(lblist)):
         try:
