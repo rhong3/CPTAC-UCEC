@@ -1,3 +1,10 @@
+"""
+Loader Functions for NYU samples
+
+Created on 10/28/2020
+
+@author: RH
+"""
 import tensorflow as tf
 import cv2
 import numpy as np
