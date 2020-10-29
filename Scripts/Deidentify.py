@@ -26,5 +26,5 @@ dicts = dict(zip(case['Case'].tolist(), case['NYU_name'].tolist()))
 
 for m in os.listdir('../tiles/'):
     if m in dicts.keys():
-        os.rename(m, dicts[m])
+        os.rename('../tiles/'+m, '../tiles/'+dicts[m])
 
