@@ -33,7 +33,6 @@ else:
     sup = False
 
 ref = pd.read_csv(opt.reference, header=0)
-tecc = len(ref['label'])
 
 # paths to directories
 img_dir = '../tiles/'
@@ -94,6 +93,8 @@ if __name__ == "__main__":
                 tile_ids = Sample_prep2.paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
                 test_tiles = pd.concat([test_tiles, tile_ids])
             test_tiles.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
+            tes = test_tiles
+        tecc = len(tes['label'])
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             NYU_loaders.loaderX(data_dir, 'test')
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=opt.modeltoload, log_dir=LOG_DIR,
@@ -101,7 +102,7 @@ if __name__ == "__main__":
         print("Loaded! Ready for test!")
         if tecc >= bs:
             datasets = data_input_fusion.DataSet(bs, tecc, ep=1, cls=2, mode='test', filename=data_dir + '/test.tfrecords')
-            m.inference(datasets, opt.dirr, testset=ref, pmd=opt.pdmd)
+            m.inference(datasets, opt.dirr, testset=tes, pmd=opt.pdmd)
         else:
             print("Not enough testing images!")
 
@@ -161,6 +162,8 @@ if __name__ == "__main__":
                 test_tiles_list.extend(tile_ids)
             test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'level', 'path', 'label'])
             test_tiles.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
+            tes = test_tiles
+        tecc = len(tes['label'])
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             NYU_loaders.loader(data_dir, 'test')
 
@@ -169,6 +172,6 @@ if __name__ == "__main__":
         print("Loaded! Ready for test!")
         if tecc >= bs:
             datasets = data_input2.DataSet(bs, tecc, ep=1, cls=2, mode=opt.mode, filename=data_dir + '/test.tfrecords')
-            m.inference(datasets, opt.dirr, testset=ref, pmd=opt.pdmd, bs=bs)
+            m.inference(datasets, opt.dirr, testset=tes, pmd=opt.pdmd, bs=bs)
         else:
             print("Not enough testing images!")
