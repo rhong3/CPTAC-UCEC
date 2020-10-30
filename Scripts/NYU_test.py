@@ -175,7 +175,7 @@ if __name__ == "__main__":
                            meta_dir=LOG_DIR, model=opt.mode)
         print("Loaded! Ready for test!")
         if tecc >= bs:
-            datasets = data_input2.DataSet(bs, tecc, ep=1, cls=2, mode=opt.mode, filename=data_dir + '/test.tfrecords')
+            datasets = data_input2.DataSet(bs, tecc, ep=1, cls=2, mode='test', filename=data_dir + '/test.tfrecords')
             m.inference(datasets, opt.dirr, testset=tes, pmd=opt.pdmd, bs=bs)
         else:
             print("Not enough testing images!")
