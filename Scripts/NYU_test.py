@@ -73,7 +73,11 @@ if __name__ == "__main__":
                     if row['histology_Serous'] == 1:
                         big_images.append([row['name'], 1, img_dir + "{}/".format(str(row['name'])), row['age'], row['BMI']])
             elif opt.pdmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
-                # ref = ref.loc[ref['histology_Endometrioid'] == 1]
+                # special version
+                ref = ref.loc[ref['histology_Mixed'] == 0]
+                ref = ref.loc[ref['histology_Endometrioid'] == 1]
+                # special version
+
                 ref = ref.loc[ref['subtype_0NA'] == 0]
                 for idx, row in ref.iterrows():
                     big_images.append(
@@ -135,10 +139,10 @@ if __name__ == "__main__":
             elif opt.pdmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
                 ref = ref.loc[ref['subtype_0NA'] == 0]
 
-                ### special version
-                # ref = ref.loc[ref['histology_Mixed'] == 0]
-                # ref = ref.loc[ref['histology_Endometrioid'] == 1]
-                ### special version
+                ## special version
+                ref = ref.loc[ref['histology_Mixed'] == 0]
+                ref = ref.loc[ref['histology_Endometrioid'] == 1]
+                ## special version
 
                 negimg = Sample_prep.intersection(ref.loc[ref['subtype_{}'.format(opt.pdmd)] == 0]['name'].tolist(), allimg)
                 posimg = Sample_prep.intersection(ref.loc[ref['subtype_{}'.format(opt.pdmd)] == 1]['name'].tolist(), allimg)
