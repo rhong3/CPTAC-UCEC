@@ -8,7 +8,7 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1histology_NYU_NL5')
+inlist = c('X4MSI_NYU_NL6')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, SEP='_')
@@ -52,6 +52,7 @@ for (i in targets){
       } else{
         pos = feature
         neg = 'negative'
+        POS_score = 'POS_score'
       }
 
       Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_slide.csv", sep=''))
