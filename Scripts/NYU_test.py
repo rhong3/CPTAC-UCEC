@@ -28,6 +28,8 @@ parser.add_argument('--metadirr', type=str, default='', help='reload trained mod
 parser.add_argument('--reference', type=str, default='../NYU/label.csv', help='reference label file')
 opt = parser.parse_args()
 
+print(opt)
+
 if opt.mode in ['F1', 'F2', 'F3', 'F4']:
     sup = True
 else:
