@@ -103,7 +103,7 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/test.tfrecords'):
             NYU_loaders.loaderX(data_dir, 'test')
         m = cnn5.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=opt.modeltoload, log_dir=LOG_DIR,
-                           meta_dir=LOG_DIR, model=opt.mode)
+                           meta_dir=METAGRAPH_DIR, model=opt.mode)
         print("Loaded! Ready for test!")
         if tecc >= bs:
             datasets = data_input_fusion.DataSet(bs, tecc, ep=1, cls=2, mode='test', filename=data_dir + '/test.tfrecords')
@@ -173,7 +173,7 @@ if __name__ == "__main__":
             NYU_loaders.loader(data_dir, 'test')
 
         m = cnn4.INCEPTION(INPUT_DIM, HYPERPARAMS, meta_graph=opt.modeltoload, log_dir=LOG_DIR,
-                           meta_dir=LOG_DIR, model=opt.mode)
+                           meta_dir=METAGRAPH_DIR, model=opt.mode)
         print("Loaded! Ready for test!")
         if tecc >= bs:
             datasets = data_input2.DataSet(bs, tecc, ep=1, cls=2, mode='test', filename=data_dir + '/test.tfrecords')
