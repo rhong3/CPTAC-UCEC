@@ -24,6 +24,7 @@ parser.add_argument('--dirr', type=str, default='trial', help='output directory'
 parser.add_argument('--pdmd', type=str, default='histology', help='feature to predict')
 parser.add_argument('--mode', type=str, default='X1', help='train or test')
 parser.add_argument('--modeltoload', type=str, default='', help='reload trained model')
+parser.add_argument('--metadirr', type=str, default='', help='reload trained model in dirr')
 parser.add_argument('--reference', type=str, default='../NYU/label.csv', help='reference label file')
 opt = parser.parse_args()
 
@@ -37,7 +38,7 @@ ref = pd.read_csv(opt.reference, header=0)
 # paths to directories
 img_dir = '../tiles/'
 LOG_DIR = "../Results/{}".format(opt.dirr)
-METAGRAPH_DIR = "../Results/{}".format(opt.dirr)
+METAGRAPH_DIR = "../Results/{}".format(opt.metadirr)
 data_dir = "../Results/{}/data".format(opt.dirr)
 out_dir = "../Results/{}/out".format(opt.dirr)
 
