@@ -8,7 +8,8 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X3histology_NYU_NL6', 'X4CNVH_NYU_NL6', 'X3CNVH_NYU_NL5', 'X1TP53_NYU_NL5')
+inlist = c('X1histology_NYU_NL6','X2histology_NYU_NL6','X3histology_NYU_NL6','X4histology_NYU_NL6','F1histology_NYU_NL6','F2histology_NYU_NL6','F3histology_NYU_NL6','F4histology_NYU_NL6','I1histology_NYU_NL6','I2histology_NYU_NL6','I3histology_NYU_NL6','I5histology_NYU_NL6','I6histology_NYU_NL6',
+           'X1histology_NYU_NL5','X2histology_NYU_NL5','X3histology_NYU_NL5','X4histology_NYU_NL5','F1histology_NYU_NL5','F2histology_NYU_NL5','F3histology_NYU_NL5','F4histology_NYU_NL5','I1histology_NYU_NL5','I2histology_NYU_NL5','I3histology_NYU_NL5','I5histology_NYU_NL5','I6histology_NYU_NL5')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, SEP='_')
@@ -120,7 +121,7 @@ for (i in targets){
 
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
-New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, New_OUTPUT$Architecture),]
+New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, New_OUTPUT$Patient_ROC),]
 write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_NYU.csv", row.names=FALSE)
 
 
