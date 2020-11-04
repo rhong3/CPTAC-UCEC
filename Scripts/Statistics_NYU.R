@@ -8,8 +8,8 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1histology_NYU_NL6','X2histology_NYU_NL6','X3histology_NYU_NL6','X4histology_NYU_NL6','F1histology_NYU_NL6','F2histology_NYU_NL6','F3histology_NYU_NL6','F4histology_NYU_NL6','I1histology_NYU_NL6','I2histology_NYU_NL6','I3histology_NYU_NL6','I5histology_NYU_NL6','I6histology_NYU_NL6',
-           'X1histology_NYU_NL5','X2histology_NYU_NL5','X3histology_NYU_NL5','X4histology_NYU_NL5','F1histology_NYU_NL5','F2histology_NYU_NL5','F3histology_NYU_NL5','F4histology_NYU_NL5','I1histology_NYU_NL5','I2histology_NYU_NL5','I3histology_NYU_NL5','I5histology_NYU_NL5','I6histology_NYU_NL5')
+inlist = c('X1MSI_NYU_NL6','X2MSI_NYU_NL6','X3MSI_NYU_NL6','X4MSI_NYU_NL6','F1MSI_NYU_NL6','F2MSI_NYU_NL6','F3MSI_NYU_NL6','F4MSI_NYU_NL6','I1MSI_NYU_NL6','I2MSI_NYU_NL6','I3MSI_NYU_NL6','I5MSI_NYU_NL6','I6MSI_NYU_NL6',
+           'X1MSI_NYU_NL5','X2MSI_NYU_NL5','X3MSI_NYU_NL5','X4MSI_NYU_NL5','F1MSI_NYU_NL5','F2MSI_NYU_NL5','F3MSI_NYU_NL5','F4MSI_NYU_NL5','I1MSI_NYU_NL5','I2MSI_NYU_NL5','I3MSI_NYU_NL5','I5MSI_NYU_NL5','I6MSI_NYU_NL5')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, SEP='_')
@@ -37,6 +37,7 @@ OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Feature", "Archite
 for (i in targets){
   tryCatch(
     {
+      print(i)
       tiles = strsplit(i, '_')[[1]][3]
       tmm = strsplit(i, '_')[[1]][1]
       arch = substr(tmm, 1, 2)
@@ -121,7 +122,7 @@ for (i in targets){
 
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
-New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, New_OUTPUT$Patient_ROC),]
+New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, -New_OUTPUT$Patient_ROC),]
 write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_NYU.csv", row.names=FALSE)
 
 
