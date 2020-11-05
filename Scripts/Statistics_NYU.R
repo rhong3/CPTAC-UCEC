@@ -8,8 +8,8 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1SL_NYU_NL6','X2SL_NYU_NL6','X3SL_NYU_NL6','X4SL_NYU_NL6','F1SL_NYU_NL6','F2SL_NYU_NL6','F3SL_NYU_NL6','F4SL_NYU_NL6','I1SL_NYU_NL6','I2SL_NYU_NL6','I3SL_NYU_NL6','I5SL_NYU_NL6','I6SL_NYU_NL6',
-           'X1SL_NYU_NL5','X2SL_NYU_NL5','X3SL_NYU_NL5','X4SL_NYU_NL5','F1SL_NYU_NL5','F2SL_NYU_NL5','F3SL_NYU_NL5','F4SL_NYU_NL5','I1SL_NYU_NL5','I2SL_NYU_NL5','I3SL_NYU_NL5','I5SL_NYU_NL5','I6SL_NYU_NL5')
+inlist = c('X1CNVH_NYU_NL6','X2CNVH_NYU_NL6','X3CNVH_NYU_NL6','X4CNVH_NYU_NL6','F1CNVH_NYU_NL6','F2CNVH_NYU_NL6','F3CNVH_NYU_NL6','F4CNVH_NYU_NL6','I1CNVH_NYU_NL6','I2CNVH_NYU_NL6','I3CNVH_NYU_NL6','I5CNVH_NYU_NL6','I6CNVH_NYU_NL6',
+           'X1CNVH_NYU_NL5','X2CNVH_NYU_NL5','X3CNVH_NYU_NL5','X4CNVH_NYU_NL5','F1CNVH_NYU_NL5','F2CNVH_NYU_NL5','F3CNVH_NYU_NL5','F4CNVH_NYU_NL5','I1CNVH_NYU_NL5','I2CNVH_NYU_NL5','I3CNVH_NYU_NL5','I5CNVH_NYU_NL5','I6CNVH_NYU_NL5')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, sep='_')
@@ -72,7 +72,7 @@ for (i in targets){
       # PRC
       SprcR = PRAUC(Test_slide[, POS_score], factor(Test_slide$True_label))
       Sprls = list()
-      for (j in 1:5){
+      for (j in 1:100){
         sampleddf = Test_slide[sample(nrow(Test_slide), round(nrow(Test_slide)*0.9)),]
         Sprc = PRAUC(sampleddf[, POS_score], factor(sampleddf$True_label))
         Sprls[j] = Sprc
