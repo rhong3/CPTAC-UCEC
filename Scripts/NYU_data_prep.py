@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 
 
-# case = pd.read_excel('../NYU/Cases ready for Runyu.xlsx', header=0)
-# batch = pd.read_csv('../NYU/Samples_Runyu_Hong_Batch2.csv', header=0)
+# case = pd.read_excel('../NYU/Cases ready for Runyu.xlsx', header=0, usecols=['NYU_name', 'Group', 'IHC', 'Diagnosis'])
+# batch = pd.read_csv('../NYU/Samples_Runyu_Hong_Batch3.csv', header=0)
 # case.columns = ['Patient_ID', 'subtype', 'IHC', 'diagnosis']
 # batch.columns = ['Slide_ID', 'stain', 'num', 'file']
 #
@@ -23,11 +23,11 @@ import numpy as np
 # combined = combined[['Patient_ID', 'Slide_ID', 'histology', 'subtype', 'FIGO', 'file']]
 # combined = combined.dropna(subset=['histology', 'file'])
 # combined['file'] = combined['file'].str[:-1]
-# combined.to_csv('../NYU/batch2_sum.csv', index=False)
+# combined.to_csv('../NYU/batch3_sum.csv', index=False)
 
 
 combined = pd.read_csv('../NYU/sum.csv', header=0, usecols=['Patient_ID', 'histology', 'subtype'])
-case = pd.read_excel('../NYU/Cases ready for Runyu.xlsx', header=0)
+case = pd.read_excel('../NYU/Cases ready for Runyu.xlsx', header=0, usecols=['NYU_name', 'Group', 'IHC', 'Diagnosis'])
 case.columns = ['Patient_ID', 'subtype', 'IHC', 'diagnosis']
 case = case[case['Patient_ID'].isin(combined['Patient_ID'].tolist())]
 case['subtype_0NA'] = case['subtype'].isna().astype(np.uint8)
