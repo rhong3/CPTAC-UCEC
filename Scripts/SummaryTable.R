@@ -66,4 +66,49 @@ idp= idp[, c(1:2, 40, 4:39)]
 write.csv(idp, '~/Documents/CPTAC-UCEC/Results/Independent_models_summary.csv', row.names=FALSE)
 
 
+# NYU Summary
+NYU = read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
+NYU$Architecture = gsub('I1', 'InceptionV1', NYU$Architecture)
+NYU$Architecture = gsub('I2', 'InceptionV2', NYU$Architecture)
+NYU$Architecture = gsub('I3', 'InceptionV3', NYU$Architecture)
+NYU$Architecture = gsub('I4', 'InceptionV4', NYU$Architecture)
+NYU$Architecture = gsub('I5', 'InceptionResnetV1', NYU$Architecture)
+NYU$Architecture = gsub('I6', 'InceptionResnetV2', NYU$Architecture)
+NYU$Architecture = gsub('X1', 'Panoptes2', NYU$Architecture)
+NYU$Architecture = gsub('X2', 'Panoptes1', NYU$Architecture)
+NYU$Architecture = gsub('X3', 'Panoptes4', NYU$Architecture)
+NYU$Architecture = gsub('X4', 'Panoptes3', NYU$Architecture)
+NYU$Architecture = gsub('F1', 'Panoptes2 with clinical', NYU$Architecture)
+NYU$Architecture = gsub('F2', 'Panoptes1 with clinical', NYU$Architecture)
+NYU$Architecture = gsub('F3', 'Panoptes4 with clinical', NYU$Architecture)
+NYU$Architecture = gsub('F4', 'Panoptes3 with clinical', NYU$Architecture)
+colnames(NYU) = gsub('Tiles', 'Split', colnames(NYU))
+NYU$Split = gsub('NL5', 'Mixed', NYU$Split)
+NYU$Split = gsub('NL6', 'Independent', NYU$Split)
+NYU$Feature = gsub('histology', 'Histology', NYU$Feature)
+NYU$Feature = gsub('MSI', 'MSI-High', NYU$Feature)
+NYU$Feature = gsub('SL', 'CNVH in Endometrioid', NYU$Feature)
+
+is.num <- sapply(NYU, is.numeric)
+NYU[is.num] <- lapply(NYU[is.num], round, 3)
+NYU$Patient_AUROC = paste(NYU$Patient_ROC, ' (', NYU$Patient_ROC.95.CI_lower, '-', NYU$Patient_ROC.95.CI_upper, ')', sep='')
+NYU$Patient_AUPR = paste(NYU$Patient_PRC, ' (', NYU$Patient_PRC.95.CI_lower, '-', NYU$Patient_PRC.95.CI_upper, ')', sep='')
+NYU$Patient_Accuracy = paste(NYU$Patient_Accuracy, ' (', NYU$Patient_AccuracyLower, '-', NYU$Patient_AccuracyUpper, ')', sep='')
+NYU$Tile_AUROC = paste(NYU$Tile_ROC, ' (', NYU$Tile_ROC.95.CI_lower, '-', NYU$Tile_ROC.95.CI_upper, ')', sep='')
+NYU$Tile_AUPR = paste(NYU$Tile_PRC, ' (', NYU$Tile_PRC.95.CI_lower, '-', NYU$Tile_PRC.95.CI_upper, ')', sep='')
+NYU$Tile_Accuracy = paste(NYU$Tile_Accuracy, ' (', NYU$Tile_AccuracyLower, '-', NYU$Tile_AccuracyUpper, ')', sep='')
+
+NYU = NYU[order(NYU[,3], NYU[,1], -NYU[,5], -NYU[,29]),]
+NYU = cbind(NYU[, c(1:3, 52:53, 10, 54:55, 34)], NYU[, c(11, 14:27, 35, 38:51)])
+
+NYU = NYU[NYU$Architecture %in% c('InceptionV1', 'InceptionV2', 'InceptionV3', 'InceptionResnetV1', 'InceptionResnetV2', 
+                                                                       'Panoptes1', 'Panoptes2', 'Panoptes3', 'Panoptes4', 
+                                                                       'Panoptes1 with clinical' ,'Panoptes2 with clinical', 'Panoptes3 with clinical', 'Panoptes4 with clinical'), ]
+NYU$Resolution = 'multi'
+NYU[NYU$Architecture %in% c('InceptionV1', 'InceptionV2', 'InceptionV3', 'InceptionResnetV1', 'InceptionResnetV2'), ]$Resolution = '10X'
+NYU = NYU[, c(1:3, 40, 4:39)]
+
+write.csv(NYU, '~/Documents/CPTAC-UCEC/Results/NYU_models_summary.csv', row.names=FALSE)
+
+
 
