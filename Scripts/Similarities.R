@@ -85,7 +85,7 @@ pdf(file=out_fig,
     width=12,height=4.5)
 myBreaks <- c(seq(min(OUTPUT_hm), 0, length.out=ceiling(100/2) + 1), 
               seq(max(OUTPUT_hm)/100, max(OUTPUT_hm), length.out=floor(100/2)))
-pheatmap(OUTPUT_hm_inter, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", breaks = myBreaks)
+pheatmap(OUTPUT_hm_inter, cluster_cols = FALSE, cluster_rows = FALSE, main = "YuleY Colligation", fontsize = 15, breaks = myBreaks)
 dev.off()
 
 nm = rownames(OUTPUT_hm_inter)

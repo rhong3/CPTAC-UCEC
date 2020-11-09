@@ -472,7 +472,7 @@ data_summary <- function(data, varname, groupnames){
   }
   data_sum<-ddply(data, groupnames, .fun=summary_func,
                   varname)
-  data_sum <- rename(data_sum, c("mean" = varname))
+  data_sum <- plyr::rename(data_sum, c("mean" = varname))
   return(data_sum)
 }
 arch = list(c('X1', 'Panoptes2'), c('X2', 'Panoptes1'), c('X3', 'Panoptes4'), c('X4', 'Panoptes3'), c('F1', 'Panoptes2_clinical'), c('F2', 'Panoptes1_clinical'), c('F3', 'Panoptes4_clinical'), c('F4', 'Panoptes3_clinical'))
@@ -503,11 +503,13 @@ for (arc in arch){
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +
     geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
                   position=position_dodge(.9)) +
-    geom_text(aes(label=round(Patient_AUC, 2)), position=position_dodge(width=0.9), vjust=-2) + 
+    # geom_text(aes(label=round(Patient_AUC, 2)), position=position_dodge(width=0.9), vjust=-2, size=8) + 
     theme_bw()+ 
-    theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(), legend.position = "top")
-  
+    theme(axis.text.x = element_text(size = 22, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = 'none')+  
+    font("xlab", size = 0, color = "black")+
+    font("ylab", size = 22, color = "black", face = "bold")+
+    font("xy.text", size = 22, color = "black", face = "bold")
   
   pl<- ggplot(all_sub.y, aes(x=reorder(Feature, -Tile_AUC), y=Tile_AUC, fill=Split)) + 
     xlab("")+ 
@@ -516,10 +518,13 @@ for (arc in arch){
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +
     geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
                   position=position_dodge(.9)) + 
-    geom_text(aes(label=round(Tile_AUC, 2)), position=position_dodge(width=0.9), vjust=-2) + 
+    # geom_text(aes(label=round(Tile_AUC, 2)), position=position_dodge(width=0.9), vjust=-2, size=8) + 
     theme_bw()+ 
-    theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(), legend.position = "top")
+    theme(axis.text.x = element_text(size = 22, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = 'none')+  
+    font("xlab", size = 0, color = "black")+
+    font("ylab", size = 22, color = "black", face = "bold")+
+    font("xy.text", size = 22, color = "black", face = "bold")
   
   pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test-multi/", wa, wb, "_", arc[2], "_bar_lite.pdf", sep=''),
       width=30,height=7.5)
