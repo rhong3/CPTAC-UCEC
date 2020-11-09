@@ -47,43 +47,61 @@ pp = pp_DF %>%
   gather(key=Length, value=Pixel) %>% 
   ggplot(aes(x=Pixel,fill=Length)) + 
   geom_histogram(position="dodge", binwidth=5000)+ scale_fill_grey() +theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(pp, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/X20Xtile_count.pdf", sep=''),
     width=5,height=3)
 p<-ggplot(slide_ct, aes(x=X20Xtiles)) + geom_histogram(binwidth=500)+theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                                                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+                                                                                                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/X10Xtile_count.pdf", sep=''),
     width=5,height=3)
 p<-ggplot(slide_ct, aes(x=X10Xtiles)) + geom_histogram(binwidth=100)+theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+                                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/X5Xtile_count.pdf", sep=''),
     width=5,height=3)
 p<-ggplot(slide_ct, aes(x=X5Xtiles)) + geom_histogram(binwidth=25)+theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+                                                                                        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/X2.5Xtile_count.pdf", sep=''),
     width=5,height=3)
 p<-ggplot(slide_ct, aes(x=X2.5Xtiles)) + geom_histogram(binwidth=5)+theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                                                                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+                                                                                      panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/Patient_count.pdf", sep=''),
     width=10,height=6)
 p = ggplot(data=patient, aes(x = reorder(Feature, -Count), y=Count, fill=Label)) +
-  geom_bar(stat="identity")+ scale_fill_brewer(palette="Greys") +theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-                                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, hjust = 1))
+  geom_bar(stat="identity")+ scale_fill_brewer(palette="Greys") +theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), legend.text=element_text(size=12),
+                                     panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), axis.text.x = element_text(angle = 90, hjust = 1))+
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black", face = "bold")+
+  font("xy.text", size = 12, color = "black", face = "bold")
 grid.arrange(p, nrow=1, ncol=1)
 dev.off()
 

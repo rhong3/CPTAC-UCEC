@@ -3,6 +3,7 @@
 # "two.sided", "greater", "less"
 library(ggplot2)
 library(ggpubr)
+library(gridExtra)
 features = c('his', 'SL', 'CNVH', 'TP53', 'FAT1', 'MSIst', 'ZFHX3', 'PTEN', 'FGFR2', 'MTOR', 'CTCF', 'PIK3R1', 'PIK3CA', 'ARID1A', 'JAK1', 'CTNNB1', 'KRAS', 'FBXW7', 'RPL22', 'BRCA2')
 arch = c('I5', 'I6', 'I1', 'I2', 'I3')
 
@@ -94,9 +95,11 @@ for (f in todolist){
 
 pp = ggboxplot(tile_all, x = "feature", y = "Prediction_score",
                color = "black", fill = "True_label", palette = "grey")+ 
-  stat_compare_means(method.args = list(alternative = "greater"), aes(group = True_label), label = "p.signif", label.y = 1.1) + 
-  stat_compare_means(method.args = list(alternative = "greater"), aes(group = True_label), label = "p.format", label.y = 1.15) + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  stat_compare_means(method.args = list(alternative = "greater"), aes(group = True_label), label = "p.signif", label.y = 1.1, size=10) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 0, color = "black")+
+  font("xy.text", size = 18, color = "black", face = "bold")
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/Wilcoxon/Figure.pdf", sep=''),
     width=18.5,height=8)

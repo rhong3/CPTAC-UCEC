@@ -309,12 +309,9 @@ for (pwa in pair){
   pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
                  color = "black", fill = "Architecture", palette = "grey")+ 
     stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)+
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   pl = ggboxplot(all_sub, x = "Feature", y = "Tile_AUC",
                  color = "black", fill = "Architecture", palette = "grey")+ 
-    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-    stat_compare_means(method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.1)+
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
   pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, "_lite.pdf", sep=''),
@@ -368,10 +365,12 @@ for (pwa in pair){
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +
     geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
                   position=position_dodge(.9)) +
-    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(), legend.position = "top")
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.1, size=8)+
+    theme(axis.text.x = element_text(angle = 30, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(), panel.background = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "none")+  
+    font("xlab", size = 0, color = "black")+
+    font("ylab", size = 15, color = "black", face = "bold")+
+    font("xy.text", size = 15, color = "black", face = "bold")
   
   
   pl<- ggplot(all_sub.y, aes(x=Feature, y=Tile_AUC, fill=Architecture)) + 
@@ -380,10 +379,12 @@ for (pwa in pair){
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +
     geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
                   position=position_dodge(.9)) +
-    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.05)+
-    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.format", label.y = 1.15)+theme_bw()+ 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(), legend.position = "top")
+    stat_compare_means(data = all_sub, method = "t.test", method.args = list(alternative = "greater"), aes(group = Architecture), label = "p.signif", label.y = 1.1, size=8)+
+    theme(axis.text.x = element_text(angle = 30, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),panel.background = element_blank(),
+          panel.grid.minor = element_blank(), legend.position = "none")+  
+    font("xlab", size = 0, color = "black")+
+    font("ylab", size = 15, color = "black", face = "bold")+
+    font("xy.text", size = 15, color = "black", face = "bold")
   
   pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test/", wa, wb, "_bar_lite.pdf", sep=''),
       width=20,height=5)
