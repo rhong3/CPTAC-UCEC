@@ -98,14 +98,17 @@ library(Hmisc)
 library(Rfast)
 library(dplyr)
 library(pheatmap)
+outdf_patient = read.csv("~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_patient.csv", row.names = 1)
+outdf_tile = read.csv("~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_tile.csv", row.names = 1)
+
 myBreaks <- seq(0.5, 1, by=0.005)
 # myBreaks <- seq(0, 1, by=0.01)
-pdf(file="~/documents/CPTAC-UCEC/Results/NL6/Results_Matrix_patient.pdf",
+pdf(file="~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_patient.pdf",
     width=6.5,height=7)
-pheatmap(outdf_patient, cluster_cols = FALSE, cluster_rows = FALSE, main = 'Per-patient AUROC', breaks = myBreaks)
+pheatmap(outdf_patient, cluster_cols = FALSE, cluster_rows = FALSE, main = 'Per-patient AUROC', breaks = myBreaks, fontsize = 13)
 dev.off()
 
-pdf(file="~/documents/CPTAC-UCEC/Results/NL6/Results_Matrix_tile.pdf",
+pdf(file="~/documents/CPTAC-UCEC/Results/NL5/Results_Matrix_tile.pdf",
     width=6.5,height=7)
-pheatmap(outdf_tile, cluster_cols = FALSE, cluster_rows = FALSE, main = 'Per-tile AUROC', breaks = myBreaks)
+pheatmap(outdf_tile, cluster_cols = FALSE, cluster_rows = FALSE, main = 'Per-tile AUROC', breaks = myBreaks, fontsize = 13)
 dev.off()
