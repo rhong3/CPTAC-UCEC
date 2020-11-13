@@ -63,6 +63,12 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v2
  - tSNE_for_figure.R: High quality tSNE dimensional reduction for activation maps
  - label_pred.Rmd: Prediction using machine learning methods with non-image features
  - SummaryTable.R: Summary table for the manuscript
+ - NYU_data_prep.py: NYU data preparation
+ - NYU_loaders.py: Loading NYU data
+ - NYU_test.py: Run testing on NYU dataset
+ - Cutter_NYU.py: Bulk cutting NYU svs/scn images and normalization.
+ - Slicer_NYU.py: Multi-thread cutting of NYU images 
+ - Deidentify.py: Process deidentified data
  - tox.ini: Tox to check the coding manner 
  - Legacy: Deprecated codes
  
