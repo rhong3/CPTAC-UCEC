@@ -8,7 +8,6 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_special.csv")
 existed=paste(previous$Tiles, paste(paste(previous$Architecture, previous$Feature, sep=''), previous$Positive, sep='_'), sep='/')
