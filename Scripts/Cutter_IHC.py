@@ -12,15 +12,12 @@ import shutil
 import pandas as pd
 matplotlib.use('Agg')
 import Slicer_NYU as Slicer
-import staintools
 
 
 # cut; each level is 2 times difference (10x, 5x, 2.5x)
 def cut():
     # load standard image for normalization
-    std = staintools.read_image("../colorstandard.png")
-    std = staintools.LuminosityStandardizer.standardize(std)
-    ref = pd.read_csv('../NYU/batch3_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
+    ref = pd.read_csv('../NYU/IHC_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
 
