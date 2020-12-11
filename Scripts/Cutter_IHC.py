@@ -47,7 +47,7 @@ def cut():
                 pass
             try:
                 n_x, n_y, raw_img, ct = Slicer.tile(image_file='NYU/'+row['file'], outdir=otdir,
-                                                                level=level, std_img=std, dp=row['Slide_ID'], ft=tff)
+                                                                level=level, dp=row['Slide_ID'], ft=tff)
             except Exception as e:
                 print(e)
                 pass

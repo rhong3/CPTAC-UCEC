@@ -11,7 +11,6 @@ from openslide import OpenSlide
 import numpy as np
 import pandas as pd
 import multiprocessing as mp
-from PIL import Image
 
 
 # check if a tile is background or not; return a blank pixel percentage score
@@ -28,17 +27,6 @@ def bgcheck(img, ts):
     maskb = maskb[:, :, 0] * maskb[:, :, 1] * maskb[:, :, 2]
     white = (np.sum(mask) + np.sum(maskb)) / (ts * ts)
     return white
-
-
-# Tile color normalization
-def normalization(img, sttd):
-    img = np.array(img)[:, :, :3]
-    img = staintools.LuminosityStandardizer.standardize(img)
-    normalizer = staintools.StainNormalizer(method='vahadane')
-    normalizer.fit(sttd)
-    img = normalizer.transform(img)
-    img = Image.fromarray(img.astype('uint8'), 'RGB')
-    return img
 
 
 # tile method; slp is the scn/svs image; n_y is the number of tiles can be cut on y column to be cut;
@@ -60,7 +48,6 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
         wscore = bgcheck(img, tile_size)
         if wscore < 0.5:
             img = img.resize((299, 299))
-            # img = normalization(img, std)
             if dp:
                 img.save(outdir + "/region_x-{}-y-{}_{}.png".format(image_x, image_y, str(dp)))
                 strr = outdir + "/region_x-{}-y-{}_{}.png".format(image_x, image_y, str(dp))
@@ -77,7 +64,7 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
 # First open the slide, determine how many tiles can be cut, record the residue edges width,
 # and calculate the final output prediction heat map size should be. Then, using multithread to cut tiles, and stack up
 # tiles and their position dictionaries.
-def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None, ft=1):
+def tile(image_file, outdir, level, path_to_slide="../images/", dp=None, ft=1):
     slide = OpenSlide(path_to_slide+image_file)
     slp = str(path_to_slide+image_file)
     print(slp)
@@ -105,7 +92,7 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     pool = mp.Pool(processes=mp.cpu_count())
     tasks = []
     while x0 < n_x:
-        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level, dp, std_img))
+        task = tuple((slp, n_y, x, y, full_width_region, stepsize, x0, outdir, level, dp))
         tasks.append(task)
         x0 += 1
     # slice images with multiprocessing
@@ -118,7 +105,7 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     tempdict = list(filter(None, tempdict))
     imloc = []
     list(map(imloc.extend, tempdict))
-    imlocpd = pd.DataFrame(imloc, columns = ["X_pos", "Y_pos", "X", "Y", "Loc"])
+    imlocpd = pd.DataFrame(imloc, columns=["X_pos", "Y_pos", "X", "Y", "Loc"])
     imlocpd = imlocpd.sort_values(["X_pos", "Y_pos"], ascending=[True, True])
     imlocpd = imlocpd.reset_index(drop=True)
     imlocpd = imlocpd.reset_index(drop=False)
