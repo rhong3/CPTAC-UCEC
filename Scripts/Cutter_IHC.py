@@ -11,7 +11,7 @@ import os
 import shutil
 import pandas as pd
 matplotlib.use('Agg')
-import Slicer_NYU as Slicer
+import Slicer_IHC as Slicer
 
 
 # cut; each level is 2 times difference (10x, 5x, 2.5x)
