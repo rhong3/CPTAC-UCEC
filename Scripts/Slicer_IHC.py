@@ -33,7 +33,7 @@ def bgcheck(img, ts):
 # x and y are the upper left position of each tile; tile_size is tile size; stepsize of each step; x0 is the row to cut.
 # outdir is the output directory for images;
 # imloc record each tile's relative and absolute coordinates; imlist is a list of cut tiles (Removed 01/24/2019).
-def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp, std):
+def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
     # pid = os.getpid()
     # print('{}: start working'.format(pid))
     slide = OpenSlide(slp)
