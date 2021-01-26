@@ -1,5 +1,5 @@
 """
-Convolutional neural nets driving code for TF2.0 and Xeption
+Convolutional neural nets driving code for TF2.0 and Panoptes
 
 Created on 04/26/2019
 
