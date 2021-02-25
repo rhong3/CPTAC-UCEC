@@ -104,3 +104,20 @@ pdf(file = paste(out_dir,'NYU_data_summary.pdf',sep='/'),
 draw(plot_heatmap, annotation_legend_side = "bottom")
 graphics.off()
 
+
+# alignment evaluation
+library(ggplot2)
+align = read.csv('~/documents/GYN-HE-IHC/align/align_eval.csv')
+pdf(file = paste('~/documents/GYN-HE-IHC/align/align_eval.pdf',sep='/'),
+    width =4, height = 4, bg='white')
+ggplot(align, aes(Align_score)) +
+  geom_histogram() + 
+  labs(x='Align Score (median=0.91776)') +
+  geom_vline(aes(xintercept = median(Align_score)),col='red',size=0.5)
+dev.off()
+
+
+
+
+
+
