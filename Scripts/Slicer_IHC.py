@@ -69,11 +69,14 @@ def tile(image_file, outdir, level, path_to_slide="../images/", dp=None, ft=1):
     slp = str(path_to_slide+image_file)
     print(slp)
     print(slide.level_dimensions)
-    print([int(slide.properties['openslide.bounds-x']), int(slide.properties['openslide.bounds-y'])])
-    print([int(slide.properties['openslide.bounds-width']), int(slide.properties['openslide.bounds-height'])])
+    # print([int(slide.properties['openslide.bounds-x']), int(slide.properties['openslide.bounds-y'])])
+    # print([int(slide.properties['openslide.bounds-width']), int(slide.properties['openslide.bounds-height'])])
 
     bounds_width = slide.level_dimensions[level][0]
     bounds_height = slide.level_dimensions[level][1]
+    print(bounds_width)
+    print(bounds_height)
+
     x = 0
     y = 0
     half_width_region = 49*ft

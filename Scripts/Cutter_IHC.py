@@ -17,7 +17,7 @@ import Slicer_IHC as Slicer
 # cut; each level is 2 times difference (10x, 5x, 2.5x)
 def cut():
     # load standard image for normalization
-    ref = pd.read_csv('../NYU/IHC_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
+    ref = pd.read_csv('../NYU/IHC4_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
 
@@ -28,18 +28,30 @@ def cut():
         except FileExistsError:
             pass
         for m in range(1, 4):
+            # if m == 0:
+            #     tff = 1
+            #     level = 0
+            # elif m == 1:
+            #     tff = 2
+            #     level = 0
+            # elif m == 2:
+            #     tff = 1
+            #     level = 1
+            # elif m == 3:
+            #     tff = 2
+            #     level = 1
             if m == 0:
                 tff = 1
                 level = 0
             elif m == 1:
-                tff = 2
-                level = 0
-            elif m == 2:
                 tff = 1
                 level = 1
+            elif m == 2:
+                tff = 1
+                level = 2
             elif m == 3:
-                tff = 2
-                level = 1
+                tff = 1
+                level = 3
             otdir = "../tiles/{}/level{}".format(row['Patient_ID'], str(m))
             try:
                 os.mkdir(otdir)
