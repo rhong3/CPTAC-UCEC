@@ -20,7 +20,7 @@ def cut():
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
-    ref = pd.read_csv('../NYU/batch_redo.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
+    ref = pd.read_csv('../NYU/batch4_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
 
