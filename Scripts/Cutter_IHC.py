@@ -28,30 +28,18 @@ def cut():
         except FileExistsError:
             pass
         for m in range(1, 4):
-            # if m == 0:
-            #     tff = 1
-            #     level = 0
-            # elif m == 1:
-            #     tff = 2
-            #     level = 0
-            # elif m == 2:
-            #     tff = 1
-            #     level = 1
-            # elif m == 3:
-            #     tff = 2
-            #     level = 1
             if m == 0:
                 tff = 1
-                level = 0
+                level = 1
             elif m == 1:
-                tff = 1
+                tff = 2
                 level = 1
             elif m == 2:
                 tff = 1
                 level = 2
             elif m == 3:
-                tff = 1
-                level = 3
+                tff = 2
+                level = 2
             otdir = "../tiles/{}/level{}".format(row['Patient_ID'], str(m))
             try:
                 os.mkdir(otdir)
