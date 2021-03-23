@@ -32,14 +32,14 @@ def cut():
                 tff = 1
                 level = 1
             elif m == 1:
-                tff = 2
-                level = 1
-            elif m == 2:
                 tff = 1
                 level = 2
+            elif m == 2:
+                tff = 1
+                level = 3
             elif m == 3:
-                tff = 2
-                level = 2
+                tff = 1
+                level = 4
             otdir = "../tiles/{}/level{}".format(row['Patient_ID'], str(m))
             try:
                 os.mkdir(otdir)

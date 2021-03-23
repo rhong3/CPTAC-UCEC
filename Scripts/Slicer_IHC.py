@@ -40,10 +40,10 @@ def v_slide(slp, n_y, x, y, tile_size, stepsize, x0, outdir, level, dp):
     imloc = []
     y0 = 0
     target_x = x0 * stepsize
-    image_x = (target_x + x)*(4**level)
+    image_x = (target_x + x)*(2**(level-1))
     while y0 < n_y:
         target_y = y0 * stepsize
-        image_y = (target_y + y)*(4**level)
+        image_y = (target_y + y)*(2**(level-1))
         img = slide.read_region((image_x, image_y), level, (tile_size, tile_size))
         wscore = bgcheck(img, tile_size)
         if wscore < 0.5:
