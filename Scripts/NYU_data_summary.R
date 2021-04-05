@@ -19,6 +19,7 @@ summ_label = inner_join(summ.x, label, by=c('Patient_ID'))
 summ_label['histology'] = tolower(summ_label$histology)
 summ_label['histology'] = gsub('mixed serous/endometrioid', 'mixed', summ_label$histology)
 summ_label['histology'] = gsub('mixed endometrioid/clear cell', 'mixed', summ_label$histology)
+summ_label['histology'] = gsub('mixed ', 'mixed', summ_label$histology)
 summ_label = inner_join(summ_label, summ.m, by=c('Patient_ID'))
 
 IHC = read.csv('~/documents/CPTAC-UCEC/NYU/IHC_sum.csv')
@@ -63,7 +64,7 @@ ColSide=lapply(summ_label_ihc[,7:11],
 ColSide[['subtype']]=get_color(colors=c('#7fc97f','#beaed4','#fdc086'),
                                factor=summ_label_ihc$subtype)
 
-ColSide[['histology']]=get_color(colors=c('#1b9e77','#d95f02', '#7570b3', '#e7298a','#66a61e'),
+ColSide[['histology']]=get_color(colors=c('#1b9e77','#d95f02', '#7570b3', '#e7298a','#66a61e', '#e6ab02'),
                                  factor = summ_label_ihc$histology)
 
 ColSide[['FIGO']]=colorRamp2(breaks=range(summ_label_ihc$FIGO, na.rm=T), 
@@ -76,14 +77,14 @@ ColSide[['H.E_slides']]=colorRamp2(breaks=range(summ_label_ihc$H.E_slides, na.rm
                                    colors=c("#fcfbfd", "#3f007d"))
 
 
-ca = HeatmapAnnotation(df = summ_label_ihc[order(summ_label_ihc$histology,summ_label_ihc$subtype),-1], na_col ='white',
+ca = HeatmapAnnotation(df = summ_label_ihc[order(summ_label_ihc$subtype, summ_label_ihc$histology),-1], na_col ='white',
                        which = 'column',
-                       annotation_name_gp = gpar(fontsize =20,fontface='bold'),
+                       annotation_name_gp = gpar(fontsize =18,fontface='bold'),
                        annotation_height = unit(rep(0.5,length(ColSide)), "inch"),
                        border = F,
                        gap = unit(rep(0,length(ColSide)), "inch"),
                        annotation_legend_param = list(title_gp = gpar(fontsize = 22,fontface = 'bold'),
-                                                      labels_gp = gpar(fontsize = 20),
+                                                      labels_gp = gpar(fontsize = 18),
                                                       direction='horizontal',
                                                       #nrow =2, ncol=10,
                                                       grid_width= unit(0.3,'inch'),
@@ -100,7 +101,7 @@ plot_heatmap=Heatmap(ph[,order(summ_label_ihc$histology,summ_label_ihc$subtype)]
 
 out_dir = '~/documents/CPTAC-UCEC/NYU/'
 pdf(file = paste(out_dir,'NYU_data_summary.pdf',sep='/'),
-    width =15, height = 5, bg='white')
+    width =20, height = 5, bg='white')
 draw(plot_heatmap, annotation_legend_side = "bottom")
 graphics.off()
 
