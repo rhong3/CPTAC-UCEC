@@ -44,13 +44,17 @@ def paired_tile_ids_in_old(slide, label, root_dir):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if '.png' in id:
-                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
-                    y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
-                    try:
-                        dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
-                    except IndexError:
-                        dup = np.nan
-                    ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
+                    for faa in ["MLH1", "MSH2", "MSH6", "PMS2", "P53"]:
+                        if faa in id:
+                            pass
+                        else:
+                            x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
+                            y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
+                            try:
+                                dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
+                            except IndexError:
+                                dup = np.nan
+                            ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
                 else:
                     print('Skipping ID:', id)
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
@@ -81,7 +85,11 @@ def tile_ids_in(inp):
     try:
         for id in os.listdir(inp['path']):
             if '_{}.png'.format(str(inp['sldnum'])) in id:
-                ids.append([inp['slide'], inp['level'], inp['path']+'/'+id, inp['BMI'], inp['age'], inp['label']])
+                for faa in ["MLH1", "MSH2", "MSH6", "PMS2", "P53"]:
+                    if faa in id:
+                        pass
+                    else:
+                        ids.append([inp['slide'], inp['level'], inp['path']+'/'+id, inp['BMI'], inp['age'], inp['label']])
     except FileNotFoundError:
         print('Ignore:', inp['path'])
 
@@ -103,13 +111,17 @@ def paired_tile_ids_in(slide, label, root_dir, age=None, BMI=None):
             dirr = root_dir + 'level{}'.format(str(level))
             for id in os.listdir(dirr):
                 if '.png' in id:
-                    x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
-                    y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
-                    try:
-                        dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
-                    except IndexError:
-                        dup = np.nan
-                    ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
+                    for faa in ["MLH1", "MSH2", "MSH6", "PMS2", "P53"]:
+                        if faa in id:
+                            pass
+                        else:
+                            x = int(float(id.split('x-', 1)[1].split('-', 1)[0]) / fac)
+                            y = int(float(re.split('_', id.split('y-', 1)[1])[0]) / fac)
+                            try:
+                                dup = re.split('.p', re.split('_', id.split('y-', 1)[1])[1])[0]
+                            except IndexError:
+                                dup = np.nan
+                            ids.append([slide, label, level, dirr + '/' + id, x, y, dup])
                 else:
                     print('Skipping ID:', id)
         ids = pd.DataFrame(ids, columns=['slide', 'label', 'level', 'path', 'x', 'y', 'dup'])
