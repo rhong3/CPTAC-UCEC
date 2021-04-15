@@ -98,9 +98,7 @@ if __name__ == "__main__":
             for idx, row in datapd.iterrows():
                 tile_ids = Sample_prep2.paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
                 test_tiles = pd.concat([test_tiles, tile_ids])
-            test_tiles = test_tiles[(test_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False) and
-                                    (test_tiles['L1path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False) and
-                                    (test_tiles['L2path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False)]
+            test_tiles = test_tiles[(test_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False)]
             test_tiles.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
             tes = test_tiles
         tecc = len(tes['label'])
