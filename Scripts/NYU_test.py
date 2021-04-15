@@ -93,7 +93,6 @@ if __name__ == "__main__":
                         [row['name'], int(row[opt.pdmd]), img_dir + "{}/".format(str(row['name'])), row['age'], row['BMI']])
 
             datapd = pd.DataFrame(big_images, columns=['slide', 'label', 'path', 'age', 'BMI'])
-            datapd = datapd.dropna()
 
             test_tiles = pd.DataFrame(columns=['slide', 'label', 'L0path', 'L1path', 'L2path', 'age', 'BMI'])
             for idx, row in datapd.iterrows():
