@@ -99,6 +99,9 @@ if __name__ == "__main__":
             for idx, row in datapd.iterrows():
                 tile_ids = Sample_prep2.paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
                 test_tiles = pd.concat([test_tiles, tile_ids])
+            test_tiles = test_tiles[(test_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False) and
+                                    (test_tiles['L1path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False) and
+                                    (test_tiles['L2path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False)]
             test_tiles.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
             tes = test_tiles
         tecc = len(tes['label'])
@@ -168,6 +171,7 @@ if __name__ == "__main__":
                 tile_ids = Sample_prep.tile_ids_in(row['slide'], row['level'], row['path'], row['label'])
                 test_tiles_list.extend(tile_ids)
             test_tiles = pd.DataFrame(test_tiles_list, columns=['slide', 'level', 'path', 'label'])
+            test_tiles = test_tiles[(test_tiles['path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53')==False)]
             test_tiles.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
             tes = test_tiles
         tecc = len(tes['label'])
