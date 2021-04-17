@@ -195,7 +195,6 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Fusion_dummy_His_MUT_joine
             big_images.append([row['name'], int(row[pmd]), path + "{}/".format(str(row['name'])), row['age'], row['BMI']])
 
     datapd = pd.DataFrame(big_images, columns=['slide', 'label', 'path', 'age', 'BMI'])
-    datapd = datapd.dropna()
 
     return datapd
 
