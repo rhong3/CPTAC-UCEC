@@ -363,8 +363,11 @@ def set_sep(alll, path, cls, cut=0.2, batchsize=24):
         tile_ids = paired_tile_ids_in(row['slide'], row['label'], row['path'], row['age'], row['BMI'])
         validation_tiles = pd.concat([validation_tiles, tile_ids])
 
-    train_tiles = balance(train_tiles, cls=cls)
-    validation_tiles = balance(validation_tiles, cls=cls)
+    # train_tiles = balance(train_tiles, cls=cls)
+    # validation_tiles = balance(validation_tiles, cls=cls)
+    test_tiles = test_tiles[(test_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]
+    train_tiles = train_tiles[(train_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]
+    validation_tiles = validation_tiles[(validation_tiles['L0path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]
     # No shuffle on test set
     train_tiles = sku.shuffle(train_tiles)
     validation_tiles = sku.shuffle(validation_tiles)
