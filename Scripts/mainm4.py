@@ -231,10 +231,10 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir)
+        alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir, ref_file='../NYU/label.csv')
         # trs, tes, vas = Sample_prep2.set_sep_secondary(alll, path=data_dir, cls=classes, pmd=pdmd, batchsize=bs)
-        trs, tes, vas = Sample_prep2.set_sep_idp(alll, path=data_dir, cls=classes, batchsize=bs)
-        # trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes, batchsize=bs)
+        # trs, tes, vas = Sample_prep2.set_sep_idp(alll, path=data_dir, cls=classes, batchsize=bs)
+        trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes, batchsize=bs)
         trc, tec, vac, weights = counters(data_dir, classes)
         loader(data_dir, 'train')
         loader(data_dir, 'validation')
