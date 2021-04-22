@@ -17,9 +17,6 @@ label = label[, c(1, 7)]
 colnames(label) = c('Patient_ID', 'P53_overexpression')
 summ_label = inner_join(summ.x, label, by=c('Patient_ID'))
 summ_label['histology'] = tolower(summ_label$histology)
-summ_label['histology'] = gsub('mixed serous/endometrioid', 'mixed', summ_label$histology)
-summ_label['histology'] = gsub('mixed endometrioid/clear cell', 'mixed', summ_label$histology)
-summ_label['histology'] = gsub('mixed ', 'mixed', summ_label$histology)
 summ_label = inner_join(summ_label, summ.m, by=c('Patient_ID'))
 
 IHC = read.csv('~/documents/CPTAC-UCEC/NYU/IHC_sum.csv')
@@ -64,7 +61,7 @@ ColSide=lapply(summ_label_ihc[,7:11],
 ColSide[['subtype']]=get_color(colors=c('#7fc97f','#beaed4','#fdc086'),
                                factor=summ_label_ihc$subtype)
 
-ColSide[['histology']]=get_color(colors=c('#1b9e77','#d95f02', '#7570b3', '#e7298a','#66a61e', '#e6ab02'),
+ColSide[['histology']]=get_color(colors=c('#1b9e77','#d95f02', '#7570b3', '#e7298a','#66a61e', '#e6ab02', '#a6761d'),
                                  factor = summ_label_ihc$histology)
 
 ColSide[['FIGO']]=colorRamp2(breaks=range(summ_label_ihc$FIGO, na.rm=T), 
@@ -101,7 +98,7 @@ plot_heatmap=Heatmap(ph[,order(summ_label_ihc$histology,summ_label_ihc$subtype)]
 
 out_dir = '~/documents/CPTAC-UCEC/NYU/'
 pdf(file = paste(out_dir,'NYU_data_summary.pdf',sep='/'),
-    width =20, height = 5, bg='white')
+    width =25, height = 5, bg='white')
 draw(plot_heatmap, annotation_legend_side = "bottom")
 graphics.off()
 

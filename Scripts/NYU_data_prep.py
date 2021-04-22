@@ -39,7 +39,8 @@ case['TP53'] = case['IHC'].str.contains('p53 overexpressed').astype(np.uint8)
 case['histology_Endometrioid'] = case['diagnosis'].str.contains('Endometrioid', case=False).astype(np.uint8)
 case['histology_Serous'] = case['diagnosis'].str.contains('Serous', case=False).astype(np.uint8)
 case['histology_Mixed'] = np.abs(case['histology_Endometrioid']
-                                 +case['histology_Serous']-1).astype(np.bool).astype(np.uint8)
+                                 +case['histology_Serous']-1).astype(np.bool).astype(np.uint8) + \
+                          case['diagnosis'].str.contains('Mixed endometrioid/clear cell', case=False).astype(np.uint8)
 
 case = case[['Patient_ID', 'subtype_0NA', 'subtype_Endometrioid', 'subtype_MSI', 'subtype_Serous-like', 'subtype_POLE',
              'TP53', 'histology_Endometrioid', 'histology_Serous', 'histology_Mixed']]

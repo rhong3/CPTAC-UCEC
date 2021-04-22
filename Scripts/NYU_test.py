@@ -69,11 +69,11 @@ if __name__ == "__main__":
         except FileNotFoundError:
             big_images = []
             if opt.pdmd == 'histology':
-                ref = ref.loc[ref['histology_Mixed'] == 0]
+                # ref = ref.loc[ref['histology_Mixed'] == 0]
                 for idx, row in ref.iterrows():
-                    if row['histology_Endometrioid'] == 1:
+                    if row['histology_Endometrioid'] == 1 or row['histology_Mixed'] == 1:
                         big_images.append([row['name'], 0, img_dir + "{}/".format(str(row['name'])), row['age'], row['BMI']])
-                    if row['histology_Serous'] == 1:
+                    if row['histology_Serous'] == 1 or row['histology_Mixed'] == 1:
                         big_images.append([row['name'], 1, img_dir + "{}/".format(str(row['name'])), row['age'], row['BMI']])
             elif opt.pdmd in ['Endometrioid', 'MSI', 'Serous-like', 'POLE']:
                 # # special version
@@ -132,9 +132,9 @@ if __name__ == "__main__":
             level = 1
             big_images = []
             if opt.pdmd == 'histology':
-                allimg = Sample_prep.intersection(ref.loc[ref['histology_Mixed'] == 0]['name'].tolist(), allimg)
-                EMimg = Sample_prep.intersection(ref.loc[ref['histology_Endometrioid'] == 1]['name'].tolist(), allimg)
-                Serousimg = Sample_prep.intersection(ref.loc[ref['histology_Serous'] == 1]['name'].tolist(), allimg)
+                # allimg = Sample_prep.intersection(ref.loc[ref['histology_Mixed'] == 0]['name'].tolist(), allimg)
+                EMimg = Sample_prep.intersection(ref.loc[(ref['histology_Endometrioid'] == 1) | (ref['histology_Mixed'] == 1)]['name'].tolist(), allimg)
+                Serousimg = Sample_prep.intersection(ref.loc[(ref['histology_Serous'] == 1) | (ref['histology_Mixed'] == 1)]['name'].tolist(), allimg)
                 for i in EMimg:
                     big_images.append([i, level, img_dir + "{}/level{}".format(i, level), 0])
                 for i in Serousimg:

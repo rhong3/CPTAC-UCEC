@@ -29,7 +29,7 @@ class INCEPTION:
 
     def __init__(self, input_dim, d_hyperparams={},
                  save_graph_def=True, meta_graph=None,
-                 log_dir="./log", meta_dir="./meta", model='X1', weights = tf.constant([1., 1., 1., 1.])):
+                 log_dir="./log", meta_dir="./meta", model='X1', weights=tf.constant([1., 1., 1., 1.])):
 
         self.input_dim = input_dim
         self.__dict__.update(INCEPTION.DEFAULTS, **d_hyperparams)
@@ -182,8 +182,8 @@ class INCEPTION:
                             xa, xb, xc, y, dm = sessa.run(next_element)
                             feed_dict = {self.xa_in: xa, self.xb_in: xb, self.xc_in: xc,
                                          self.dm_in: None, self.is_train: train_status}
-                        fetches = [self.pred, self.net, self.w]
-                        pred, net, w = self.sesh.run(fetches, feed_dict)
+                        fetches = [self.pred, self.net, self.w, self.logits]
+                        pred, net, w, logits = self.sesh.run(fetches, feed_dict)
                         # for i in range(3):
                             # neta = net[:, :, :, :int(np.shape(net)[3] / 3)]
                             # netb = net[:, :, :, int(np.shape(net)[3] / 3):2 * int(np.shape(net)[3] / 3)]
@@ -202,13 +202,16 @@ class INCEPTION:
                             pdx = pred
                             yl = y
                             netl = net
+                            logitsl = logits
                         else:
                             pdx = np.concatenate((pdx, pred), axis=0)
                             yl = np.concatenate((yl, y), axis=0)
                             netl = np.concatenate((netl, net), axis=0)
+                            logitsl = np.concatenate((logitsl, logits), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
                         ac.metrics(pdx, yl, dirr, 'Test', pmd, testset)
+                        ac.logit_agg(logitsl, testset, dirr, "Test")
                         ac.tSNE_prep(flatnet=netl, ori_test=testset, y=yl, pred=pdx, path=dirr, pmd=pmd)
                         break
         else:

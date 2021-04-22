@@ -226,21 +226,24 @@ class INCEPTION:
                     try:
                         x, y = sessa.run(next_element)
                         feed_dict = {self.x_in: x, self.is_train: train_status}
-                        fetches = [self.pred, self.net, self.w]
-                        pred, net, w = self.sesh.run(fetches, feed_dict)
+                        fetches = [self.pred, self.net, self.w, self.logits]
+                        pred, net, w, logits = self.sesh.run(fetches, feed_dict)
                         # ac.CAM(net, w, pred, x, y, dirr, 'Test', bs, pmd, rd)
                         net = np.mean(net, axis=(1, 2))
                         if rd == 0:
                             pdx = pred
                             yl = y
                             netl = net
+                            logitsl = logits
                         else:
                             pdx = np.concatenate((pdx, pred), axis=0)
                             yl = np.concatenate((yl, y), axis=0)
                             netl = np.concatenate((netl, net), axis=0)
+                            logitsl = np.concatenate((logitsl, logits), axis=0)
                         rd += 1
                     except tf.errors.OutOfRangeError:
                         ac.metrics(pdx, yl, dirr, 'Test', pmd, testset)
+                        ac.logit_agg(logitsl, testset, dirr, "Test")
                         ac.tSNE_prep(flatnet=netl, ori_test=testset, y=yl, pred=pdx, path=dirr, pmd=pmd)
                         break
         else:
