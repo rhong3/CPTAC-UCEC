@@ -309,8 +309,8 @@ def set_sep(alll, path, cls, level=None, cut=0.3, batchsize=64):
     train_tiles = pd.DataFrame(train_tiles_list, columns=['slide', 'level', 'path', 'label'])
     validation_tiles = pd.DataFrame(validation_tiles_list, columns=['slide', 'level', 'path', 'label'])
 
-    # train_tiles = balance(train_tiles, cls=cls)
-    # validation_tiles = balance(validation_tiles, cls=cls)
+    train_tiles = balance(train_tiles, cls=cls)
+    validation_tiles = balance(validation_tiles, cls=cls)
     test_tiles = test_tiles[(test_tiles['path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]
     train_tiles = train_tiles[(train_tiles['path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]
     validation_tiles = validation_tiles[(validation_tiles['path'].str.contains('MSH6|MSH2|PMS2|MLH1|P53') == False)]

@@ -1,8 +1,6 @@
 """
 Main method for X
-
 Created on 04/26/2019; modified 11/06/2019
-
 @author: RH
 """
 import os
@@ -231,7 +229,7 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir, ref_file='../NYU/label.csv')
+        alll = Sample_prep2.big_image_sum(pmd=pdmd, path=img_dir)
         # trs, tes, vas = Sample_prep2.set_sep_secondary(alll, path=data_dir, cls=classes, pmd=pdmd, batchsize=bs)
         # trs, tes, vas = Sample_prep2.set_sep_idp(alll, path=data_dir, cls=classes, batchsize=bs)
         trs, tes, vas = Sample_prep2.set_sep(alll, path=data_dir, cls=classes, batchsize=bs)
@@ -258,4 +256,3 @@ if __name__ == "__main__":
         if sup:
             print("Using Fusion Mode!")
         main(trc, tec, vac, classes, weights, testset=tes)
-

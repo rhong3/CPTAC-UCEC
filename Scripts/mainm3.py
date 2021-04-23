@@ -1,8 +1,6 @@
 """
 Main method
-
 Created on 11/26/2018
-
 @author: RH
 """
 import os
@@ -210,7 +208,7 @@ if __name__ == "__main__":
         tes = pd.read_csv(data_dir+'/te_sample.csv', header=0)
         vas = pd.read_csv(data_dir+'/va_sample.csv', header=0)
     except FileNotFoundError:
-        alll = Sample_prep.big_image_sum(pmd=pdmd, path=img_dir, ref_file='../NYU/label.csv')
+        alll = Sample_prep.big_image_sum(pmd=pdmd, path=img_dir)
         # trs, tes, vas = Sample_prep.set_sep_secondary(alll, path=data_dir, cls=classes, pmd=pdmd,
         #                                               level=level, batchsize=bs)
         trs, tes, vas = Sample_prep.set_sep(alll, path=data_dir, cls=classes, level=level, batchsize=bs)
@@ -236,4 +234,3 @@ if __name__ == "__main__":
         if not os.path.isfile(data_dir + '/validation.tfrecords'):
             loader(data_dir, 'validation')
         main(trc, tec, vac, classes, weights, testset=tes)
-
