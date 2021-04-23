@@ -561,4 +561,4 @@ def logit_agg(logit, ori_test, path, name):
     out.to_csv("../Results/{}/out/{}_tile_logit.csv".format(path, name), index=False)
     out = out.drop(['path', 'level'], axis=1)
     out_slide = out.groupby(['slide']).mean()
-    out_slide.to_csv("../Results/{}/out/{}_slide_logit.csv".format(path, name), index=False)
+    out_slide.to_csv("../Results/{}/out/{}_slide_logit.csv".format(path, name), index=True)
