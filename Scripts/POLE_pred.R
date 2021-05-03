@@ -85,7 +85,7 @@ for (ta in arch_list){
       tryCatch(
         {
           if (paste(ta, tb, tc, sep="_") %in% existed){
-            print("skip: ", ta, tb, tc)
+            print(paste("skip: ", ta, tb, tc, sep=""))
             next
           } else{
             xxxx = generate(ta, tb, tc)
@@ -158,7 +158,7 @@ for (ta in arch_list){
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
 New_OUTPUT = New_OUTPUT[order(-New_OUTPUT$Patient_ROC, -New_OUTPUT$Tile_ROC),]
-write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_special.csv", row.names=FALSE)
+write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_POLE_fusion.csv", row.names=FALSE)
 
 
 
