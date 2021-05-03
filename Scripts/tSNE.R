@@ -13,10 +13,10 @@
 inlist=c('I1CNVL', 'I2CNVL', 'I3CNVL', 'I5CNVL', 'I6CNVL', 'X1CNVL', 'X2CNVL', 'X3CNVL', 'X4CNVL', 'F1CNVL', 'F2CNVL', 'F3CNVL', 'F4CNVL')
 
 for(xx in inlist){
-  input_file=paste('~/documents/CPTAC-UCEC/Results/NL6/',xx,'/out/For_tSNE.csv',sep='')
-  output_file=paste('~/documents/CPTAC-UCEC/Results/NL6/',xx,'/out/tSNE_P_N.csv',sep='')
-  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL6/',xx,'/out/tSNE_sampled.csv',sep='')
-  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL6/',xx,'/out/P_N.pdf',sep='')
+  input_file=paste('~/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/For_tSNE.csv',sep='')
+  output_file=paste('~/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_P_N.csv',sep='')
+  sampled_file=paste('~/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/tSNE_sampled.csv',sep='')
+  out_fig=paste('~/documents/CPTAC-UCEC/Results/NL5/',xx,'/out/P_N.pdf',sep='')
   start=12
   bins=50
   POS_score=c('POS_score')
