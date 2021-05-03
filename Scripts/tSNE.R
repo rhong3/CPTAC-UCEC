@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('F2PTEN')
+inlist=c('I1CNVL', 'I2CNVL', 'I3CNVL', 'I5CNVL', 'I6CNVL', 'X1CNVL', 'X2CNVL', 'X3CNVL', 'X4CNVL', 'F1CNVL', 'F2CNVL', 'F3CNVL', 'F4CNVL')
 
 for(xx in inlist){
   input_file=paste('~/documents/CPTAC-UCEC/Results/NL6/',xx,'/out/For_tSNE.csv',sep='')
