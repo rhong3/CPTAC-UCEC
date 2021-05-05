@@ -64,16 +64,16 @@ for (i in targets){
       Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_slide.csv", sep=''))
       Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_tile.csv", sep=''))
       
-      # #### Special filter ####
-      # Test_slide$slide = gsub("NYU00", '', Test_slide$slide)
-      # Test_slide$slide = gsub("NYU0", '', Test_slide$slide)
-      # Test_slide$slide = as.numeric(Test_slide$slide)
-      # Test_slide = Test_slide[Test_slide$slide %in% 1:41, ]
-      # Test_tile$slide = gsub("NYU00", '', Test_tile$slide)
-      # Test_tile$slide = gsub("NYU0", '', Test_tile$slide)
-      # Test_tile$slide = as.numeric(Test_tile$slide)
-      # Test_tile = Test_tile[Test_tile$slide %in% 1:41, ]
-      # #### Special filter ####
+      #### Special filter ####
+      Test_slide$slide = gsub("NYU00", '', Test_slide$slide)
+      Test_slide$slide = gsub("NYU0", '', Test_slide$slide)
+      Test_slide$slide = as.numeric(Test_slide$slide)
+      Test_slide = Test_slide[Test_slide$slide %in% 1:41, ]
+      Test_tile$slide = gsub("NYU00", '', Test_tile$slide)
+      Test_tile$slide = gsub("NYU0", '', Test_tile$slide)
+      Test_tile$slide = as.numeric(Test_tile$slide)
+      Test_tile = Test_tile[Test_tile$slide %in% 1:41, ]
+      #### Special filter ####
       
       # per patient level
       answers <- factor(Test_slide$True_label)
