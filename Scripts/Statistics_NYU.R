@@ -8,8 +8,8 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1CNVH_NYU_NL6','X2CNVH_NYU_NL6','X3CNVH_NYU_NL6','X4CNVH_NYU_NL6','F1CNVH_NYU_NL6','F2CNVH_NYU_NL6','F3CNVH_NYU_NL6','F4CNVH_NYU_NL6','I1CNVH_NYU_NL6','I2CNVH_NYU_NL6','I3CNVH_NYU_NL6','I5CNVH_NYU_NL6','I6CNVH_NYU_NL6',
-           'X1CNVH_NYU_NL5','X2CNVH_NYU_NL5','X3CNVH_NYU_NL5','X4CNVH_NYU_NL5','F1CNVH_NYU_NL5','F2CNVH_NYU_NL5','F3CNVH_NYU_NL5','F4CNVH_NYU_NL5','I1CNVH_NYU_NL5','I2CNVH_NYU_NL5','I3CNVH_NYU_NL5','I5CNVH_NYU_NL5','I6CNVH_NYU_NL5')
+inlist = c('I1CNVL_NYU_NL6','I2CNVL_NYU_NL6','I3CNVL_NYU_NL6','I5CNVL_NYU_NL6','I6CNVL_NYU_NL6',
+           'I1CNVL_NYU_NL5','I2CNVL_NYU_NL5','I3CNVL_NYU_NL5','I5CNVL_NYU_NL5','I6CNVL_NYU_NL5')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, sep='_')
@@ -51,6 +51,10 @@ for (i in targets){
         pos = 'Serous-like'
         neg = 'negative'
         POS_score = 'POS_score'
+      } else if (feature == 'CNVL'){
+        pos = 'Endometrioid'
+        neg = 'negative'
+        POS_score = 'POS_score'
       } else{
         pos = feature
         neg = 'negative'
@@ -59,6 +63,17 @@ for (i in targets){
 
       Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_slide.csv", sep=''))
       Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_tile.csv", sep=''))
+      
+      # #### Special filter ####
+      # Test_slide$slide = gsub("NYU00", '', Test_slide$slide)
+      # Test_slide$slide = gsub("NYU0", '', Test_slide$slide)
+      # Test_slide$slide = as.numeric(Test_slide$slide)
+      # Test_slide = Test_slide[Test_slide$slide %in% 1:41, ]
+      # Test_tile$slide = gsub("NYU00", '', Test_tile$slide)
+      # Test_tile$slide = gsub("NYU0", '', Test_tile$slide)
+      # Test_tile$slide = as.numeric(Test_tile$slide)
+      # Test_tile = Test_tile[Test_tile$slide %in% 1:41, ]
+      # #### Special filter ####
       
       # per patient level
       answers <- factor(Test_slide$True_label)
