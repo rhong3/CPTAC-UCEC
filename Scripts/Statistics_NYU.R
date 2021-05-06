@@ -8,8 +8,8 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('I1CNVL_NYU_NL6','I2CNVL_NYU_NL6','I3CNVL_NYU_NL6','I5CNVL_NYU_NL6','I6CNVL_NYU_NL6',
-           'I1CNVL_NYU_NL5','I2CNVL_NYU_NL5','I3CNVL_NYU_NL5','I5CNVL_NYU_NL5','I6CNVL_NYU_NL5')
+inlist = c('X1CNVL_NYU_NL6','X2CNVL_NYU_NL6','X3CNVL_NYU_NL6','X4CNVL_NYU_NL6','F1CNVL_NYU_NL6','F2CNVL_NYU_NL6','F3CNVL_NYU_NL6','F4CNVL_NYU_NL6',
+           'X1CNVL_NYU_NL5','X2CNVL_NYU_NL5','X3CNVL_NYU_NL5','X4CNVL_NYU_NL5','F1CNVL_NYU_NL5','F2CNVL_NYU_NL5','F3CNVL_NYU_NL5','F4CNVL_NYU_NL5')
 # Check previously calculated trials
 previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, sep='_')
