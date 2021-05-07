@@ -7,7 +7,7 @@ mutation = mutation[mutation$Feature %in% mut, ]
 histology = read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_histology.csv")
 histology$Feature = 'Histology'
 special = read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_special.csv")
-special = special[special$Positive == 'Serous-like', -4]
+special = special[, -4]
 special$Feature = gsub('SL', 'CNVH in Endometrioid', special$Feature)
 MSI =read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_MSI.csv")
 MSI$Feature = 'MSI-High'
@@ -47,8 +47,8 @@ mixed = merged[merged$Tiles %in% c('NL5') & merged$Architecture %in% c('Inceptio
                                                                        'Panoptes1', 'Panoptes2', 'Panoptes3', 'Panoptes4', 
                                                                        'Panoptes1 with clinical' ,'Panoptes2 with clinical', 'Panoptes3 with clinical', 'Panoptes4 with clinical'), ]
 mixed$Resolution = 'multi'
-mixed[mixed$Tiles == 'NL8', ]$Resolution = '5X'
-mixed[mixed$Tiles == 'NL9', ]$Resolution = '2.5X'
+# mixed[mixed$Tiles == 'NL8', ]$Resolution = '5X'
+# mixed[mixed$Tiles == 'NL9', ]$Resolution = '2.5X'
 mixed[mixed$Tiles == 'NL5' & mixed$Architecture %in% c('InceptionV1', 'InceptionV2', 'InceptionV3', 'InceptionResnetV1', 'InceptionResnetV2'), ]$Resolution = '10X'
 mixed = mixed[, c(1:2, 40, 4:39)]
 
