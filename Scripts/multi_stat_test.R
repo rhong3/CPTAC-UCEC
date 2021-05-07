@@ -489,6 +489,11 @@ colnames(all)[5] <- gsub('Tile', 'Split', colnames(all)[5])
 all = all[all$Split == 'NL5' | all$Split == 'NL6',]
 all$Split <- gsub('NL5', 'Mixed', all$Split)
 all$Split <- gsub('NL6', 'Independent', all$Split)
+all$Feature <- gsub('his', 'Histology', all$Feature)
+all$Feature <- gsub('SL', 'CNV-H (Endometrioid)', all$Feature)
+all$Feature <- gsub('CNVH', 'CNV-H', all$Feature)
+all$Feature <- gsub('MSIst', 'MSI-high', all$Feature)
+all$Feature <- gsub('CNVL', 'CNV-L', all$Feature)
 
 for (arc in arch){
   forfig = data.frame(Patient_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0), Split=character(0))
@@ -533,7 +538,7 @@ for (arc in arch){
     font("ylab", size = 22, color = "black", face = "bold")+
     font("xy.text", size = 22, color = "black", face = "bold")
   
-  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test-multi/", wa, wb, "_", arc[2], "_bar_lite.pdf", sep=''),
+  pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test-multi/", arc[2], "_bar_lite.pdf", sep=''),
       width=30,height=7.5)
   grid.arrange(pp,pl,nrow=1, ncol=2)
   dev.off()
