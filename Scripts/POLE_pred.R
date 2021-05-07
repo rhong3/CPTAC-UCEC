@@ -168,7 +168,7 @@ pos = "POS_score"
 lev = c('negative', 'POLE')
 mm = "POLE"
 sw = TRUE
-color = c("#F6AE2D", "#F26419", "#55DDE0", "#33658A")
+color = c("#F26419", "#F6AE2D", "#55DDE0", "#33658A")
 arch_list = c('I1', 'I2', 'I3', 'I5', 'I6', 'X1', 'X2', 'X3', 'X4', 'F1', 'F2', 'F3', 'F4')
 
 for (ta in arch_list){
@@ -181,22 +181,19 @@ for (ta in arch_list){
             print(paste("skip: ", ta, tb, tc, sep=""))
             next
           } else{
-                  pdf(file=paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/ROC_slide.pdf", sep=''),
+                  pdf(file=paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/ROC.pdf", sep=''),
                       width=6,height=6)
                   Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/Test_slide.csv", sep=''))
                   answersa <- factor(Test_slide$True_label)
                   resultsa <- factor(Test_slide$Prediction)
                   roca <- plot(roc(answersa, Test_slide[[pos]], levels=lev), print.auc = FALSE, col = color[1], add = FALSE, labels = FALSE, tck = -0.02)
-                  legend("bottomright", legend=c(paste("POLE independent per-patient AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
-                  dev.off()
-                  
-                  pdf(file=paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/ROC_tile.pdf", sep=''),
-                      width=6,height=6)
+
                   Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/Test_tile.csv", sep=''))
                   answersa <- factor(Test_tile$True_label)
                   resultsa <- factor(Test_tile$Prediction)
-                  roca <- plot(roc(answersa, Test_tile[[pos]], levels=lev), print.auc = FALSE, col = color[1], add = FALSE, labels = FALSE, tck = -0.02)
-                  legend("bottomright", legend=c(paste("POLE independent per-tile AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
+                  rocb <- plot(roc(answersa, Test_tile[[pos]], levels=lev), print.auc = FALSE, col = color[2], add = sw, labels = FALSE, tck = -0.02)
+                  legend("bottomright", legend=c(paste("POLE independent per-patient AUC=", round(as.numeric(roca$auc), 3), sep=''), paste("POLE independent per-tile AUC=", round(as.numeric(rocb$auc), 3), sep='')), col=c("#F26419", "#F6AE2D"), 
+                         lwd=2, cex=1.1)
                   dev.off()
           }
         },

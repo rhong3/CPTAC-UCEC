@@ -110,7 +110,6 @@ for (a in arch){
 }
 
 colnames(all) = c("Patient_AUC", "Tile_AUC", "Architecture", "Feature", "Tile")
-all = rbind(oldsampled, all)
 write.csv(all, file = "~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv", row.names=FALSE)
 
 # 
@@ -379,7 +378,7 @@ all = read.csv("~/documents/CPTAC-UCEC/Results/t-test-multi/bootstrap_80%_50.csv
 mixed = list(c('X1', 'Histology'), c('X2', 'CNV-H (Endometrioid)'), c('X3', 'CNV-H'), c('X2', "CNV-L"), c('X1', 'TP53'), c('F1', 'FAT1'), c('I5', 'MSI-high'), c('I5', 'ZFHX3'), c('I2', 'PTEN'), c('I5', 'POLE'), c('F3', 'FGFR2'),
                 c('X2', 'MTOR'), c('X3', 'CTCF'), c('I5', 'PIK3R1'), c('X3', 'PIK3CA'), c('I6', 'ARID1A'), c('F1', 'JAK1'), c('I6', 'CTNNB1'), c('F1', 'KRAS'), 
                 c('I3', 'FBXW7'), c('I3', 'RPL22'), c('I5', 'BRCA2'), c('I2', 'ATM'), c('X2', 'PPP2R1A'))
-ind = list(c('F3', 'Histology'), c('F4', 'CNV-H (Endometrioid)'), c('X4', 'CNV-H'), c('i5', "CNV-L"), c('I1', 'TP53'), c('I5', 'FAT1'), c('X4', 'MSI-high'), c('I3', 'ZFHX3'), c('X3', 'PTEN'), c('F1', 'POLE'), c('F4', 'FGFR2'),
+ind = list(c('F3', 'Histology'), c('F4', 'CNV-H (Endometrioid)'), c('X4', 'CNV-H'), c('I5', "CNV-L"), c('I1', 'TP53'), c('I5', 'FAT1'), c('X4', 'MSI-high'), c('I3', 'ZFHX3'), c('X3', 'PTEN'), c('F1', 'POLE'), c('F4', 'FGFR2'),
            c('X1', 'MTOR'), c('F2', 'CTCF'), c('X4', 'PIK3R1'), c('I2', 'PIK3CA'), c('X2', 'ARID1A'), c('X3', 'JAK1'), c('I2', 'CTNNB1'), c('I1', 'KRAS'), 
            c('X3', 'FBXW7'), c('X2', 'RPL22'), c('X2', 'BRCA2'), c('X3', 'ATM'), c('I2', 'PPP2R1A'))
 
@@ -441,10 +440,13 @@ pp<- ggplot(all_sub.x, aes(x=reorder(Feature, -Patient_AUC), y=Patient_AUC, fill
   scale_fill_manual(values=c("#D3D3D3", "#808080")) +
   geom_errorbar(aes(ymin=Patient_AUC-sd, ymax=Patient_AUC+sd), width=.2,
                 position=position_dodge(.9)) +
-  geom_text(aes(label=round(Patient_AUC, 2)), position=position_dodge(width=0.9), vjust=-2) + 
+  geom_text(aes(label=round(Patient_AUC, 2)), position=position_dodge(width=0.9), vjust=-2, fontface="bold") + 
   theme_bw()+ 
   theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), legend.position = "top")
+        panel.grid.minor = element_blank(), legend.position = "top")+  
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 15, color = "black", face = "bold")+
+  font("x.text", size = 15, color = "black", face = "bold")
 
 
 pl<- ggplot(all_sub.y, aes(x=reorder(Feature, -Tile_AUC), y=Tile_AUC, fill=Split)) + 
@@ -454,13 +456,16 @@ pl<- ggplot(all_sub.y, aes(x=reorder(Feature, -Tile_AUC), y=Tile_AUC, fill=Split
   scale_fill_manual(values=c("#D3D3D3", "#808080")) +
   geom_errorbar(aes(ymin=Tile_AUC-sd, ymax=Tile_AUC+sd), width=.2,
                 position=position_dodge(.9)) + 
-  geom_text(aes(label=round(Tile_AUC, 2)), position=position_dodge(width=0.9), vjust=-2) + 
+  geom_text(aes(label=round(Tile_AUC, 2)), position=position_dodge(width=0.9), vjust=-2, fontface="bold") + 
   theme_bw()+ 
   theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1), panel.border = element_blank(), panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(), legend.position = "top")
+        panel.grid.minor = element_blank(), legend.position = "top")+  
+  font("xlab", size = 0, color = "black")+
+  font("ylab", size = 15, color = "black", face = "bold")+
+  font("x.text", size = 15, color = "black", face = "bold")
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/t-test-multi/", wa, wb, "_best_bar_lite.pdf", sep=''),
-    width=30,height=7.5)
+    width=32,height=7.5)
 grid.arrange(pp,pl,nrow=1, ncol=2)
 dev.off()
 
