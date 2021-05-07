@@ -365,7 +365,7 @@ for (pwa in pair){
   all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
                            groupnames=c("Architecture", "Feature"))
   
-  pp<- ggplot(all_sub.x, aes(x=Feature, y=Patient_AUC, fill=Architecture)) + 
+  pp<- ggplot(all_sub.x, aes(x=reorder(Feature, -Patient_AUC), y=Patient_AUC, fill=Architecture)) + 
     geom_bar(stat="identity", color="black",
              position=position_dodge()) +
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +
@@ -379,7 +379,7 @@ for (pwa in pair){
     font("xy.text", size = 15, color = "black", face = "bold")
   
   
-  pl<- ggplot(all_sub.y, aes(x=Feature, y=Tile_AUC, fill=Architecture)) + 
+  pl<- ggplot(all_sub.y, aes(x=reorder(Feature, -Tile_AUC), y=Tile_AUC, fill=Architecture)) + 
     geom_bar(stat="identity", color="black",
              position=position_dodge()) +
     scale_fill_manual(values=c("#D3D3D3", "#808080")) +

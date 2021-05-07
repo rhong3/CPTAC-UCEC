@@ -187,7 +187,7 @@ for (ta in arch_list){
                   answersa <- factor(Test_slide$True_label)
                   resultsa <- factor(Test_slide$Prediction)
                   roca <- plot(roc(answersa, Test_slide[[pos]], levels=lev), print.auc = FALSE, col = color[1], add = FALSE, labels = FALSE, tck = -0.02)
-                  legend("bottomright", legend=c(paste("POLE per-patient AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
+                  legend("bottomright", legend=c(paste("POLE independent per-patient AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
                   dev.off()
                   
                   pdf(file=paste("~/documents/CPTAC-UCEC/Results/POLE_fusion/", ta, "_", tb, "_", tc, "/ROC_tile.pdf", sep=''),
@@ -196,7 +196,7 @@ for (ta in arch_list){
                   answersa <- factor(Test_tile$True_label)
                   resultsa <- factor(Test_tile$Prediction)
                   roca <- plot(roc(answersa, Test_tile[[pos]], levels=lev), print.auc = FALSE, col = color[1], add = FALSE, labels = FALSE, tck = -0.02)
-                  legend("bottomright", legend=c(paste("POLE per-tile AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
+                  legend("bottomright", legend=c(paste("POLE independent per-tile AUROC=", round(as.numeric(roca$auc), 5), sep='')), col=c("#F6AE2D"), lwd=2)
                   dev.off()
           }
         },
