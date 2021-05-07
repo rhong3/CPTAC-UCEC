@@ -56,7 +56,7 @@ for (a in arch){
 
 
 ## For figure
-todolist = list(c('X1', 'his'), c('X2', 'SL'), c('X3', 'CNVH'), c('X1', 'TP53'), c('F1', 'FAT1'), c('I5', 'MSIst'), c('I5', 'ZFHX3'), c('I2', 'PTEN'), c('F3', 'FGFR2'),
+todolist = list(c('X1', 'his'), c('X2', 'SL'), c('X3', 'CNVH'), c('X2', 'CNVL'), c('I5', 'MSIst'), c('I5', 'POLE'), c('X1', 'TP53'), c('F1', 'FAT1'), c('I5', 'ZFHX3'), c('I2', 'PTEN'), c('F3', 'FGFR2'),
              c('X2', 'MTOR'), c('X3', 'CTCF'), c('I5', 'PIK3R1'), c('X3', 'PIK3CA'), c('I6', 'ARID1A'), c('F1', 'JAK1'), c('I6', 'CTNNB1'), c('F1', 'KRAS'), 
              c('I3', 'FBXW7'), c('I3', 'RPL22'), c('I5', 'BRCA2'))
 tile_all = data.frame(Prediction_score= numeric(0), True_label= character(0), feature = character(0))
@@ -77,6 +77,10 @@ for (f in todolist){
     pos = "POS_score"
     lev = c('negative', 'Serous-like')
     mm = "CNV-H"
+  } else if(f[2] == 'CNVL'){
+    pos = "POS_score"
+    lev = c('negative', 'Endometrioid')
+    mm = "CNV-L"
   } else{
     pos = "POS_score"
     lev = c('negative', f[2])
@@ -102,7 +106,7 @@ pp = ggboxplot(tile_all, x = "feature", y = "Prediction_score",
   font("xy.text", size = 18, color = "black", face = "bold")
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/Wilcoxon/Figure.pdf", sep=''),
-    width=18.5,height=8)
+    width=20,height=8)
 grid.arrange(pp,nrow=1)
 dev.off()
 

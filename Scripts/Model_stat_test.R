@@ -243,7 +243,7 @@ for (f in features){
 # t-test task based
 library(ggplot2)
 library(ggpubr)
-features = c('his', 'MSIst', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'ARID1A', 'ATM', 'BRCA2', 'CTCF', 'CTNNB1', 'FBXW7', 'JAK1', 'KRAS', 'MTOR', 'PIK3CA', 'PIK3R1', 'PPP2R1A', 'RPL22', 'FGFR2', 'SL', 'CNVH')
+features = c('SL', 'CNVH', 'CNVL')
 arch = c("I5", 'X2', 'X4', 'F2', 'F4', 'I6', 'X1', 'X3', 'F1', 'F3')
 
 all = data.frame(Slide_AUC= numeric(0), Tile_AUC= numeric(0), Architecture= character(0), Feature=character(0))
@@ -258,6 +258,9 @@ for (a in arch){
     } else if(f == 'SL' | f == 'CNVH'){
       pos = "POS_score"
       lev = c('negative', 'Serous-like')  
+    } else if(f == 'CNVL'){
+      pos = "POS_score"
+      lev = c('negative', 'Endometrioid') 
     } else{
       pos = "POS_score"
       lev = c('negative', f)
@@ -281,7 +284,7 @@ for (a in arch){
       rocb =  roc(answersb, sampleddfb[[pos]], levels=lev)
       Sprlb[j] = rocb$auc
     }
-    temp_all= data.frame(Slide_AUC=as.numeric(Sprla), Tile_AUC=as.numeric(Sprlb), Architecture=a, Feature=f)
+    temp_all= data.frame(Patient_AUC=as.numeric(Sprla), Tile_AUC=as.numeric(Sprlb), Architecture=a, Feature=f)
     all = rbind(all, temp_all)
   }
 }
@@ -296,6 +299,7 @@ all = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
 all$Feature <- gsub('his', 'Histology', all$Feature)
 all$Feature <- gsub('SL', 'CNV-H (Endometrioid)', all$Feature)
 all$Feature <- gsub('CNVH', 'CNV-H', all$Feature)
+all$Feature <- gsub('CNVL', 'CNV-L', all$Feature)
 all$Feature <- gsub('MSIst', 'MSI-high', all$Feature)
 
 pair = list(c('I6', 'X1'), c('I5', 'X2'), c('X1', 'X3'), c('X2', 'X4'), c('X1', 'F1'), c('X2', 'F2'), c('X3', 'F3'), c('X4', 'F4'))
@@ -304,7 +308,7 @@ for (pwa in pair){
   wa = pwa[1]
   wb = pwa[2]
   all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
-  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H', "CNV-L"), ]
   
   pp = ggboxplot(all_sub, x = "Feature", y = "Patient_AUC",
                  color = "black", fill = "Architecture", palette = "grey")+ 
@@ -336,11 +340,13 @@ data_summary <- function(data, varname, groupnames){
 
 library(ggplot2)
 library(ggpubr)
+library(gridExtra)
 
 all = read.csv("~/documents/CPTAC-UCEC/Results/t-test/bootstrap_80%_50.csv")
 all$Feature <- gsub('his', 'Histology', all$Feature)
 all$Feature <- gsub('SL', 'CNV-H (Endometrioid)', all$Feature)
 all$Feature <- gsub('CNVH', 'CNV-H', all$Feature)
+all$Feature <- gsub('CNVL', 'CNV-L', all$Feature)
 all$Feature <- gsub('MSIst', 'MSI-high', all$Feature)
 all$Architecture = gsub("F1", "Z1", all$Architecture)
 all$Architecture = gsub("F2", "Z2", all$Architecture)
@@ -353,7 +359,7 @@ for (pwa in pair){
   wa = pwa[1]
   wb = pwa[2]
   all_sub = all[all["Architecture"] == wa | all["Architecture"] == wb, ]
-  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H'), ]
+  all_sub = all_sub[all_sub$Feature %in% c('Histology', 'MSI-high', 'FAT1', 'TP53', 'PTEN', 'ZFHX3', 'CNV-H (Endometrioid)', 'CNV-H', "CNV-L"), ]
   all_sub.x = data_summary(all_sub, varname="Patient_AUC", 
                          groupnames=c("Architecture", "Feature"))
   all_sub.y = data_summary(all_sub, varname="Tile_AUC", 
