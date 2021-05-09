@@ -112,3 +112,42 @@ write.csv(NYU, '~/Documents/CPTAC-UCEC/Results/NYU_models_summary.csv', row.name
 
 
 
+# POLE Summary
+POLE = read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_POLE_fusion.csv")
+POLE[, 7:54] <- lapply(POLE[, 7:54], round, 3)
+POLE = POLE[order(-POLE$Patient_ROC, -POLE$Tile_ROC),]
+POLE = POLE[, -6]
+POLE = as.matrix(POLE)
+POLE = gsub('\\<I1\\>', 'InceptionV1', POLE)
+POLE = gsub('\\<I2\\>', 'InceptionV2', POLE)
+POLE = gsub('\\<I3\\>', 'InceptionV3', POLE)
+POLE = gsub('\\<I4\\>', 'InceptionV4', POLE)
+POLE = gsub('\\<I5\\>', 'InceptionResnetV1', POLE)
+POLE = gsub('\\<I6\\>', 'InceptionResnetV2', POLE)
+POLE = gsub('\\<X1\\>', 'Panoptes2', POLE)
+POLE = gsub('\\<X2\\>', 'Panoptes1', POLE)
+POLE = gsub('\\<X3\\>', 'Panoptes4', POLE)
+POLE = gsub('\\<X4\\>', 'Panoptes3', POLE)
+POLE = gsub('\\<F1\\>', 'Panoptes2 with clinical', POLE)
+POLE = gsub('\\<F2\\>', 'Panoptes1 with clinical', POLE)
+POLE = gsub('\\<F3\\>', 'Panoptes4 with clinical', POLE)
+POLE = gsub('\\<F4\\>', 'Panoptes3 with clinical', POLE)
+colnames(POLE) = gsub('Architecture', 'Model', colnames(POLE))
+
+
+POLE = data.frame(POLE)
+colnames(POLE) = gsub('Tiles', 'Split', colnames(POLE))
+POLE$Split = gsub('NL6', 'Independent', POLE$Split)
+
+
+POLE$Patient_AUROC = paste(POLE$Patient_ROC, ' (', POLE$Patient_ROC.95.CI_lower, '-', POLE$Patient_ROC.95.CI_upper, ')', sep='')
+POLE$Patient_AUPR = paste(POLE$Patient_PRC, ' (', POLE$Patient_PRC.95.CI_lower, '-', POLE$Patient_PRC.95.CI_upper, ')', sep='')
+POLE$Patient_Accuracy = paste(POLE$Patient_Accuracy, ' (', POLE$Patient_AccuracyLower, '-', POLE$Patient_AccuracyUpper, ')', sep='')
+POLE$Tile_AUROC = paste(POLE$Tile_ROC, ' (', POLE$Tile_ROC.95.CI_lower, '-', POLE$Tile_ROC.95.CI_upper, ')', sep='')
+POLE$Tile_AUPR = paste(POLE$Tile_PRC, ' (', POLE$Tile_PRC.95.CI_lower, '-', POLE$Tile_PRC.95.CI_upper, ')', sep='')
+POLE$Tile_Accuracy = paste(POLE$Tile_Accuracy, ' (', POLE$Tile_AccuracyLower, '-', POLE$Tile_AccuracyUpper, ')', sep='')
+
+POLE = cbind(POLE[, c(1:5, 54:55, 12, 56:57, 36)], POLE[, c(13, 16:29, 37, 40:53)])
+
+write.csv(POLE, '~/Documents/CPTAC-UCEC/Results/POLE_models_summary.csv', row.names=FALSE)
+
