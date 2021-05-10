@@ -11,7 +11,10 @@ for (i in c('NL5', 'NL6')){
     Slogit = cbind(NYU, Slogit)
     
     ggplot(Slogit, aes(logit0, logit1, color=histology)) +
-      geom_point() + xlab("logit0")+ ylab("logit1")
+      geom_point() + xlab("logit0")+ ylab("logit1") + theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+                                                                         panel.grid.minor = element_blank(), 
+                                                                         axis.line = element_line(colour = "black"), 
+                                                                         legend.position='bottom', legend.box="vertical") + guides(colour = guide_legend(nrow = 4))
     ggsave(paste("Results/NYU_test_revision/", j, "his_NYU_", i, "/out/slide_logits.png", sep=''), plot=last_plot(), width = 6, height = 4, units="in", dpi=300) 
     
     Slogits_mean = Slogit %>%
