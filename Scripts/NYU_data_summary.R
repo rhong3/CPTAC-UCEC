@@ -64,14 +64,12 @@ ColSide[['subtype']]=get_color(colors=c('#7fc97f','#beaed4','#fdc086'),
 ColSide[['histology']]=get_color(colors=c('#1b9e77','#d95f02', '#7570b3', '#e7298a','#66a61e', '#e6ab02', '#a6761d'),
                                  factor = summ_label_ihc$histology)
 
-ColSide[['FIGO']]=colorRamp2(breaks=range(summ_label_ihc$FIGO, na.rm=T), 
-                            colors=c('#fee5d9', '#fb6a4a'))
+ColSide[['FIGO']]=get_color(colors=c('#fbb4b9', '#f768a1', '#ae017e'), 
+                            factor = as.factor(summ_label_ihc$FIGO))
 
-ColSide[['P53_overexpression']]=colorRamp2(breaks=range(summ_label_ihc$P53_overexpression, na.rm=T),
-                                           colors=c("#eff3ff","#2171b5"))
+ColSide[['P53_overexpression']]=get_color(colors=c("#eff3ff","#2171b5"), factor=as.factor(summ_label_ihc$P53_overexpression))
 
-ColSide[['H.E_slides']]=colorRamp2(breaks=range(summ_label_ihc$H.E_slides, na.rm=T),
-                                   colors=c("#fcfbfd", "#3f007d"))
+ColSide[['H.E_slides']]=get_color(colors=c("#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b","#001c0a"), factor=as.factor(summ_label_ihc$H.E_slides))
 
 
 ca = HeatmapAnnotation(df = summ_label_ihc[order(summ_label_ihc$subtype, summ_label_ihc$histology),-1], na_col ='white',
@@ -98,7 +96,7 @@ plot_heatmap=Heatmap(ph[,order(summ_label_ihc$histology,summ_label_ihc$subtype)]
 
 out_dir = '~/documents/CPTAC-UCEC/NYU/'
 pdf(file = paste(out_dir,'NYU_data_summary.pdf',sep='/'),
-    width =25, height = 5, bg='white')
+    width =25, height = 5.5, bg='white')
 draw(plot_heatmap, annotation_legend_side = "bottom")
 graphics.off()
 
