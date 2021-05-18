@@ -61,7 +61,7 @@ OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Feature", "Archite
 # }
 
 # Read reference DF
-ref = read.csv('~/documents/GYN-HE-IHC/align/final_summary.csv')
+ref = read.csv('~/documents/GYN-HE-IHC/align/final_summary_full.csv')
 ref_split = str_split_fixed(ref$IHC_ID, "-", 2)
 ref_split[,2] = gsub("1-", "", ref_split[,2])
 ref_split[,2] = gsub("2-", "", ref_split[,2])
@@ -76,9 +76,10 @@ for (i in targets){
       tmm = strsplit(i, '_')[[1]][1]
       ihc = strsplit(i, '_')[[1]][2]
       arch = substr(tmm, 1, 2)
-      feature = paste(substr(tmm, 3, nchar(tmm)), strsplit(i, '_')[[1]][2], sep="_")
+      feature = paste(substr(tmm, 3, nchar(tmm)), ihc, sep="_")
       
-      reflist = as.character(ref_split[ref_split$IHC != ihc,]$Patient)
+      # filter
+      reflist = as.character(ref_split[!ref_split$IHC %in% strsplit(ihc, '-')[[1]], ]$Patient)
       
       if (strsplit(feature, '_')[[1]][1] == "MSI"){
         pos = 'MSI'
