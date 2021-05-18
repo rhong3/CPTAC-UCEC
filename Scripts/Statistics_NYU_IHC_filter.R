@@ -79,7 +79,15 @@ for (i in targets){
       feature = paste(substr(tmm, 3, nchar(tmm)), ihc, sep="_")
       
       # filter
-      reflist = as.character(ref_split[!ref_split$IHC %in% strsplit(ihc, '-')[[1]], ]$Patient)
+      reflist = c()
+      for (ptt in as.character(unique(ref_split$Patient))){
+        sublts = ref_split[ref_split$Patient==ptt, ]
+        if (all(strsplit(ihc, '-')[[1]] %in% as.character(sublts$IHC))){
+          reflist = append(reflist, ptt)
+        }
+      }
+      # antifilter
+      reflist = as.character(unique(ref_split$Patient))[!as.character(unique(ref_split$Patient)) %in% reflist]
       
       if (strsplit(feature, '_')[[1]][1] == "MSI"){
         pos = 'MSI'
