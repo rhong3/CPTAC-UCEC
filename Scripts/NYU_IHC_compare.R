@@ -105,7 +105,6 @@ for (fff in c('_PMS2', '_MLH1', '_MSH2', '_MSH6', '_PMS2-MLH1', '_MSH2-MSH6',
   
   concat = rbind(NYU, filter)
   concat = rbind(concat, all)
-  concat = concat[concat$Feature %in% c("MSI"),]
   
   concat$Architecture = gsub("X1", "P2", concat$Architecture)
   concat$Architecture = gsub("X2", "P1", concat$Architecture)
@@ -138,6 +137,89 @@ for (fff in c('_PMS2', '_MLH1', '_MSH2', '_MSH6', '_PMS2-MLH1', '_MSH2-MSH6',
   dev.off()
 }
 
+# MSI features side by side
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(gridExtra)
 
+all = read.csv("~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC.csv")
+filter = read.csv("~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_filter.csv")
+
+filter = filter %>%
+  select(c(1:6,28:30)) %>%
+  mutate(group="IHC")
+
+all = all %>%
+  select(c(1:6,28:30)) %>%
+  mutate(group="Mix")
+
+# all
+all$Architecture = gsub("X1", "P2", all$Architecture)
+all$Architecture = gsub("X2", "P1", all$Architecture)
+all$Architecture = gsub("X3", "P4", all$Architecture)
+all$Architecture = gsub("X4", "P3", all$Architecture)
+all$Architecture = gsub("F1", "PC2", all$Architecture)
+all$Architecture = gsub("F2", "PC1", all$Architecture)
+all$Architecture = gsub("F3", "PC4", all$Architecture)
+all$Architecture = gsub("F4", "PC3", all$Architecture)
+all$Tiles = gsub("NL5", "TCGA+CPTAC", all$Tiles)
+all$Tiles = gsub("NL6", "TCGA", all$Tiles)
+
+all = all["MSI" %in% all$Feature,]
+
+
+
+pa = ggplot(all, aes(Architecture, Patient_ROC, fill=Feature)) +
+  geom_bar(position="dodge", stat="identity") + 
+  geom_errorbar(aes(ymin=Patient_ROC.95.CI_lower, ymax=Patient_ROC.95.CI_upper), width=.2,
+                position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
+  ggtitle("MSI Markers Per-Patient Comparison") + facet_wrap(~Tiles) + theme_classic()
+
+pb = ggplot(all, aes(Architecture, Tile_ROC, fill=Feature)) +
+  geom_bar(position="dodge", stat="identity") + 
+  geom_errorbar(aes(ymin=Tile_ROC.95.CI_lower, ymax=Tile_ROC.95.CI_upper), width=.2,
+                position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
+  ggtitle("MSI Markers Per-Tile Comparison") + facet_wrap(~Tiles) + theme_classic()
+
+pdf(file=paste("~/documents/CPTAC-UCEC/Results/IHC_MSI_markers_test_comparison_all.pdf", sep=''),
+    width=16,height=15)
+
+grid.arrange(pa,pb,ncol=1)
+
+dev.off()
+
+# filtered
+filter$Architecture = gsub("X1", "P2", filter$Architecture)
+filter$Architecture = gsub("X2", "P1", filter$Architecture)
+filter$Architecture = gsub("X3", "P4", filter$Architecture)
+filter$Architecture = gsub("X4", "P3", filter$Architecture)
+filter$Architecture = gsub("F1", "PC2", filter$Architecture)
+filter$Architecture = gsub("F2", "PC1", filter$Architecture)
+filter$Architecture = gsub("F3", "PC4", filter$Architecture)
+filter$Architecture = gsub("F4", "PC3", filter$Architecture)
+filter$Tiles = gsub("NL5", "TCGA+CPTAC", filter$Tiles)
+filter$Tiles = gsub("NL6", "TCGA", filter$Tiles)
+
+filter = filter["MSI" %in% filter$Feature,]
+
+pa = ggplot(filter, aes(Architecture, Patient_ROC, fill=Feature)) +
+  geom_bar(position="dodge", stat="identity") + 
+  geom_errorbar(aes(ymin=Patient_ROC.95.CI_lower, ymax=Patient_ROC.95.CI_upper), width=.2,
+                position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
+  ggtitle("MSI Markers Per-Patient Comparison") + facet_wrap(~Tiles) + theme_classic()
+
+pb = ggplot(filter, aes(Architecture, Tile_ROC, fill=Feature)) +
+  geom_bar(position="dodge", stat="identity") + 
+  geom_errorbar(aes(ymin=Tile_ROC.95.CI_lower, ymax=Tile_ROC.95.CI_upper), width=.2,
+                position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
+  ggtitle("MSI Markers Per-Tile Comparison") + facet_wrap(~Tiles) + theme_classic()
+
+pdf(file=paste("~/documents/CPTAC-UCEC/Results/IHC_MSI_markers_test_comparison_filter.pdf", sep=''),
+    width=16,height=15)
+
+grid.arrange(pa,pb,ncol=1)
+
+dev.off()
 
 
