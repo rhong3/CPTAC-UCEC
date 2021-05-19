@@ -122,20 +122,22 @@ for (fff in c('_PMS2', '_MLH1', '_MSH2', '_MSH6', '_PMS2-MLH1', '_MSH2-MSH6',
   pdf(file=paste("~/documents/CPTAC-UCEC/Results/IHC_MSI", fff,"_test_comparison.pdf", sep=''),
       width=14,height=7)
   
-  ggplot(concat, aes(Architecture, Patient_ROC, fill=group)) +
+  print(ggplot(concat, aes(Architecture, Patient_ROC, fill=group)) +
     geom_bar(position="dodge", stat="identity") + 
     geom_errorbar(aes(ymin=Patient_ROC.95.CI_lower, ymax=Patient_ROC.95.CI_upper), width=.2,
                   position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
-    ggtitle(paste(fff, " Per-Patient Comparison", sep='')) + facet_wrap(~Tiles) + theme_classic()
+    ggtitle(paste('MSI', fff, " Per-Patient Comparison", sep='')) + facet_wrap(~Tiles) + theme_classic())
   
-  ggplot(concat, aes(Architecture, Tile_ROC, fill=group)) +
+  print(ggplot(concat, aes(Architecture, Tile_ROC, fill=group)) +
     geom_bar(position="dodge", stat="identity") + 
     geom_errorbar(aes(ymin=Tile_ROC.95.CI_lower, ymax=Tile_ROC.95.CI_upper), width=.2,
                   position=position_dodge(.9)) + scale_fill_brewer(palette="Dark2")  +  
-    ggtitle(paste(fff, " Per-Tile Comparison", sep='')) + facet_wrap(~Tiles) + theme_classic()
+    ggtitle(paste('MSI', fff, " Per-Tile Comparison", sep='')) + facet_wrap(~Tiles) + theme_classic())
   
-  dev.off()
+  dev.off() 
+  
 }
+
 
 # MSI features side by side
 library(dplyr)
@@ -147,12 +149,10 @@ all = read.csv("~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC.csv")
 filter = read.csv("~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_filter.csv")
 
 filter = filter %>%
-  select(c(1:6,28:30)) %>%
-  mutate(group="IHC")
+  select(c(1:6,28:30))
 
 all = all %>%
-  select(c(1:6,28:30)) %>%
-  mutate(group="Mix")
+  select(c(1:6,28:30))
 
 # all
 all$Architecture = gsub("X1", "P2", all$Architecture)
@@ -166,7 +166,7 @@ all$Architecture = gsub("F4", "PC3", all$Architecture)
 all$Tiles = gsub("NL5", "TCGA+CPTAC", all$Tiles)
 all$Tiles = gsub("NL6", "TCGA", all$Tiles)
 
-all = all["MSI" %in% all$Feature,]
+all = all[grepl("MSI", all$Feature),]
 
 
 
@@ -183,7 +183,7 @@ pb = ggplot(all, aes(Architecture, Tile_ROC, fill=Feature)) +
   ggtitle("MSI Markers Per-Tile Comparison") + facet_wrap(~Tiles) + theme_classic()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/IHC_MSI_markers_test_comparison_all.pdf", sep=''),
-    width=16,height=15)
+    width=30,height=15)
 
 grid.arrange(pa,pb,ncol=1)
 
@@ -201,7 +201,7 @@ filter$Architecture = gsub("F4", "PC3", filter$Architecture)
 filter$Tiles = gsub("NL5", "TCGA+CPTAC", filter$Tiles)
 filter$Tiles = gsub("NL6", "TCGA", filter$Tiles)
 
-filter = filter["MSI" %in% filter$Feature,]
+filter = filter[grepl("MSI", filter$Feature),]
 
 pa = ggplot(filter, aes(Architecture, Patient_ROC, fill=Feature)) +
   geom_bar(position="dodge", stat="identity") + 
@@ -216,7 +216,7 @@ pb = ggplot(filter, aes(Architecture, Tile_ROC, fill=Feature)) +
   ggtitle("MSI Markers Per-Tile Comparison") + facet_wrap(~Tiles) + theme_classic()
 
 pdf(file=paste("~/documents/CPTAC-UCEC/Results/IHC_MSI_markers_test_comparison_filter.pdf", sep=''),
-    width=16,height=15)
+    width=30,height=15)
 
 grid.arrange(pa,pb,ncol=1)
 
