@@ -37,7 +37,7 @@ inlist = c('I1MSI_PMS2_NYU_NL5', 'I1MSI_MSH6_NYU_NL5', 'I1MSI_MSH2_NYU_NL5', 'I1
            'F4MSI_PMS2_NYU_NL6', 'F4MSI_MSH6_NYU_NL6', 'F4MSI_MSH2_NYU_NL6', 'F4MSI_MLH1_NYU_NL6', 'F4CNVH_P53_NYU_NL6', 'F4TP53_P53_NYU_NL6', 'F4MSI_PMS2-MLH1_NYU_NL6', 'F4MSI_MSH2-MSH6_NYU_NL6', 'F4MSI_PMS2-MLH1-MSH2-MSH6_NYU_NL6')
 
 # Check previously calculated trials
-previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_antifilter.csv")
+previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_filter.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, sep='_')
 # Find the new trials to be calculated
 targets = inlist[which(!inlist %in% existed)]
@@ -86,8 +86,8 @@ for (i in targets){
           reflist = append(reflist, ptt)
         }
       }
-      # antifilter
-      reflist = as.character(unique(ref_split$Patient))[!as.character(unique(ref_split$Patient)) %in% reflist]
+      # # antifilter
+      # reflist = as.character(unique(ref_split$Patient))[!as.character(unique(ref_split$Patient)) %in% reflist]
       
       if (strsplit(feature, '_')[[1]][1] == "MSI"){
         pos = 'MSI'
@@ -171,6 +171,6 @@ for (i in targets){
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
 New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, -New_OUTPUT$Patient_ROC),]
-write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_antifilter.csv", row.names=FALSE)
+write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_NYU_IHC_filter.csv", row.names=FALSE)
 
 
