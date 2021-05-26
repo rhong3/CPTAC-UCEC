@@ -1,5 +1,5 @@
 ### Endometrial Cancer Molecular Features prediction and Visualization Using Deep Learning (Unpublished work; please contact us for usage and questions)
-https://www.biorxiv.org/content/10.1101/2020.02.25.965038v2
+https://www.biorxiv.org/content/10.1101/2020.02.25.965038v4
 # Features included 
  - 18 mutations (ARID1A, ATM, BRCA2, CTCF, CTNNB1, FAT1, FBXW7, FGFR2, JAK1, KRAS, MTOR, 
  PIK3CA, PIK3R1, PPP2R1A, PTEN, RPL22, TP53, ZFHX3)
@@ -9,11 +9,12 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v2
 ## Architecture included
  - Inception (V1, V2, V3, V4)
  - inception-ResNet (V1, V2)
- - X (V1, V2, V3, V4)
+ - Panoptes(X & F) (V1, V2, V3, V4)
  
 ## Catalogue of codes including all statistical analyses codes
  - Accessory.py: Accessory functions for Inception Models, including AUROC/AUPRC plotting, CAM, etc.
  - Accessory2.py: Accessory functions for X Models, including AUROC/AUPRC plotting, CAM, etc.
+ - annotation_plot.R: Build data summary heatmap
  - Cutter.py: Bulk cutting svs images and normalization.
  - FPFN.py: Finding False Positive and False Negative tiles in test sets.
  - Fusion_prep.py: Label preparation with BMI and age integrated.
