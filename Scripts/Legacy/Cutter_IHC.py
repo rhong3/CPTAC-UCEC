@@ -17,7 +17,7 @@ import Slicer_IHC as Slicer
 # cut; each level is 2 times difference (10x, 5x, 2.5x)
 def cut():
     # load standard image for normalization
-    ref = pd.read_csv('../NYU/IHC4_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
+    ref = pd.read_csv('../../NYU/IHC4_sum.csv', header=0, usecols=['Patient_ID', 'Slide_ID', 'file'])
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
 

@@ -14,62 +14,60 @@ https://www.biorxiv.org/content/10.1101/2020.02.25.965038v4
 ## Catalogue of codes including all statistical analyses codes
  - Accessory.py: Accessory functions for Inception Models, including AUROC/AUPRC plotting, CAM, etc.
  - Accessory2.py: Accessory functions for X Models, including AUROC/AUPRC plotting, CAM, etc.
- - annotation_plot.R: Build data summary heatmap
+ - annotation_plot.R: Build data summary heatmap.
  - Cutter.py: Bulk cutting svs images and normalization.
- - FPFN.py: Finding False Positive and False Negative tiles in test sets.
+ - Cutter_NYU.py: Bulk cutting svs images and normalization for NYU samples.
+ - cnn4.py: Tensorflow driving code for single resolution model training/validation/testing.
+ - cnn5.py: Tensorflow driving code for multi resolution model training/validation/testing.
+ - data_input2.py: Reading TFrecords file for single resolution tiles.
+ - data_input3.py: Reading TFrecords file for multi resolution tiles.
+ - data_input_fusion.py: Reading TFrecords file for multi resolution tiles with BMI and age.
  - Fusion_prep.py: Label preparation with BMI and age integrated.
- - HE_mosaic.py: Make tSNE mosaic plots (single resolution)
- - HE_mosaic2.py: Make tSNE mosaic plots (multi resolution)
- - Img_summary.R: Summary of images in the cohort (dimension, # images per patient, counts)
- - InceptionV1.py: InceptionV1 architecture
- - InceptionV2.py: InceptionV2 architecture
- - InceptionV3.py: InceptionV3 architecture
- - InceptionV4.py: InceptionV4 architecture
- - InceptionV5.py: InceptionResnetV1 architecture
- - InceptionV6.py: InceptionResnetV2 architecture
- - ResNet.py: ResNet architecture
- - X1.py: Panoptes2 architecture
- - X2.py: Panoptes1 architecture
- - X3.py: Panoptes4 architecture
- - X4.py: Panoptes3 architecture
- - Label_prep2.py: Label preparation
- - RGB_profiler.py: Get RGB summary of tiles in cohort. 
- - RealtestV4.py: Deployment code for trained models
- - Realtest_for_figure.py: Deployment code for best performing trained models
- - Sample_prep.py: Sample preparation code for single resolution models, including sampling
- - Sample_prep2.py: Sample preparation code for multi resolution models, including sampling
- - Slicer.py: Multi-thread cutting of images
- - Slide_Size_Count.py: Image dimension summary and number of tiles per image counts
- - cnn4.py: Tensorflow driving code for single resolution model training/validation/testing
- - cnn5.py: Tensorflow driving code for multi resolution model training/validation/testing
- - data_input2.py: Reading TFrecords file for single resolution tiles
- - data_input3.py: Reading TFrecords file for multi resolution tiles
- - data_input_fusion.py: Reading TFrecords file for multi resolution tiles with BMI and age
- - mainm3.py: Main method for single resolution model training/validation/testing
- - mainm4.py: Main method for multi resolution model training/validation/testing
- - MW_test.R: Tile-level Wilcoxon tests and plotting
+ - HE_mosaic.py: Make tSNE mosaic plots (single resolution).
+ - HE_mosaic2.py: Make tSNE mosaic plots (multi resolution).
+ - Img_summary.R: Summary of images in the cohort (dimension, # images per patient, counts).
+ - InceptionV1.py: InceptionV1 architecture.
+ - InceptionV2.py: InceptionV2 architecture.
+ - InceptionV3.py: InceptionV3 architecture.
+ - InceptionV4.py: InceptionV4 architecture.
+ - InceptionV5.py: InceptionResnetV1 architecture.
+ - InceptionV6.py: InceptionResnetV2 architecture.
+ - Label_prep2.py: Label preparation.
+ - mainm3.py: Main method for single resolution model training/validation/testing.
+ - mainm4.py: Main method for multi resolution model training/validation/testing. 
+ - make_table.R: Summarize all the prediction tasks results in a table and a heatmap.
+ - MW_test.R: Tile-level Wilcoxon tests and plotting.
  - Model_stat_test.R: Patient-level Wilcoxon tests, t-tests, AUROC tests, and plotting.
- - multi_stat_test.R: compare multi-resolution and single resolution models
- - ROC_figure.R: Example ROC plot for figures
- - Similarities.R: YuleY similarity calculations between features
- - Statistics_MSI.R: Statistical metrics for MSI predictions
- - Statistics_histology.R: Statistical metrics for histological subtype predictions
- - Statistics_mutations.R: Statistical metrics for mutation predictions
- - Statistics_special.R: Statistical metrics for other types of predictions
- - Statistics_subtypes.R: Statistical metrics for molecular subtype predictions
- - Summary.R: Count number of patients for each task in the cohort
- - UMAP.R: UMAP dimensional reduction for activation maps
- - make_table.R: Summarize all the prediction tasks results in a table and a heatmap
- - tSNE.R: tSNE dimensional reduction for activation maps
- - tSNE_for_figure.R: High quality tSNE dimensional reduction for activation maps
- - label_pred.Rmd: Prediction using machine learning methods with non-image features
- - SummaryTable.R: Summary table for the manuscript
- - NYU_data_prep.py: NYU data preparation
- - NYU_loaders.py: Loading NYU data
- - NYU_test.py: Run testing on NYU dataset
- - Cutter_NYU.py: Bulk cutting NYU svs/scn images and normalization.
- - Slicer_NYU.py: Multi-thread cutting of NYU images 
- - Deidentify.py: Process deidentified data
- - tox.ini: Tox to check the coding manner 
- - Legacy: Deprecated codes
+ - multi_stat_test.R: compare multi-resolution and single resolution models.
+ - NYU_data_prep.py: NYU data preparation.
+ - NYU_loaders.py: Loading NYU data.
+ - NYU_test.py: Run testing on NYU dataset.
+ - POLE_pred.R: Multi-model systems to predict POLE subtype.  
+ - RGB_profiler.py: Get RGB summary of tiles in cohort. 
+ - RealtestV4.py: Deployment code for trained models.
+ - Realtest_for_figure.py: Deployment code for best performing trained models.
+ - ROC_figure.R: Example ROC plot for figures.
+ - Sample_prep.py: Sample preparation code for single resolution models, including sampling.
+ - Sample_prep2.py: Sample preparation code for multi resolution models, including sampling.
+ - scatter_logits.R: Plot prediction logits for figure 6.
+ - Similarities.R: YuleY similarity calculations between features.
+ - Slicer.py: Multi-thread cutting of images.
+ - Slicer_NYU.py: Multi-thread cutting of NYU images.   
+ - Slide_Size_Count.py: Image dimension summary and number of tiles per image counts.
+ - Statistics_MSI.R: Statistical metrics for MSI predictions.
+ - Statistics_histology.R: Statistical metrics for histological subtype predictions.
+ - Statistics_mutations.R: Statistical metrics for mutation predictions.
+ - Statistics_special.R: Statistical metrics for other types of predictions.
+ - Statistics_subtypes.R: Statistical metrics for molecular subtype predictions.
+ - Statistics_NYU.R: Statistical metrics for NYU samples.
+ - Summary.R: Count number of patients for each task in the cohort.
+ - SummaryTable.R: Summary table for the paper.
+ - tSNE.R: tSNE dimensional reduction for activation maps.
+ - tSNE_for_figure.R: High quality tSNE dimensional reduction for activation maps.   
+ - UMAP.R: UMAP dimensional reduction for activation maps.
+ - X1.py: Panoptes2 architecture.
+ - X2.py: Panoptes1 architecture.
+ - X3.py: Panoptes4 architecture.
+ - X4.py: Panoptes3 architecture.
+ - Legacy: Deprecated codes.
  

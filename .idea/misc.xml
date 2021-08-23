@@ -6,8 +6,13 @@
       <map>
         <entry key="$PROJECT_DIR$/Scripts/label_pred.Rmd">
           <value>
+            <RMarkdownRenderProfile />
+          </value>
+        </entry>
+        <entry key="file://$PROJECT_DIR$/Scripts/Legacy/label_pred.Rmd">
+          <value>
             <RMarkdownRenderProfile>
-              <option name="knitRootDirectory" value="$PROJECT_DIR$/Scripts" />
+              <option name="outputDirectoryUrl" value="file://$PROJECT_DIR$/Scripts/Legacy" />
             </RMarkdownRenderProfile>
           </value>
         </entry>

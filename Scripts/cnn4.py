@@ -131,7 +131,7 @@ class INCEPTION:
                                                    scope='InceptionResV2')
             print('Using Inception-Resnet-V2')
         elif model == 'R18':
-            import ResNet
+            from Scripts.Legacy import ResNet
             logits, nett, ww = ResNet.resnet(x_in_reshape,
                                              mode=18,
                                              num_classes=classes,
@@ -140,7 +140,7 @@ class INCEPTION:
                                              scope='ResNet18')
             print('Using ResNet18')
         elif model == 'R34':
-            import ResNet
+            from Scripts.Legacy import ResNet
             logits, nett, ww = ResNet.resnet(x_in_reshape,
                                              mode=34,
                                              num_classes=classes,
@@ -149,7 +149,7 @@ class INCEPTION:
                                              scope='ResNet34')
             print('Using ResNet34')
         elif model == 'R50':
-            import ResNet
+            from Scripts.Legacy import ResNet
             logits, nett, ww = ResNet.resnet(x_in_reshape,
                                              mode=50,
                                              num_classes=classes,
@@ -158,7 +158,7 @@ class INCEPTION:
                                              scope='ResNet50')
             print('Using ResNet50')
         elif model == 'R101':
-            import ResNet
+            from Scripts.Legacy import ResNet
             logits, nett, ww = ResNet.resnet(x_in_reshape,
                                              mode=101,
                                              num_classes=classes,
@@ -167,7 +167,7 @@ class INCEPTION:
                                              scope='ResNet101')
             print('Using ResNet101')
         elif model == 'R152':
-            import ResNet
+            from Scripts.Legacy import ResNet
             logits, nett, ww = ResNet.resnet(x_in_reshape,
                                              mode=152,
                                              num_classes=classes,
